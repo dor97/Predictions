@@ -11,10 +11,10 @@ import static gameEngien.utilites.Utilites.environment;
 public class calculation extends action {
     private String m_entity;
     private String m_property;
-    private Entity m_e;
-    private PropertyInterface m_p;
+    //private Entity m_e;
+    //private PropertyInterface m_p;
     private String m_value1, m_value2;
-    private typeOfExprecen m_v1Type, m_v2Type;
+    //private typeOfExprecen m_v1Type, m_v2Type;
     //private PropertyInterface m_v1 = null, m_v2 = null;
     private exprecnWithFunc m_v1, m_v2;
     private boolean isMultiply = true;
@@ -40,6 +40,8 @@ public class calculation extends action {
             action.getPRDDivide().getArg2();
             isMultiply = false;
         }
+        m_v1 = new exprecnWithFunc();
+        m_v2 = new exprecnWithFunc();
         m_v1.convertValueInString(m_value1);
         m_v2.convertValueInString(m_value2);
     }
@@ -91,48 +93,46 @@ public class calculation extends action {
     }
     
     @Override
-    public boolean activateAction(Entity entity){
+    public void activateAction(Entity entity){
         exprecn v1 = new exprecn(), v2 = new exprecn();
         setArgumentValue(v1, m_v1, entity);
         setArgumentValue(v2, m_v2, entity);
 
         if(v1.getType() == v2.getType() && v2.getType() == exprecnType.INT){
-            setProperty(v1.getInt(), v2.getInt());
-            return false;
+            setProperty(v1.getInt(), v2.getInt(), entity);
+            return;
         }
         if(v1.getType() == v2.getType() && v2.getType() == exprecnType.FLOAT){
-            setProperty(v1.getFloat(), v2.getFloat());
-            return false;
+            setProperty(v1.getFloat(), v2.getFloat(), entity);
+            return;
         }
         if(v1.getType() == exprecnType.INT && v2.getType() ==exprecnType.FLOAT){
-            setProperty(v1.getInt() , v2.getFloat());
-            return false;
+            setProperty(v1.getInt() , v2.getFloat() , entity);
+            return;
         }
         if(v1.getType() == exprecnType.FLOAT && v2.getType() ==exprecnType.INT){
-            setProperty(v1.getFloat() , v2.getInt());
-            return false;
+            setProperty(v1.getFloat() , v2.getInt(), entity);
+            return;
         }
         //exepcen
-
-        return false;
     }
 
-    public void setProperty(int v1, int v2){
+    public void setProperty(int v1, int v2, Entity entity){
         if(isMultiply){
-            m_p.setProperty(v1 * v2);
+            entity.getProperty(m_property).setProperty(v1 * v2);
         }
         else{
-            m_p.setProperty(v1 / v2);
+            entity.getProperty(m_property).setProperty(v1 / v2);
         }
 
     }
 
-    public void setProperty(float v1, float v2){
+    public void setProperty(float v1, float v2, Entity entity){
         if(isMultiply){
-            m_p.setProperty(v1 * v2);
+            entity.getProperty(m_property).setProperty(v1 * v2);
         }
         else{
-            m_p.setProperty(v1 / v2);
+            entity.getProperty(m_property).setProperty(v1 / v2);
         }
     }
 
