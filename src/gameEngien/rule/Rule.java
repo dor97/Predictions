@@ -6,6 +6,7 @@ import gameEngien.generated.PRDRule;
 import gameEngien.rule.action.actionInterface.ActionInterface;
 import gameEngien.rule.action.increase.Increase;
 import gameEngien.rule.action.increase.calculation;
+import gameEngien.rule.action.increase.condition;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,6 +39,10 @@ public class Rule {
             } else if (action.getType() == "calculation") {
                 m_actions.add(new calculation(action));
             }
+            else if (action.getType() == "condition") {
+                m_actions.add(new condition(action));
+            }
+
 
         }
     }
@@ -51,9 +56,9 @@ public class Rule {
     }
     public void activeRule(Entity entity, int tick){
         if(tick % m_ticks == 0 && random.nextDouble() < m_probability){
-            for(ActionInterface a : m_actions){
-                if(a.getEntityName() == entity.getName() && entity.isPropertyExists(a.getPropertyName())){
-                    a.activateAction(entity);
+            for(ActionInterface action : m_actions){
+                if(action.getEntityName() == entity.getName() && entity.isPropertyExists(action.getPropertyName())){
+                    action.activateAction(entity);
                 }
             }
         }

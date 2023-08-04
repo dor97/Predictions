@@ -13,7 +13,7 @@ public class exprecnWithFunc extends exprecn{
     @Override
     public void convertValueInString(String value){
         super.convertValueInString(value);
-        isFunc = false;
+        m_isFunc = false;
         if(getType() == exprecnType.STRING){
             if (value.contains("(") && value.contains(")")) {
                 String trimmedInput = value.trim().replace("(", "").replace(")", "");

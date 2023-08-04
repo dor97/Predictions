@@ -8,7 +8,7 @@ import gameEngien.utilites.Utilites;
 
 import static gameEngien.utilites.Utilites.environment;
 
-public class calculation implements ActionInterface {
+public class calculation extends action {
     private String m_entity;
     private String m_property;
     private Entity m_e;
@@ -74,17 +74,20 @@ public class calculation implements ActionInterface {
             } else {
                 if (entity.isPropertyExists(v.getString())) {
                     exprecn temp = new exprecn();
-                    temp.setValue(entity.getProperty(v.getString()));
-                    if (v.getType() == exprecnType.INT) {
+                    temp.setValue(entity.getProperty(v.getString()).getValue());
+                    if (temp.getType() == exprecnType.INT) {
                         argument.setValue(temp.getInt());
-                    } else if (v.getType() == exprecnType.FLOAT) {
+                    } else if (temp.getType() == exprecnType.FLOAT) {
                         argument.setValue(temp.getFloat());
                     } else {
                         //expcen
                     }
                 }
             }
+        } else if (v.getType() == exprecnType.BOOL) {
+            //excepcen
         }
+        //do not get here
     }
     
     @Override

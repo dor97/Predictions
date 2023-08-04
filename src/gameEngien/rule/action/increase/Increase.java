@@ -7,7 +7,7 @@ import gameEngien.rule.action.actionInterface.ActionInterface;
 
 import static gameEngien.utilites.Utilites.environment;
 
-public class Increase implements ActionInterface {
+public class Increase extends action {
     private String m_entity;
     private String m_property;
     private exprecnWithFunc m_by;
@@ -61,7 +61,7 @@ public class Increase implements ActionInterface {
             else {
                 if(entity.isPropertyExists(m_by.getString())){
                     exprecn temp = new exprecn();
-                    temp.setValue(entity.getProperty(m_by.getString()));
+                    temp.setValue(entity.getProperty(m_by.getString()).getValue());
                     if(m_by.getType() == exprecnType.INT) {
                         entity.getProperty(m_property).addToProperty(m_by.getInt());
                     }
@@ -76,13 +76,12 @@ public class Increase implements ActionInterface {
 
             //expcen
         }
+        else if (m_by.getType() == exprecnType.BOOL){
+            //excepcen
+        }
+        //do not get here
     }
 
-    @Override
-    public boolean setValues(PropertyInterface v1, PropertyInterface v2) {
-
-        return false;
-    }
 
 
 }
