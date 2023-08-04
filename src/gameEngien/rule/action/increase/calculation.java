@@ -40,6 +40,8 @@ public class calculation extends action {
             action.getPRDDivide().getArg2();
             isMultiply = false;
         }
+        m_v1 = new exprecnWithFunc();
+        m_v2 = new exprecnWithFunc();
         m_v1.convertValueInString(m_value1);
         m_v2.convertValueInString(m_value2);
     }

@@ -17,6 +17,7 @@ public class single implements subCondition {
         m_entity = condition.getEntity();
         m_property = condition.getProperty();
         m_op = getOpFromString(condition.getOperator());
+        m_exprecn = new exprecnWithFunc();
         m_exprecn.convertValueInString(condition.getValue());
     }
 

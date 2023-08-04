@@ -21,6 +21,7 @@ public class Increase extends action {
     }
 
     public Increase(PRDAction action) {
+        m_by = new exprecnWithFunc();
         m_by.convertValueInString(action.getBy());
         m_entity = action.getEntity();
         m_property = action.getProperty();
