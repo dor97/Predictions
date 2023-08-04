@@ -35,7 +35,7 @@ public class Increase extends action {
         return m_property;
     }
     @Override
-    public void activateAction(Entity entity){
+    public boolean activateAction(Entity entity){
         if(m_by.getType() == exprecnType.INT) {
             entity.getProperty(m_property).addToProperty(m_by.getInt());
         }
@@ -79,9 +79,6 @@ public class Increase extends action {
         else if (m_by.getType() == exprecnType.BOOL){
             //excepcen
         }
-        //do not get here
+        return false;
     }
-
-
-
 }

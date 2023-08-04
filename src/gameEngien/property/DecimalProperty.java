@@ -1,4 +1,4 @@
-package gameEngien.property.decimalProperty;
+package gameEngien.property;
 
 import gameEngien.generated.PRDEnvProperty;
 import gameEngien.property.Property;
@@ -12,7 +12,6 @@ public class DecimalProperty extends Property {
     private String m_name;
     private int m_property;
     private Double m_lowRange, m_highRang;
-    private boolean m_randomlyIneceat;
 
     public DecimalProperty(propertyDifenichan propertyDifenichan){
         m_name = propertyDifenichan.getName();
@@ -52,10 +51,9 @@ public class DecimalProperty extends Property {
     }
 
     @Override
-    public boolean addToProperty(int add){
+    public void addToProperty(int add){
         if(m_property + add <= m_highRang && m_property + add >= m_lowRange)
             m_property += add;
-        return true;
     }
     @Override
     public String getName(){
@@ -68,9 +66,5 @@ public class DecimalProperty extends Property {
     @Override
     public void setProperty(int v){
         m_property = v;
-    }
-    @Override
-    public void setProperty(float v){
-        //exepecn
     }
 }

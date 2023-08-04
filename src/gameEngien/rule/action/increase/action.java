@@ -16,8 +16,8 @@ public class action implements ActionInterface {
     }
 
     @Override
-    public void activateAction(Entity entity) {
-
+    public boolean activateAction(Entity entity) {
+        return false;
     }
 
     @Override

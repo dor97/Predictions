@@ -3,14 +3,12 @@ package gameEngien.world;
 import gameEngien.entity.Entity;
 import gameEngien.entity.EntityDifenichan;
 import gameEngien.generated.*;
-import gameEngien.property.decimalProperty.DecimalProperty;
-import gameEngien.property.propertyDifenichan;
+import gameEngien.property.DecimalProperty;
 import gameEngien.property.propertyInterface.PropertyInterface;
 import gameEngien.rule.Rule;
 import gameEngien.rule.action.actionInterface.ActionInterface;
 import gameEngien.rule.action.increase.Increase;
 import gameEngien.rule.action.increase.calculation;
-import gameEngien.rule.action.increase.typeOfExprecen;
 import gameEngien.utilites.Utilites;
 
 import java.util.ArrayList;
@@ -55,7 +53,9 @@ public class World {
         for(int i = 0; i < 100; ++i){
             for(Entity entity : m_entities){
                 for(Rule r : m_rules){
-                    r.activeRule(entity, i);
+                    if (r.activeRule(entity, i)){
+                        m_entities.remove(entity);
+                    }
                 }
             }
         }

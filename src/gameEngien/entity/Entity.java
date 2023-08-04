@@ -1,14 +1,11 @@
 package gameEngien.entity;
 
-import gameEngien.generated.PRDEntity;
-import gameEngien.property.decimalProperty.DecimalProperty;
+import gameEngien.property.DecimalProperty;
 import gameEngien.property.propertyDifenichan;
 import gameEngien.property.propertyInterface.PropertyInterface;
 import gameEngien.rule.action.increase.exprecnType;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class Entity {

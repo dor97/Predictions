@@ -54,13 +54,16 @@ public class Rule {
     public void addAction(ActionInterface ActionToAdd){
         m_actions.add(ActionToAdd);
     }
-    public void activeRule(Entity entity, int tick){
+    public boolean activeRule(Entity entity, int tick){
         if(tick % m_ticks == 0 && random.nextDouble() < m_probability){
             for(ActionInterface action : m_actions){
                 if(action.getEntityName() == entity.getName() && entity.isPropertyExists(action.getPropertyName())){
-                    action.activateAction(entity);
+                    if (action.activateAction(entity)){
+                        return true;
+                    }
                 }
             }
         }
+        return false;
     }
 }

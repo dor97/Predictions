@@ -117,7 +117,7 @@ public class exprecn {
         return valueFloat;
     }
     public String getString() {return valueString;}
-
+    public boolean getBool(){return valueBool;}
     public exprecnType getType(){
         return m_type;
     }

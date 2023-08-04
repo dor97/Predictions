@@ -48,7 +48,7 @@ public class condition extends action{
         }
     }
     @Override
-    public void activateAction(Entity entity) {
+    public boolean activateAction(Entity entity) {
         if (m_subCon.getBoolValue(entity)) {
             for (ActionInterface action : m_then) {
                 //if(action.getEntityName() == entity.getName() && entity.isPropertyExists(action.getPropertyName())){
@@ -64,6 +64,8 @@ public class condition extends action{
                 }
             }
         }
+
+        return false;
     }
 
 }

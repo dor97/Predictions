@@ -7,13 +7,11 @@ import java.util.PrimitiveIterator;
 public class Property implements PropertyInterface {
 
     @Override
-    public boolean addToProperty(int add) {
-        return false;
+    public void addToProperty(int add) {
     }
 
     @Override
-    public boolean addToProperty(float add) {
-        return false;
+    public void addToProperty(float add) {
     }
 
     @Override
@@ -35,4 +33,14 @@ public class Property implements PropertyInterface {
     public void setProperty(float v) {
 
     }
+    @Override
+    public void setProperty(boolean v) {
+
+    }
+
+    @Override
+    public void setProperty(String v) {
+
+    }
+
 }

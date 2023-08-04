@@ -91,28 +91,30 @@ public class calculation extends action {
     }
     
     @Override
-    public void activateAction(Entity entity){
+    public boolean activateAction(Entity entity){
         exprecn v1 = new exprecn(), v2 = new exprecn();
         setArgumentValue(v1, m_v1, entity);
         setArgumentValue(v2, m_v2, entity);
 
         if(v1.getType() == v2.getType() && v2.getType() == exprecnType.INT){
             setProperty(v1.getInt(), v2.getInt());
-            return;
+            return false;
         }
         if(v1.getType() == v2.getType() && v2.getType() == exprecnType.FLOAT){
             setProperty(v1.getFloat(), v2.getFloat());
-            return;
+            return false;
         }
         if(v1.getType() == exprecnType.INT && v2.getType() ==exprecnType.FLOAT){
             setProperty(v1.getInt() , v2.getFloat());
-            return;
+            return false;
         }
         if(v1.getType() == exprecnType.FLOAT && v2.getType() ==exprecnType.INT){
             setProperty(v1.getFloat() , v2.getInt());
-            return;
+            return false;
         }
         //exepcen
+
+        return false;
     }
 
     public void setProperty(int v1, int v2){

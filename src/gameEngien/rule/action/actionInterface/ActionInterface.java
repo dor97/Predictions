@@ -7,6 +7,6 @@ public interface ActionInterface {
     //public void setEntityAndProperty(Entity e, PropertyInterface p);
     public String getEntityName();
     public String getPropertyName();
-    public void activateAction(Entity entity);
+    public boolean activateAction(Entity entity);
     public boolean setValues(PropertyInterface v1, PropertyInterface v2);
     }
