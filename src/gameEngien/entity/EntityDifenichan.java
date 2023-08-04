@@ -5,6 +5,7 @@ import gameEngien.generated.PRDProperty;
 import gameEngien.property.propertyDifenichan;
 import gameEngien.property.propertyInterface.PropertyInterface;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class EntityDifenichan {
@@ -15,6 +16,7 @@ public class EntityDifenichan {
     public EntityDifenichan(PRDEntity e){
         m_name = e.getName();
         m_amount = e.getPRDPopulation();
+        m_propertys = new ArrayList<>();
         for(PRDProperty p : e.getPRDProperties().getPRDProperty()){
             m_propertys.add(new propertyDifenichan(p));
         }

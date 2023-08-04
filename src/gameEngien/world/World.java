@@ -11,6 +11,13 @@ import gameEngien.rule.action.increase.Increase;
 import gameEngien.rule.action.increase.calculation;
 import gameEngien.utilites.Utilites;
 
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -23,6 +30,9 @@ public class World {
     private List<EntityDifenichan> m_entitiesDifenichan = new ArrayList<>();
     private Map<String, PropertyInterface> m_environments = new HashMap<>();
     private int m_time = 0;
+
+    private final static String JAXB_XML_GAME_PACKAGE_NAME = "gameEngien.generated";
+
 
     public void start(){
         PropertyInterface p = new DecimalProperty("pro", 100, 0, 200);
@@ -50,20 +60,34 @@ public class World {
     }
 
     public void startSimolesan(){
-        for(int i = 0; i < 100; ++i){
+        List<Entity> toRemove = new ArrayList<>();
+        for(int i = 0; i < 240; ++i){
             for(Entity entity : m_entities){
                 for(Rule r : m_rules){
                     if (r.activeRule(entity, i)){
-                        m_entities.remove(entity);
+                        toRemove.add(entity);
+                        break;
                     }
                 }
+            }
+            for(Entity entity : toRemove){
+                m_entities.remove(entity);
             }
         }
     }
 
     //public void setEnviroment(String name, )
 
-    public void loadFile(PRDWorld w){
+    public void loadFile(){
+        PRDWorld w = new PRDWorld();
+        try {
+            InputStream inputStream = new FileInputStream(new File("src/resources/ex1-cigarets.xml"));
+            w = deserializeFrom(inputStream);
+            //System.out.println("name of first country is: " + countries.getCountry().get(0).getName());
+        } catch (JAXBException | FileNotFoundException e) {
+            e.printStackTrace();
+        }
+
         for(PRDEntity e : w.getPRDEntities().getPRDEntity()){
             m_entitiesDifenichan.add(new EntityDifenichan(e));
         }
@@ -72,7 +96,7 @@ public class World {
         }
 
         for(PRDEnvProperty envProperty : w.getPRDEvironment().getPRDEnvProperty()){
-            if(envProperty.getType() == "decimal") {
+            if(envProperty.getType().equals("decimal")) {
                 m_environments.put(envProperty.getPRDName(), new DecimalProperty(envProperty));
             }
             else{
@@ -89,6 +113,12 @@ public class World {
                 m_entities.add(new Entity(entityDifenichan));
             }
         }
+    }
+
+    private static PRDWorld deserializeFrom(InputStream in) throws JAXBException {
+        JAXBContext jc = JAXBContext.newInstance(JAXB_XML_GAME_PACKAGE_NAME);
+        Unmarshaller u = jc.createUnmarshaller();
+        return (PRDWorld) u.unmarshal(in);
     }
 
 }

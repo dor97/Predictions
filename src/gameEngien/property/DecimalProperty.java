@@ -39,7 +39,7 @@ public class DecimalProperty extends Property {
         m_name = envProperty.getPRDName();
         m_lowRange = envProperty.getPRDRange().getFrom();
         m_highRang = envProperty.getPRDRange().getTo();
-        m_property = 0;
+        m_property = 10;
 
     }
 

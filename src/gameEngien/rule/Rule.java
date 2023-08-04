@@ -14,8 +14,8 @@ import java.util.Random;
 
 public class Rule {
     private String m_name;
-    private Integer m_ticks;
-    private double m_probability;
+    private Integer m_ticks = 1;
+    private double m_probability = 1;
     private List<ActionInterface> m_actions;
     private Random random;
 
@@ -29,17 +29,27 @@ public class Rule {
 
     public Rule(PRDRule rule){
         m_name = rule.getName();
-        m_ticks = rule.getPRDActivation().getTicks() != null ? rule.getPRDActivation().getTicks() : 1;
-        m_probability = rule.getPRDActivation().getProbability() != null ? rule.getPRDActivation().getProbability() : 1;
+        try{
+            m_ticks = rule.getPRDActivation().getTicks() != null ? rule.getPRDActivation().getTicks() : 1;
+        }
+        catch (NullPointerException e){
+
+        }
+        try {
+            m_probability = rule.getPRDActivation().getProbability() != null ? rule.getPRDActivation().getProbability() : 1;
+        }
+        catch (NullPointerException e){
+
+        }
         random = new Random();
         m_actions = new ArrayList<>();
         for(PRDAction action : rule.getPRDActions().getPRDAction()){
-            if(action.getType() == "increase"){
+            if(action.getType().equals("increase")){
                 m_actions.add(new Increase(action));
-            } else if (action.getType() == "calculation") {
+            } else if (action.getType().equals("calculation")) {
                 m_actions.add(new calculation(action));
             }
-            else if (action.getType() == "condition") {
+            else if (action.getType().equals("condition")) {
                 m_actions.add(new condition(action));
             }
 
@@ -57,7 +67,7 @@ public class Rule {
     public boolean activeRule(Entity entity, int tick){
         if(tick % m_ticks == 0 && random.nextDouble() < m_probability){
             for(ActionInterface action : m_actions){
-                if(action.getEntityName() == entity.getName() && entity.isPropertyExists(action.getPropertyName())){
+                if(action.getEntityName().equals(entity.getName()) && (entity.isPropertyExists(action.getPropertyName()) || action.getPropertyName() == null)){
                     if (action.activateAction(entity)){
                         return true;
                     }

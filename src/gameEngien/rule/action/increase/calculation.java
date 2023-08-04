@@ -7,6 +7,7 @@ import gameEngien.rule.action.actionInterface.ActionInterface;
 import gameEngien.utilites.Utilites;
 
 import static gameEngien.utilites.Utilites.environment;
+import static gameEngien.utilites.Utilites.random;
 
 public class calculation extends action {
     private String m_entity;
@@ -62,7 +63,7 @@ public class calculation extends action {
             argument.setValue(v.getFloat());
         } else if (v.getType() == exprecnType.STRING) {
             if (v.isFunc()) {
-                if(v.getString() == "environment") {
+                if(v.getString().equals("environment")) {
                     exprecn temp = new exprecn();
                     temp.setValue(environment(v.getParams(0).getString()));
                     if (temp.getType() == exprecnType.INT) {
@@ -73,6 +74,16 @@ public class calculation extends action {
                         //exepen
                     }
                 }
+                else if(v.getString().equals("random")){
+                    exprecn temp = new exprecn();
+                    temp.setValue(random(v.getParams(0).getInt()));
+                    if(temp.getType() == exprecnType.INT) {
+                        entity.getProperty(m_property).addToProperty(temp.getInt());
+                    }
+                    //excepcen
+                }
+
+
             } else {
                 if (entity.isPropertyExists(v.getString())) {
                     exprecn temp = new exprecn();
@@ -93,27 +104,28 @@ public class calculation extends action {
     }
     
     @Override
-    public void activateAction(Entity entity){
+    public boolean activateAction(Entity entity){
         exprecn v1 = new exprecn(), v2 = new exprecn();
         setArgumentValue(v1, m_v1, entity);
         setArgumentValue(v2, m_v2, entity);
 
         if(v1.getType() == v2.getType() && v2.getType() == exprecnType.INT){
             setProperty(v1.getInt(), v2.getInt(), entity);
-            return;
+            return false;
         }
         if(v1.getType() == v2.getType() && v2.getType() == exprecnType.FLOAT){
             setProperty(v1.getFloat(), v2.getFloat(), entity);
-            return;
+            return false;
         }
         if(v1.getType() == exprecnType.INT && v2.getType() ==exprecnType.FLOAT){
             setProperty(v1.getInt() , v2.getFloat() , entity);
-            return;
+            return false;
         }
         if(v1.getType() == exprecnType.FLOAT && v2.getType() ==exprecnType.INT){
             setProperty(v1.getFloat() , v2.getInt(), entity);
-            return;
+            return false;
         }
+        return false;
         //exepcen
     }
 

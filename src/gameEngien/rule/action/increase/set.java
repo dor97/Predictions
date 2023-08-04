@@ -5,6 +5,7 @@ import gameEngien.generated.PRDAction;
 import gameEngien.property.Property;
 
 import static gameEngien.utilites.Utilites.environment;
+import static gameEngien.utilites.Utilites.random;
 
 public class set extends action{
 
@@ -40,7 +41,7 @@ public class set extends action{
             i_entity.getProperty(m_property).setProperty(m_value.getBool());
         }else {
             if (m_value.isFunc()){
-                if(m_value.getValue() == "environment"){
+                if(m_value.getValue().equals("environment")){
                     exprecn temp = new exprecn();
                     temp.setValue(environment(m_value.getParams(0).getString()));
                     if(temp.getType() == exprecnType.INT) {
@@ -56,9 +57,17 @@ public class set extends action{
                         i_entity.getProperty(m_property).setProperty(temp.getString());
                     }
                 }
-                else {
-                    //TODO: add condition to other function;
+                else if(m_value.getString().equals("random")){
+                    exprecn temp = new exprecn();
+                    temp.setValue(random(m_value.getParams(0).getInt()));
+                    if(temp.getType() == exprecnType.INT) {
+                        i_entity.getProperty(m_property).addToProperty(temp.getInt());
+                    }
+                    //excepcen
                 }
+
+
+
             }
             else {
                 if(i_entity.isPropertyExists(m_property)){

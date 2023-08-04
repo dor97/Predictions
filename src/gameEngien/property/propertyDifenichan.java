@@ -14,9 +14,18 @@ public class propertyDifenichan {
     public propertyDifenichan(PRDProperty p){
         m_name = p.getPRDName();
         m_type = myType(p.getType());
-        m_lowRange = p.getPRDRange().getFrom();
-        m_highRang = p.getPRDRange().getTo();
+        if(p.getPRDRange() != null) {
+            m_lowRange = p.getPRDRange().getFrom();
+            m_highRang = p.getPRDRange().getTo();
+            if(m_highRang < m_lowRange){
+                //excepcen
+            }
+        }
         m_randomlyIneceat = p.getPRDValue().isRandomInitialize();
+        if(m_randomlyIneceat == true){
+            return;
+        }
+        m_init = new exprecn();
         m_init.convertValueInString(p.getPRDValue().getInit());
         if(m_type != m_init.getType()){
             //exepcen
@@ -49,13 +58,13 @@ public class propertyDifenichan {
     }
 
     private exprecnType myType(String t){
-        if(t == "decimal"){
+        if(t.equals("decimal")){
             return exprecnType.INT; 
-        } else if (t == "float") {
+        } else if (t.equals("float")) {
             return exprecnType.FLOAT;
-        } else if (t == "string") {
+        } else if (t.equals("string")) {
             return exprecnType.STRING;
-        } else if (t == "boolean") {
+        } else if (t.equals("boolean")) {
             return exprecnType.BOOL;
         }
         else{

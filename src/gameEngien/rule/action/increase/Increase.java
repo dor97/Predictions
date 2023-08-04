@@ -6,6 +6,7 @@ import gameEngien.property.propertyInterface.PropertyInterface;
 import gameEngien.rule.action.actionInterface.ActionInterface;
 
 import static gameEngien.utilites.Utilites.environment;
+import static gameEngien.utilites.Utilites.random;
 
 public class Increase extends action {
     private String m_entity;
@@ -45,7 +46,7 @@ public class Increase extends action {
         }
         else if(m_by.getType() == exprecnType.STRING){
             if(m_by.isFunc()){
-                if(m_by.getValue() == "environment"){
+                if(m_by.getString().equals("environment")){
                     exprecn temp = new exprecn();
                     temp.setValue(environment(m_by.getParams(0).getString()));
                     if(temp.getType() == exprecnType.INT) {
@@ -57,7 +58,17 @@ public class Increase extends action {
                     else{
                         //exepen
                         }
+                } else if(m_by.getString().equals("random")){
+                    exprecn temp = new exprecn();
+                    temp.setValue(random(m_by.getParams(0).getInt()));
+                    if(temp.getType() == exprecnType.INT) {
+                        entity.getProperty(m_property).addToProperty(temp.getInt());
+                    }
+                    //excepcen
                 }
+
+
+
             }
             else {
                 if(entity.isPropertyExists(m_by.getString())){

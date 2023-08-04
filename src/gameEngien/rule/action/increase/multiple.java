@@ -3,6 +3,7 @@ package gameEngien.rule.action.increase;
 import gameEngien.entity.Entity;
 import gameEngien.generated.PRDCondition;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class multiple implements subCondition {
@@ -12,16 +13,17 @@ public class multiple implements subCondition {
     List<subCondition> m_conditions;
 
     public multiple(PRDCondition condition){
-        if(condition.getLogical() == "or"){
+        m_conditions = new ArrayList<>();
+        if(condition.getLogical().equals("or")){
             m_logical = logicalOp.OR;
         }
-        else if(condition.getLogical() == "and"){
+        else if(condition.getLogical().equals("and")){
             m_logical = logicalOp.AND;
         }
         for(PRDCondition subCondition : condition.getPRDCondition()){
-            if(subCondition.getSingularity() == "multiple"){
+            if(subCondition.getSingularity().equals("multiple")){
                 m_conditions.add(new multiple(subCondition));
-            } else if (subCondition.getSingularity() == "single") {
+            } else if (subCondition.getSingularity().equals("single")) {
                 m_conditions.add(new single(subCondition));
             }
         }

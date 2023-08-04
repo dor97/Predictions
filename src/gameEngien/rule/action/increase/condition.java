@@ -15,33 +15,37 @@ public class condition extends action{
     private List<ActionInterface> m_else = null;
 
     public condition(PRDAction action){
-        m_entity = action.getPRDCondition().getEntity();
-        if(action.getPRDCondition().getPRDCondition().get(0).getSingularity() == "multiple"){
-            m_subCon = new multiple(action.getPRDCondition().getPRDCondition().get(0));
+        m_entity = action.getEntity();
+        if(action.getPRDCondition().getSingularity().equals("multiple")){
+            m_subCon = new multiple(action.getPRDCondition());
         }
-        else if (action.getPRDCondition().getPRDCondition().get(0).getSingularity() == "single"){
-            m_subCon = new single(action.getPRDCondition().getPRDCondition().get(0));
+        else if (action.getPRDCondition().getSingularity().equals("single")){
+            m_subCon = new single(action.getPRDCondition());
         }
         m_then = new ArrayList<>();
         for(PRDAction act : action.getPRDThen().getPRDAction()){
-            if(act.getType() == "increase"){
-                m_then.add(new Increase(action));
-            } else if (act.getType() == "calculation") {
-                m_then.add(new calculation(action));
-            } else if (act.getType() == "condition") {
-                m_then.add(new condition(action));
+            if(act.getType().equals("increase")){
+                m_then.add(new Increase(act));
+            } else if (act.getType().equals("calculation")) {
+                m_then.add(new calculation(act));
+            } else if (act.getType().equals("condition")) {
+                m_then.add(new condition(act));
+            } else if(act.getType().equals("kill")){
+                m_then.add(new kill(act));
             }
 
         }
         if(action.getPRDElse() != null){
             m_else = new ArrayList<>();
             for(PRDAction act : action.getPRDElse().getPRDAction()){
-                if(act.getType() == "increase"){
-                    m_then.add(new Increase(action));
-                } else if (act.getType() == "calculation") {
-                    m_then.add(new calculation(action));
-                } else if (act.getType() == "condition") {
-                    m_then.add(new condition(action));
+                if(act.getType().equals("increase")){
+                    m_then.add(new Increase(act));
+                } else if (act.getType().equals("calculation")) {
+                    m_then.add(new calculation(act));
+                } else if (act.getType().equals("condition")) {
+                    m_then.add(new condition(act));
+                } else if(act.getType().equals("kill")){
+                    m_then.add(new kill(act));
                 }
 
             }
@@ -52,20 +56,29 @@ public class condition extends action{
         if (m_subCon.getBoolValue(entity)) {
             for (ActionInterface action : m_then) {
                 //if(action.getEntityName() == entity.getName() && entity.isPropertyExists(action.getPropertyName())){
-                action.activateAction(entity);
+                if(action.activateAction(entity)){
+                    return true;
+                }
                 //}
             }
         } else {
             if (m_else != null) {
                 for (ActionInterface action : m_else) {
                     //if(action.getEntityName() == entity.getName() && entity.isPropertyExists(action.getPropertyName())){
-                    action.activateAction(entity);
+                    if(action.activateAction(entity)){
+                        return true;
+                    }
                     //}
                 }
             }
         }
 
         return false;
+    }
+
+    @Override
+    public String getEntityName(){
+        return m_entity;
     }
 
 }

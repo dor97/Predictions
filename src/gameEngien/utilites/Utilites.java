@@ -3,10 +3,7 @@ package gameEngien.utilites;
 import gameEngien.entity.Entity;
 import gameEngien.property.propertyInterface.PropertyInterface;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 public class Utilites {
     //private static List<Entity> m_entities;
@@ -18,6 +15,21 @@ public class Utilites {
     }
 
     public static Object environment(String name) {
-        return m_environments.get(name);
+        return m_environments.get(name).getValue();
+    }
+
+    public static int random(int num) {
+        Random random = new Random();
+        return random.nextInt(num);
+    }
+    public static int random(String numString) {
+        Random random = new Random();
+        int num = 1;
+        try {
+            num = Integer.parseInt(numString);
+        } catch (NumberFormatException e) {
+            // Not an int
+        }
+        return random.nextInt(num);
     }
 }

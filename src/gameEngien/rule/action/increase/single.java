@@ -4,6 +4,7 @@ import gameEngien.entity.Entity;
 import gameEngien.generated.PRDCondition;
 
 import static gameEngien.utilites.Utilites.environment;
+import static gameEngien.utilites.Utilites.random;
 
 public class single implements subCondition {
 
@@ -22,15 +23,15 @@ public class single implements subCondition {
     }
 
     private opertor getOpFromString(String op){
-        if(op == "="){
+        if(op.equals("=")){
             return opertor.EQUAL;
         }
-        else if(op == "!="){
+        else if(op.equals("!=")){
             return opertor.UNEQUAL;
         }
-        else if (op == "bt"){
+        else if (op.equals("bt")){
             return opertor.BIGGER;
-        } else if (op == "lt") {
+        } else if (op.equals("lt")) {
             return opertor.LITTLE;
         }
         return opertor.LITTLE;  //do not get here
@@ -44,15 +45,22 @@ public class single implements subCondition {
             return getOpValue(propertyValue, m_exprecn);    //cheak if propertyValue type string of bool later and trow excepcen
         } else if (m_exprecn.getType() == exprecnType.STRING) {
             if (m_exprecn.isFunc()) {
-                if (m_exprecn.getValue() == "environment") {
+                if (m_exprecn.getValue().equals("environment")) {
                     exprecn temp = new exprecn();
                     temp.setValue(environment(m_exprecn.getParams(0).getString()));
                     if (temp.getType() == exprecnType.INT || temp.getType() == exprecnType.FLOAT) {
                         return getOpValue(propertyValue, temp);    //cheak if propertyValue type string of bool later and trow excepcen
                     }
                     else {
-                        //excpcen
+                        //ecepcen
                     }
+                } else if(m_exprecn.getString().equals("random")){
+                    exprecn temp = new exprecn();
+                    temp.setValue(random(m_exprecn.getParams(0).getInt()));
+                    if(temp.getType() == exprecnType.INT) {
+                        entity.getProperty(m_property).addToProperty(temp.getInt());
+                    }
+                    //excepcen
                 }
             } else {
                 if (entity.isPropertyExists(m_exprecn.getString())) {
