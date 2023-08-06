@@ -5,11 +5,14 @@ import gameEngien.allReadyExistsException;
 import gameEngien.entity.Entity;
 import gameEngien.entity.EntityDifenichan;
 import gameEngien.generated.*;
+import gameEngien.property.BooleanProperty;
 import gameEngien.property.DecimalProperty;
+import gameEngien.property.FloatProperty;
+import gameEngien.property.StringProperty;
 import gameEngien.property.propertyInterface.PropertyInterface;
 import gameEngien.rule.Rule;
 import gameEngien.rule.action.actionInterface.ActionInterface;
-import gameEngien.rule.action.increase.Increase;
+import gameEngien.rule.action.increase.addValue;
 import gameEngien.rule.action.increase.calculation;
 import gameEngien.utilites.Utilites;
 import org.omg.CORBA.DynAnyPackage.InvalidValue;
@@ -22,10 +25,7 @@ import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class World implements Serializable {
     private List<Rule> m_rules = new ArrayList<>();
@@ -41,7 +41,7 @@ public class World implements Serializable {
     public void start(){
         PropertyInterface p = new DecimalProperty("pro", 100, 0, 200);
         PropertyInterface p2 = new DecimalProperty("p2", 100, 0, 10000);
-        ActionInterface a = new Increase("entity", "pro", "3");
+        ActionInterface a = new addValue("entity", "pro", "3");
         ActionInterface a2 = new calculation("entity", "p2", "environment(ep1)",
                "environment(ep2)");
         Entity e =new Entity("entity");
@@ -66,12 +66,15 @@ public class World implements Serializable {
     public void startSimolesan(){
         Utilites.Init(m_environments, m_entitiesDifenichan);
         List<Entity> toRemove = new ArrayList<>();
+        Random random = new Random();
         for(int i = 0; i < 240; ++i){
-            for(Entity entity : m_entities){
-                for(Rule r : m_rules){
-                    if (r.activeRule(entity, i)){
-                        toRemove.add(entity);
-                        break;
+            for(Rule r : m_rules) {
+                if(i % r.getTick() == 0 && random.nextDouble() < r.getProbability()) {
+                    for (Entity entity : m_entities) {
+                        if (r.activeRule(entity)) {
+                            toRemove.add(entity);
+                            break;
+                        }
                     }
                 }
             }
@@ -120,9 +123,12 @@ public class World implements Serializable {
             }
             if(envProperty.getType().equals("decimal")) {
                 m_environments.put(envProperty.getPRDName(), new DecimalProperty(envProperty));
-            }
-            else{
-
+            } else if(envProperty.getType().equals("float")){
+                m_environments.put(envProperty.getPRDName(), new FloatProperty(envProperty));
+            } else if (envProperty.getType().equals("string")) {
+                m_environments.put(envProperty.getPRDName(), new StringProperty(envProperty));
+            } else if (envProperty.getType().equals("boolean")) {
+                m_environments.put(envProperty.getPRDName(), new BooleanProperty(envProperty));
             }
         }
 

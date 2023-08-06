@@ -1,10 +1,7 @@
 package gameEngien.rule.action.increase;
 
 import gameEngien.entity.Entity;
-import gameEngien.entity.EntityDifenichan;
 import gameEngien.generated.PRDAction;
-import gameEngien.property.propertyInterface.PropertyInterface;
-import gameEngien.rule.action.actionInterface.ActionInterface;
 import org.omg.CORBA.DynAnyPackage.InvalidValue;
 import org.omg.CORBA.OBJECT_NOT_EXIST;
 
@@ -12,24 +9,26 @@ import java.io.Serializable;
 
 import static gameEngien.utilites.Utilites.*;
 
-public class Increase extends action implements Serializable {
+public class addValue extends action implements Serializable {  //increase or decrease
     private String m_entity;
     private String m_property;
     private exprecnWithFunc m_by;
     //private Entity m_e;
     //private PropertyInterface m_p;
+    int sign;
 
-    public Increase(String entity, String property, String by) {
+    public addValue(String entity, String property, String by) {
         m_entity = entity;
         m_property = property;
         m_by.convertValueInString(by);
     }
 
-    public Increase(PRDAction action) throws InvalidValue {
+    public addValue(PRDAction action) throws InvalidValue {
         m_by = new exprecnWithFunc();
         m_by.convertValueInString(action.getBy());
         m_entity = action.getEntity();
         m_property = action.getProperty();
+        sign = action.getType().equals("increase") ? 1 : -1;
         cheackUserInput();
     }
 
@@ -111,10 +110,10 @@ public class Increase extends action implements Serializable {
     @Override
     public boolean activateAction(Entity entity){
         if(m_by.getType() == exprecnType.INT) {
-            entity.getProperty(m_property).addToProperty(m_by.getInt());
+            entity.getProperty(m_property).addToProperty(sign * m_by.getInt());
         }
         else if (m_by.getType() == exprecnType.FLOAT) {
-            entity.getProperty(m_property).addToProperty(m_by.getFloat());
+            entity.getProperty(m_property).addToProperty(sign * m_by.getFloat());
         }
         else if(m_by.getType() == exprecnType.STRING){
             if(m_by.isFunc()){
@@ -122,10 +121,10 @@ public class Increase extends action implements Serializable {
                     exprecn temp = new exprecn();
                     temp.setValue(environment(m_by.getParams(0).getString()));
                     if(temp.getType() == exprecnType.INT) {
-                        entity.getProperty(m_property).addToProperty(temp.getInt());
+                        entity.getProperty(m_property).addToProperty(sign * temp.getInt());
                     }
                     else if (temp.getType() == exprecnType.FLOAT) {
-                        entity.getProperty(m_property).addToProperty(temp.getFloat());
+                        entity.getProperty(m_property).addToProperty(sign * temp.getFloat());
                     }
                     else{
                         //exepen
@@ -134,7 +133,7 @@ public class Increase extends action implements Serializable {
                     exprecn temp = new exprecn();
                     temp.setValue(random(m_by.getParams(0).getInt()));
                     if(temp.getType() == exprecnType.INT) {
-                        entity.getProperty(m_property).addToProperty(temp.getInt());
+                        entity.getProperty(m_property).addToProperty(sign * temp.getInt());
                     }
                     //excepcen
                 }
@@ -147,10 +146,10 @@ public class Increase extends action implements Serializable {
                     exprecn temp = new exprecn();
                     temp.setValue(entity.getProperty(m_by.getString()).getValue());
                     if(m_by.getType() == exprecnType.INT) {
-                        entity.getProperty(m_property).addToProperty(m_by.getInt());
+                        entity.getProperty(m_property).addToProperty(sign * m_by.getInt());
                     }
                     else if (m_by.getType() == exprecnType.FLOAT) {
-                        entity.getProperty(m_property).addToProperty(m_by.getFloat());
+                        entity.getProperty(m_property).addToProperty(sign * m_by.getFloat());
                     }
                     else{
                         //expcen

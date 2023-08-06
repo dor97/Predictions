@@ -5,6 +5,7 @@ import gameEngien.property.propertyInterface.propertyType;
 import gameEngien.rule.action.increase.exprecnType;
 
 import java.io.Serializable;
+import java.util.Random;
 
 public class StringProperty extends Property implements Serializable {
 
@@ -17,13 +18,32 @@ public class StringProperty extends Property implements Serializable {
         if (propertyDifenichan.getType() != exprecnType.STRING){
             //exception
         }
-        m_property = propertyDifenichan.getInit().getString();
+        if(propertyDifenichan.isRandom()){
+            final int maxTabsInRandomString = 50;
+            m_property = generateRandomString(maxTabsInRandomString);
+        }
+        else{
+            m_property = propertyDifenichan.getInit().getString();
+        }
     }
 
     public StringProperty(PRDEnvProperty envProperty){
-        super(propertyType.FLOAT);
+        super(propertyType.STRING);
         m_name = envProperty.getPRDName();
         m_property = "";    //TODO get from user
+    }
+
+    private String generateRandomString(int maxTabsInRandomString){
+        Random random = new Random();
+        int numOfTabs = random.nextInt(maxTabsInRandomString + 1);
+        String characters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!?,_-.()";
+        StringBuilder randomString = new StringBuilder();
+        for (int i = 0; i < numOfTabs; i++) {
+            int randomIndex = random.nextInt(characters.length());
+            char randomChar = characters.charAt(randomIndex);
+            randomString.append(randomChar);
+        }
+        return randomString.toString();
     }
 
     @Override

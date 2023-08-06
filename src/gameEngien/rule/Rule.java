@@ -1,13 +1,10 @@
 package gameEngien.rule;
 
 import gameEngien.entity.Entity;
-import gameEngien.entity.EntityDifenichan;
 import gameEngien.generated.PRDAction;
 import gameEngien.generated.PRDRule;
 import gameEngien.rule.action.actionInterface.ActionInterface;
-import gameEngien.rule.action.increase.Increase;
-import gameEngien.rule.action.increase.calculation;
-import gameEngien.rule.action.increase.condition;
+import gameEngien.rule.action.increase.*;
 import org.omg.CORBA.DynAnyPackage.InvalidValue;
 import org.omg.CORBA.OBJECT_NOT_EXIST;
 
@@ -49,12 +46,16 @@ public class Rule implements Serializable {
         m_actions = new ArrayList<>();
         for(PRDAction action : rule.getPRDActions().getPRDAction()){
             try {
-                if (action.getType().equals("increase")) {
-                    m_actions.add(new Increase(action));
+                if (action.getType().equals("increase") || action.getType().equals("decrease")) {
+                    m_actions.add(new addValue(action));
                 } else if (action.getType().equals("calculation")) {
                     m_actions.add(new calculation(action));
                 } else if (action.getType().equals("condition")) {
                     m_actions.add(new condition(action));
+                } else if (action.getType().equals("set")) {
+                    m_actions.add(new set(action));
+                } else if (action.getType().equals("kill")) {
+                    m_actions.add(new kill(action));
                 }
             }
             catch (OBJECT_NOT_EXIST e){
@@ -77,16 +78,22 @@ public class Rule implements Serializable {
     public void addAction(ActionInterface ActionToAdd){
         m_actions.add(ActionToAdd);
     }
-    public boolean activeRule(Entity entity, int tick){
-        if(tick % m_ticks == 0 && random.nextDouble() < m_probability){
-            for(ActionInterface action : m_actions){
-                if(action.getEntityName().equals(entity.getName()) && (entity.isPropertyExists(action.getPropertyName()) || action.getPropertyName() == null)){
-                    if (action.activateAction(entity)){
-                        return true;
-                    }
+    public boolean activeRule(Entity entity){
+        for(ActionInterface action : m_actions){
+            if(action.getEntityName().equals(entity.getName()) && (entity.isPropertyExists(action.getPropertyName()) || action.getPropertyName() == null)){
+                if (action.activateAction(entity)){
+                    return true;
                 }
             }
         }
         return false;
+    }
+    
+    public double getProbability(){
+        return m_probability;
+    }
+    
+    public int getTick(){
+        return m_ticks;
     }
 }

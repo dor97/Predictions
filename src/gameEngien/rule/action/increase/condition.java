@@ -2,7 +2,6 @@ package gameEngien.rule.action.increase;
 
 import gameEngien.entity.Entity;
 import gameEngien.generated.PRDAction;
-import gameEngien.generated.PRDCondition;
 import gameEngien.rule.action.actionInterface.ActionInterface;
 import org.omg.CORBA.DynAnyPackage.InvalidValue;
 
@@ -25,31 +24,34 @@ public class condition extends action implements Serializable {
             m_subCon = new single(action.getPRDCondition());
         }
         m_then = new ArrayList<>();
-        for(PRDAction act : action.getPRDThen().getPRDAction()){
-            if(act.getType().equals("increase")){
-                m_then.add(new Increase(act));
-            } else if (act.getType().equals("calculation")) {
-                m_then.add(new calculation(act));
-            } else if (act.getType().equals("condition")) {
-                m_then.add(new condition(act));
-            } else if(act.getType().equals("kill")){
-                m_then.add(new kill(act));
+        for(PRDAction thanAction : action.getPRDThen().getPRDAction()){
+            if (thanAction.getType().equals("increase") || thanAction.getType().equals("decrease")) {
+                m_then.add(new addValue(thanAction));
+            } else if (thanAction.getType().equals("calculation")) {
+                m_then.add(new calculation(thanAction));
+            } else if (thanAction.getType().equals("condition")) {
+                m_then.add(new condition(thanAction));
+            } else if (thanAction.getType().equals("set")) {
+                m_then.add(new set(thanAction));
+            } else if (thanAction.getType().equals("kill")) {
+                m_then.add(new kill(thanAction));
             }
 
         }
         if(action.getPRDElse() != null){
             m_else = new ArrayList<>();
-            for(PRDAction act : action.getPRDElse().getPRDAction()){
-                if(act.getType().equals("increase")){
-                    m_then.add(new Increase(act));
-                } else if (act.getType().equals("calculation")) {
-                    m_then.add(new calculation(act));
-                } else if (act.getType().equals("condition")) {
-                    m_then.add(new condition(act));
-                } else if(act.getType().equals("kill")){
-                    m_then.add(new kill(act));
+            for(PRDAction elseAction : action.getPRDElse().getPRDAction()){
+                if (elseAction.getType().equals("increase") || elseAction.getType().equals("decrease")) {
+                    m_else.add(new addValue(elseAction));
+                } else if (elseAction.getType().equals("calculation")) {
+                    m_else.add(new calculation(elseAction));
+                } else if (elseAction.getType().equals("condition")) {
+                    m_else.add(new condition(elseAction));
+                } else if (elseAction.getType().equals("set")) {
+                    m_else.add(new set(elseAction));
+                } else if (elseAction.getType().equals("kill")) {
+                    m_else.add(new kill(elseAction));
                 }
-
             }
         }
     }

@@ -26,7 +26,7 @@ public class DecimalProperty extends Property implements Serializable {
         if(propertyDifenichan.isRandom()){
             Random random = new Random();
             if(m_lowRange != null){
-                m_property = random.nextInt((int) (m_highRang - m_lowRange)) + (int)m_lowRange.doubleValue();
+                m_property = random.nextInt((int) (m_highRang - m_lowRange) + 1) + (int)m_lowRange.doubleValue();
             }
             else{
                 m_property = random.nextInt();

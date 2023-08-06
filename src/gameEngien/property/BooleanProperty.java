@@ -5,6 +5,7 @@ import gameEngien.property.propertyInterface.propertyType;
 import gameEngien.rule.action.increase.exprecnType;
 
 import java.io.Serializable;
+import java.util.Random;
 
 public class BooleanProperty extends Property implements Serializable {
 
@@ -18,11 +19,17 @@ public class BooleanProperty extends Property implements Serializable {
         if (propertyDifenichan.getType() != exprecnType.BOOL){
             //exception
         }
-        m_property = propertyDifenichan.getInit().getBool();
+        if(propertyDifenichan.isRandom()){
+            Random random = new Random();
+            m_property = random.nextBoolean();
+        }
+        else{
+            m_property = propertyDifenichan.getInit().getBool();
+        }
     }
 
     public BooleanProperty(PRDEnvProperty envProperty){
-        super(propertyType.FLOAT);
+        super(propertyType.BOOL);
         m_name = envProperty.getPRDName();
         m_property = true;    //TODO get from user
     }

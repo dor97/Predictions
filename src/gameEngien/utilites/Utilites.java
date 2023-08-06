@@ -27,7 +27,7 @@ public class Utilites {
 
     public static int random(int num) {
         Random random = new Random();
-        return random.nextInt(num);
+        return random.nextInt(num + 1);
     }
     public static int random(String numString) {
         Random random = new Random();
