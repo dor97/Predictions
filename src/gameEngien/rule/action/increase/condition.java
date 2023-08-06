@@ -4,17 +4,19 @@ import gameEngien.entity.Entity;
 import gameEngien.generated.PRDAction;
 import gameEngien.generated.PRDCondition;
 import gameEngien.rule.action.actionInterface.ActionInterface;
+import org.omg.CORBA.DynAnyPackage.InvalidValue;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class condition extends action{
+public class condition extends action implements Serializable {
     private String m_entity;
     private subCondition m_subCon;
     private List<ActionInterface> m_then = null;
     private List<ActionInterface> m_else = null;
 
-    public condition(PRDAction action){
+    public condition(PRDAction action) throws InvalidValue {
         m_entity = action.getEntity();
         if(action.getPRDCondition().getSingularity().equals("multiple")){
             m_subCon = new multiple(action.getPRDCondition());

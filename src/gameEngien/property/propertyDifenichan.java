@@ -4,7 +4,9 @@ import gameEngien.generated.PRDProperty;
 import gameEngien.rule.action.increase.exprecn;
 import gameEngien.rule.action.increase.exprecnType;
 
-public class propertyDifenichan {
+import java.io.Serializable;
+
+public class propertyDifenichan implements Serializable {
     private String m_name;
     private exprecnType m_type;
     private double m_lowRange, m_highRang;

@@ -3,21 +3,82 @@ package gameEngien.rule.action.increase;
 import gameEngien.entity.Entity;
 import gameEngien.generated.PRDAction;
 import gameEngien.property.Property;
+import org.omg.CORBA.DynAnyPackage.InvalidValue;
+import org.omg.CORBA.OBJECT_NOT_EXIST;
 
-import static gameEngien.utilites.Utilites.environment;
-import static gameEngien.utilites.Utilites.random;
+import java.io.Serializable;
 
-public class set extends action{
+import static gameEngien.utilites.Utilites.*;
+import static gameEngien.utilites.Utilites.getEntityDifenichan;
+
+public class set extends action implements Serializable {
 
     private String m_entity;
     private String m_property;
     private exprecnWithFunc m_value;
 
-    public set(PRDAction action){
+    public set(PRDAction action) throws InvalidValue{
         m_value = new exprecnWithFunc();
         m_entity = action.getEntity();
         m_property = action.getProperty();
         m_value.convertValueInString(action.getValue());
+        cheackUserInput();
+    }
+
+    private void cheackUserInput() throws InvalidValue {
+        checkEntityAndPropertyExist();
+        checkCompatibilityBetweenPropertyAndExpression();
+    }
+
+    private void checkCompatibilityBetweenPropertyAndExpression() throws InvalidValue{
+        if(getEntityDifenichan(m_entity).getPropertys().get(m_property).getType() != m_value.getType()){
+            if(!(getEntityDifenichan(m_entity).getPropertys().get(m_property).getType() == exprecnType.FLOAT && m_value.getType() == exprecnType.INT)){
+                if(m_value.getType() == exprecnType.STRING) {
+                    if (!m_value.isFunc()) {
+                        checkExpressionIfProperty();
+                    }
+                    else{
+                        checkExpressionIfFunction();
+                    }
+                }
+                else {
+                    throw new InvalidValue("In action set the property and value are not compatible");
+                }
+            }
+
+        }
+    }
+
+    private void checkExpressionIfProperty() throws InvalidValue{
+        if (!getEntityDifenichan(m_entity).getPropertys().containsValue(m_value)) {  //value is string
+            throw new InvalidValue("In action set the value is of the wrong type");
+        }
+        if(getEntityDifenichan(m_entity).getPropertys().get(m_value).getType() != getEntityDifenichan(m_entity).getPropertys().get(m_property).getType()){
+            if(!(getEntityDifenichan(m_entity).getPropertys().get(m_property).getType() == exprecnType.FLOAT && getEntityDifenichan(m_entity).getPropertys().get(m_value).getType() == exprecnType.INT)){
+                throw new InvalidValue("In action set the value is a property of the wrong type");
+            }
+        }
+    }
+
+    private void checkExpressionIfFunction() throws InvalidValue {
+        if (m_value.getString().equals("environment")) {
+            exprecn temp = new exprecn();
+            temp.setValue(environment(m_value.getParams(0).getString()));
+            if (getEntityDifenichan(m_entity).getPropertys().get(m_property).getType() != m_value.getType()) {
+                if (!(getEntityDifenichan(m_entity).getPropertys().get(m_property).getType() == exprecnType.FLOAT && m_value.getType() == exprecnType.INT)) {
+                    throw new InvalidValue("In action set the value is of the wrong type");
+                }
+            }
+        }
+    }
+
+    private void checkEntityAndPropertyExist(){
+        if(!isEntityDifenichanExists(m_entity)){
+            throw new OBJECT_NOT_EXIST("In action set the entity " + m_entity + " does not exist.");
+        }
+        if(!getEntityDifenichan(m_entity).getPropertys().containsValue(m_property)){
+            throw new OBJECT_NOT_EXIST("In action set the property " + m_property + "of entity " + m_entity +" does not exist.");
+        }
     }
 
     @Override

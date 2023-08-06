@@ -1,16 +1,20 @@
 package gameEngien.property;
 
+import gameEngien.generated.PRDEnvProperty;
+import gameEngien.property.propertyInterface.propertyType;
 import gameEngien.rule.action.increase.exprecnType;
 
+import java.io.Serializable;
 import java.util.Random;
 
-public class FloatProperty extends Property{
+public class FloatProperty extends Property implements Serializable {
 
     private String m_name;
     private float m_property;
     private Double m_lowRange, m_highRang;
 
     public FloatProperty(propertyDifenichan propertyDifenichan){
+        super(propertyType.FLOAT);
         m_name = propertyDifenichan.getName();
         m_lowRange = propertyDifenichan.getLowRange();
         m_highRang = propertyDifenichan.getHighRange();
@@ -29,6 +33,14 @@ public class FloatProperty extends Property{
         else {
             m_property = propertyDifenichan.getInit().getFloat();
         }
+    }
+
+    public FloatProperty(PRDEnvProperty envProperty){
+        super(propertyType.FLOAT);
+        m_name = envProperty.getPRDName();
+        m_lowRange = envProperty.getPRDRange().getFrom();
+        m_highRang = envProperty.getPRDRange().getTo();
+        m_property = 10;    //TODO get from user
     }
 
     @Override

@@ -1,5 +1,7 @@
 package gameEngien.rule.action.increase;
 
-public enum typeOfExprecen {
+import java.io.Serializable;
+
+public enum typeOfExprecen implements Serializable {
     PROPERTY, ENVIRONMENT, RANDOM, NORMALSTRING
 }

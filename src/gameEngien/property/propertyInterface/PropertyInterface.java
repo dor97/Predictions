@@ -2,6 +2,7 @@ package gameEngien.property.propertyInterface;
 
 public interface PropertyInterface {
 
+    public propertyType getType();
     public void addToProperty(int add);
     public void addToProperty(float add);
     public String getName();

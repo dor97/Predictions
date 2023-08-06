@@ -1,3 +1,4 @@
+import gameEngien.gameEngine;
 import gameEngien.world.World;
 
 import javax.xml.bind.JAXBContext;
@@ -12,10 +13,25 @@ import java.io.InputStream;
 // then press Enter. You can now see whitespace characters in your code.
 public class Main {
     public static void main(String[] args) {
-        World w = new World();
-        w.loadFile();
-        w.setSimulation();
-        w.startSimolesan();
+        try {
+            gameEngine g = new gameEngine();
+            if (false) {
+                g.lodSimuletion();
+                g.activeSimultion();
+                g.saveSystemState();
+            } else {
+                g.loadSystemState();
+            }
+        }
+        catch (Exception e){
+
+        }
+
+
+        //World w = new World();
+        //w.loadFile();
+        //w.setSimulation();
+        //w.startSimolesan();
     }
 
 }

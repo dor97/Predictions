@@ -5,10 +5,11 @@ import gameEngien.property.propertyDifenichan;
 import gameEngien.property.propertyInterface.PropertyInterface;
 import gameEngien.rule.action.increase.exprecnType;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-public class Entity {
+public class Entity implements Serializable {
     private String m_name;
     private Map<String, PropertyInterface> m_propertys;
 
@@ -16,7 +17,7 @@ public class Entity {
     public Entity(EntityDifenichan entity){
         m_name = entity.getName();
         m_propertys = new HashMap<>();
-        for(propertyDifenichan propertyDifenichan : entity.getPropertys()){
+        for(propertyDifenichan propertyDifenichan : entity.getPropertys().values()){
             if(propertyDifenichan.getType() == exprecnType.INT){
                 m_propertys.put(propertyDifenichan.getName(), new DecimalProperty(propertyDifenichan));
             }

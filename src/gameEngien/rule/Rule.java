@@ -1,18 +1,22 @@
 package gameEngien.rule;
 
 import gameEngien.entity.Entity;
+import gameEngien.entity.EntityDifenichan;
 import gameEngien.generated.PRDAction;
 import gameEngien.generated.PRDRule;
 import gameEngien.rule.action.actionInterface.ActionInterface;
 import gameEngien.rule.action.increase.Increase;
 import gameEngien.rule.action.increase.calculation;
 import gameEngien.rule.action.increase.condition;
+import org.omg.CORBA.DynAnyPackage.InvalidValue;
+import org.omg.CORBA.OBJECT_NOT_EXIST;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-public class Rule {
+public class Rule implements Serializable {
     private String m_name;
     private Integer m_ticks = 1;
     private double m_probability = 1;
@@ -27,7 +31,7 @@ public class Rule {
         random = new Random();
     }
 
-    public Rule(PRDRule rule){
+    public Rule(PRDRule rule) throws InvalidValue {
         m_name = rule.getName();
         try{
             m_ticks = rule.getPRDActivation().getTicks() != null ? rule.getPRDActivation().getTicks() : 1;
@@ -44,15 +48,24 @@ public class Rule {
         random = new Random();
         m_actions = new ArrayList<>();
         for(PRDAction action : rule.getPRDActions().getPRDAction()){
-            if(action.getType().equals("increase")){
-                m_actions.add(new Increase(action));
-            } else if (action.getType().equals("calculation")) {
-                m_actions.add(new calculation(action));
+            try {
+                if (action.getType().equals("increase")) {
+                    m_actions.add(new Increase(action));
+                } else if (action.getType().equals("calculation")) {
+                    m_actions.add(new calculation(action));
+                } else if (action.getType().equals("condition")) {
+                    m_actions.add(new condition(action));
+                }
             }
-            else if (action.getType().equals("condition")) {
-                m_actions.add(new condition(action));
+            catch (OBJECT_NOT_EXIST e){
+                throw new OBJECT_NOT_EXIST(e.getMessage() + " referred to in rule " + m_name);
             }
-
+            catch (ArithmeticException e){
+                throw new ArithmeticException(e.getMessage() + " referred to in rule " + m_name);
+            }
+            //catch (Exception e){
+            //    throw new Exception(e.getMessage() + " referred to in rule " + m_name);
+            //}
 
         }
     }

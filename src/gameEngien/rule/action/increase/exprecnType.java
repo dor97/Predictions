@@ -1,5 +1,7 @@
 package gameEngien.rule.action.increase;
 
-public enum exprecnType {
+import java.io.Serializable;
+
+public enum exprecnType implements Serializable {
     INT, FLOAT, STRING, BOOL
 }

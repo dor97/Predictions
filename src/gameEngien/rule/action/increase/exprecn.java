@@ -1,6 +1,8 @@
 package gameEngien.rule.action.increase;
 
-public class exprecn {
+import java.io.Serializable;
+
+public class exprecn implements Serializable {
     private Integer valueInt = null;
     private Float valueFloat = null;
     private String valueString = null;

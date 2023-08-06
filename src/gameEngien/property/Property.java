@@ -1,10 +1,20 @@
 package gameEngien.property;
 
 import gameEngien.property.propertyInterface.PropertyInterface;
+import gameEngien.property.propertyInterface.propertyType;
 
+import java.io.Serializable;
 import java.util.PrimitiveIterator;
 
-public class Property implements PropertyInterface {
+public class Property implements PropertyInterface, Serializable {
+    private propertyType m_type;
+    public Property(propertyType type){
+        m_type = type;
+    }
+    @Override
+    public propertyType getType(){
+        return m_type;
+    }
 
     @Override
     public void addToProperty(int add) {

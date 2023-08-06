@@ -5,11 +5,15 @@ import gameEngien.generated.PRDAction;
 import gameEngien.property.propertyInterface.PropertyInterface;
 import gameEngien.rule.action.actionInterface.ActionInterface;
 import gameEngien.utilites.Utilites;
+import org.omg.CORBA.DynAnyPackage.InvalidValue;
+import org.omg.CORBA.OBJECT_NOT_EXIST;
 
-import static gameEngien.utilites.Utilites.environment;
-import static gameEngien.utilites.Utilites.random;
+import java.io.Serializable;
 
-public class calculation extends action {
+import static gameEngien.utilites.Utilites.*;
+import static gameEngien.utilites.Utilites.getEntityDifenichan;
+
+public class calculation extends action implements Serializable {
     private String m_entity;
     private String m_property;
     //private Entity m_e;
@@ -28,7 +32,7 @@ public class calculation extends action {
         m_value2 = v2;
     }
 
-    public calculation(PRDAction action) {
+    public calculation(PRDAction action) throws InvalidValue{
         m_entity = action.getEntity();
         m_property = action.getProperty();
         m_value1 = action.getPRDMultiply().getArg1();
@@ -45,7 +49,79 @@ public class calculation extends action {
         m_v2 = new exprecnWithFunc();
         m_v1.convertValueInString(m_value1);
         m_v2.convertValueInString(m_value2);
+        cheackUserInput();
     }
+
+    private void cheackUserInput() throws InvalidValue{
+        checkEntityAndPropertyExist();
+        checkTypeValid(m_v1);
+        checkTypeValid(m_v2);
+        checkCompatibilityBetweenPropertyAndExpression(m_v1);
+        checkCompatibilityBetweenPropertyAndExpression(m_v2);
+    }
+
+    private void checkCompatibilityBetweenPropertyAndExpression(exprecnWithFunc arg) throws InvalidValue{
+        if(getEntityDifenichan(m_entity).getPropertys().get(m_property).getType() != arg.getType()){
+            if(getEntityDifenichan(m_entity).getPropertys().get(m_property).getType() == exprecnType.INT && arg.getType() == exprecnType.FLOAT){
+                throw new InvalidValue("In action calculation the property and ond of the expression are not compatible");
+            }
+            if(arg.getType() == exprecnType.STRING) {
+                if (!arg.isFunc()) {
+                    checkExpressionIfProperty(arg);
+                }
+                else{
+                    checkExpressionIfFunction(arg);
+                }
+            }
+        }
+    }
+
+    private void checkExpressionIfProperty(exprecnWithFunc arg) throws InvalidValue{
+        if (!getEntityDifenichan(m_entity).getPropertys().containsValue(arg)) {
+            throw new InvalidValue("In action calculation there is an expression of the wrong type");
+        }
+        if(!(getEntityDifenichan(m_entity).getPropertys().get(arg).getType() == exprecnType.INT)){
+            if(!(getEntityDifenichan(m_entity).getPropertys().get(arg).getType() == exprecnType.FLOAT)){
+                throw new InvalidValue("In action calculation one of the expression is a property of the wrong type");
+            }
+            if(!(getEntityDifenichan(m_entity).getPropertys().get(m_property).getType() == exprecnType.FLOAT)){
+                throw new InvalidValue("In action calculation one of the expression is a property of the wrong type");
+            }
+        }
+    }
+
+    private void checkExpressionIfFunction(exprecnWithFunc arg) throws InvalidValue{
+        if (arg.getString().equals("environment")) {
+            exprecn temp = new exprecn();
+            temp.setValue(environment(arg.getParams(0).getString()));
+            if (temp.getType() == exprecnType.STRING || temp.getType() == exprecnType.BOOL) {
+                throw new InvalidValue("In action calculation one of the expression is of the wrong type");
+            }
+            if (temp.getType() == exprecnType.FLOAT && getEntityDifenichan(m_entity).getPropertys().get(m_property).getType() == exprecnType.INT) {
+                throw new InvalidValue("In action calculation the property and one of the expression are not compatible");
+            }
+        }
+    }
+
+    private void checkTypeValid(exprecnWithFunc arg) throws InvalidValue{
+        if(arg.getType() == exprecnType.BOOL){
+            throw new InvalidValue("In action calculation the value  by is of the wrong type");
+        }
+        if(getEntityDifenichan(m_entity).getPropertys().get(m_property).getType() == exprecnType.STRING || getEntityDifenichan(m_entity).getPropertys().get(m_property).getType() == exprecnType.BOOL){
+            throw new InvalidValue("In action calculation got a wrong type property");
+        }
+    }
+
+    private void checkEntityAndPropertyExist(){
+        if(!isEntityDifenichanExists(m_entity)){
+            throw new OBJECT_NOT_EXIST("In action increase the entity " + m_entity + " does not exist.");
+        }
+        if(!getEntityDifenichan(m_entity).getPropertys().containsValue(m_property)){
+            throw new OBJECT_NOT_EXIST("In action increase the property " + m_property + "of entity " + m_entity +" does not exist.");
+        }
+    }
+
+
 
     @Override
     public String getEntityName(){
@@ -134,6 +210,9 @@ public class calculation extends action {
             entity.getProperty(m_property).setProperty(v1 * v2);
         }
         else{
+            if(v2 == 0){
+                throw new ArithmeticException("In action calculation with entity " + m_entity + "and property" + m_property + " ,divided by zero in");
+            }
             entity.getProperty(m_property).setProperty(v1 / v2);
         }
 
@@ -144,6 +223,9 @@ public class calculation extends action {
             entity.getProperty(m_property).setProperty(v1 * v2);
         }
         else{
+            if(v2 == 0){
+                throw new ArithmeticException("In action calculation with entity " + m_entity + "and property" + m_property + " ,divided by zero in");
+            }
             entity.getProperty(m_property).setProperty(v1 / v2);
         }
     }

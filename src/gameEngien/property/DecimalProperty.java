@@ -4,16 +4,19 @@ import gameEngien.generated.PRDEnvProperty;
 import gameEngien.property.Property;
 import gameEngien.property.propertyDifenichan;
 import gameEngien.property.propertyInterface.PropertyInterface;
+import gameEngien.property.propertyInterface.propertyType;
 import gameEngien.rule.action.increase.exprecnType;
 
+import java.io.Serializable;
 import java.util.Random;
 
-public class DecimalProperty extends Property {
+public class DecimalProperty extends Property implements Serializable {
     private String m_name;
     private int m_property;
     private Double m_lowRange, m_highRang;
 
     public DecimalProperty(propertyDifenichan propertyDifenichan){
+        super(propertyType.INT);
         m_name = propertyDifenichan.getName();
         m_lowRange = propertyDifenichan.getLowRange();
         m_highRang = propertyDifenichan.getHighRange();
@@ -36,14 +39,16 @@ public class DecimalProperty extends Property {
     }
 
     public DecimalProperty(PRDEnvProperty envProperty){
+        super(propertyType.INT);
         m_name = envProperty.getPRDName();
         m_lowRange = envProperty.getPRDRange().getFrom();
         m_highRang = envProperty.getPRDRange().getTo();
-        m_property = 10;
+        m_property = 10;    //TODO get from user
 
     }
 
     public DecimalProperty(String name, int property, double lowRange, double highRange){
+        super(propertyType.INT);
         m_name = name;
         m_lowRange = lowRange;
         m_highRang = highRange;

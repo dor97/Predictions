@@ -1,12 +1,17 @@
 package gameEngien.rule.action.increase;
 
 import gameEngien.entity.Entity;
+import gameEngien.generated.PRDAction;
 import gameEngien.generated.PRDCondition;
+import org.omg.CORBA.DynAnyPackage.InvalidValue;
+import org.omg.CORBA.OBJECT_NOT_EXIST;
 
-import static gameEngien.utilites.Utilites.environment;
-import static gameEngien.utilites.Utilites.random;
+import java.io.Serializable;
 
-public class single implements subCondition {
+import static gameEngien.utilites.Utilites.*;
+import static gameEngien.utilites.Utilites.getEntityDifenichan;
+
+public class single implements subCondition, Serializable {
 
     enum opertor{ EQUAL, UNEQUAL, BIGGER, LITTLE}
     private String m_entity;
@@ -14,12 +19,67 @@ public class single implements subCondition {
     private opertor m_op;
     private exprecnWithFunc m_exprecn;
 
-    public single(PRDCondition condition){
+    public single(PRDCondition condition) throws InvalidValue{
         m_entity = condition.getEntity();
         m_property = condition.getProperty();
         m_op = getOpFromString(condition.getOperator());
         m_exprecn = new exprecnWithFunc();
         m_exprecn.convertValueInString(condition.getValue());
+        cheackUserInput();
+    }
+
+    private void cheackUserInput() throws InvalidValue {
+        checkEntityAndPropertyExist();
+        checkTypeValid();
+        checkCompatibilityBetweenPropertyAndExpression();
+    }
+
+    private void checkCompatibilityBetweenPropertyAndExpression() throws InvalidValue{
+        if(m_exprecn.getType() == exprecnType.STRING) {
+            if (!m_exprecn.isFunc()) {
+                checkExpressionIfProperty();
+            }
+            else{
+                checkExpressionIfFunction();
+            }
+        }
+    }
+
+    private void checkExpressionIfProperty() throws InvalidValue{
+        if (!getEntityDifenichan(m_entity).getPropertys().containsValue(m_exprecn)) {
+            throw new InvalidValue("In action condition in single value is of the wrong type");
+        }
+        if(!(getEntityDifenichan(m_entity).getPropertys().get(m_exprecn).getType() == exprecnType.INT || getEntityDifenichan(m_entity).getPropertys().get(m_exprecn).getType() == exprecnType.FLOAT)){
+            throw new InvalidValue("In action condition in single value is a property of the wrong type");
+        }
+    }
+
+    private void checkExpressionIfFunction() throws InvalidValue{
+        if (m_exprecn.getString().equals("environment")) {
+            exprecn temp = new exprecn();
+            temp.setValue(environment(m_exprecn.getParams(0).getString()));
+            if (temp.getType() == exprecnType.STRING || temp.getType() == exprecnType.BOOL) {
+                throw new InvalidValue("In action condition in single value is of the wrong type");
+            }
+        }
+    }
+
+    private void checkTypeValid() throws InvalidValue{
+        if(m_exprecn.getType() == exprecnType.BOOL){
+            throw new InvalidValue("In action condition in single value is of the wrong type");
+        }
+        if(getEntityDifenichan(m_entity).getPropertys().get(m_property).getType() == exprecnType.STRING || getEntityDifenichan(m_entity).getPropertys().get(m_property).getType() == exprecnType.BOOL){
+            throw new InvalidValue("In action condition in single got a wrong type property");
+        }
+    }
+
+    private void checkEntityAndPropertyExist(){
+        if(!isEntityDifenichanExists(m_entity)){
+            throw new OBJECT_NOT_EXIST("In action condition in single the entity " + m_entity + " does not exist.");
+        }
+        if(!getEntityDifenichan(m_entity).getPropertys().containsValue(m_property)){
+            throw new OBJECT_NOT_EXIST("In action condition in single the property " + m_property + "of entity " + m_entity +" does not exist.");
+        }
     }
 
     private opertor getOpFromString(String op){

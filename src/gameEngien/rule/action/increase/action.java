@@ -4,7 +4,9 @@ import gameEngien.entity.Entity;
 import gameEngien.property.propertyInterface.PropertyInterface;
 import gameEngien.rule.action.actionInterface.ActionInterface;
 
-public class action implements ActionInterface {
+import java.io.Serializable;
+
+public class action implements ActionInterface, Serializable {
     @Override
     public String getEntityName() {
         return null;

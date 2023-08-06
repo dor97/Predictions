@@ -2,17 +2,19 @@ package gameEngien.rule.action.increase;
 
 import gameEngien.entity.Entity;
 import gameEngien.generated.PRDCondition;
+import org.omg.CORBA.DynAnyPackage.InvalidValue;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class multiple implements subCondition {
+public class multiple implements subCondition, Serializable {
 
     enum logicalOp{ OR, AND}
     logicalOp m_logical;
     List<subCondition> m_conditions;
 
-    public multiple(PRDCondition condition){
+    public multiple(PRDCondition condition) throws InvalidValue {
         m_conditions = new ArrayList<>();
         if(condition.getLogical().equals("or")){
             m_logical = logicalOp.OR;

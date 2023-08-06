@@ -1,9 +1,12 @@
 package gameEngien.rule.action.increase;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class exprecnWithFunc extends exprecn {
+import static gameEngien.utilites.Utilites.isEnvironmentExist;
+
+public class exprecnWithFunc extends exprecn  implements Serializable {
 
     private boolean m_isFunc = false;
     List<exprecn> params = new ArrayList<>();
@@ -31,15 +34,19 @@ public class exprecnWithFunc extends exprecn {
                     // Split the parameter if needed
                     String[] parameterParts = parameters.split(",");
 
-                    setValue(functionName);
-                    m_isFunc = true;
-                    // Now you have the function name and parameters
                     params.clear();
                     for (String parameter : parameterParts) {
                         exprecn temp = new exprecn();
                         temp.convertValueInString(parameter.trim());
                         params.add(temp);
                     }
+
+                    if(!ifFunctionValid(functionName)){
+                        return;
+                    }
+                    setValue(functionName);
+                    m_isFunc = true;
+
                 }
 
 
@@ -70,6 +77,18 @@ public class exprecnWithFunc extends exprecn {
         }
     }
 
+    private boolean ifFunctionValid(String name){
+        if(name.equals("environment")){
+            if(params.size() == 1 && isEnvironmentExist(params.get(0).getString())){
+                return true;
+            }
+        } else if (name.equals("random")) {
+            if(params.size() == 1 && params.get(0).getType() == exprecnType.INT){
+                return true;
+            }
+        }
+        return false;
+    }
 
     @Override
     public void setValue(int value) {

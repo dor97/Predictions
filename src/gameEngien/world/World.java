@@ -1,5 +1,7 @@
 package gameEngien.world;
 
+import gameEngien.UnsupportedFileTypeException;
+import gameEngien.allReadyExistsException;
 import gameEngien.entity.Entity;
 import gameEngien.entity.EntityDifenichan;
 import gameEngien.generated.*;
@@ -10,24 +12,26 @@ import gameEngien.rule.action.actionInterface.ActionInterface;
 import gameEngien.rule.action.increase.Increase;
 import gameEngien.rule.action.increase.calculation;
 import gameEngien.utilites.Utilites;
+import org.omg.CORBA.DynAnyPackage.InvalidValue;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.InputStream;
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class World {
+public class World implements Serializable {
     private List<Rule> m_rules = new ArrayList<>();
     private List<Entity> m_entities = new ArrayList<>();
 
-    private List<EntityDifenichan> m_entitiesDifenichan = new ArrayList<>();
+    private Map<String, EntityDifenichan> m_entitiesDifenichan = new HashMap<>();
     private Map<String, PropertyInterface> m_environments = new HashMap<>();
     private int m_time = 0;
 
@@ -54,12 +58,13 @@ public class World {
         PropertyInterface env2 = new DecimalProperty("ep2", 4, 0, 200);
         m_environments.put(env.getName(), env);
         m_environments.put(env2.getName(), env2);
-        Utilites.Init(m_environments);
+        Utilites.Init(m_environments, m_entitiesDifenichan);
 
 
     }
 
     public void startSimolesan(){
+        Utilites.Init(m_environments, m_entitiesDifenichan);
         List<Entity> toRemove = new ArrayList<>();
         for(int i = 0; i < 240; ++i){
             for(Entity entity : m_entities){
@@ -78,24 +83,42 @@ public class World {
 
     //public void setEnviroment(String name, )
 
-    public void loadFile(){
+    public void loadFile()throws NoSuchFileException , UnsupportedFileTypeException, allReadyExistsException, InvalidValue, JAXBException, FileNotFoundException {
         PRDWorld w = new PRDWorld();
+        String xmlFile = "src/resources/ex1-cigarets.xml";
+
+        Path path = Paths.get(xmlFile);
+        if (Files.exists(path) && Files.isRegularFile(path)) {
+            // Check if the file extension is .xml
+            String fileName = path.getFileName().toString();
+            if (fileName.endsWith(".xml")) {
+                System.out.println("File exists and is an XML file.");
+            } else {
+                //System.out.println("File exists but is not an XML file.");
+                throw new UnsupportedFileTypeException("Not an XML file: " + xmlFile);
+            }
+        } else {
+            //System.out.println("File does not exist or is not a regular file.");
+            throw new NoSuchFileException("File does not exist: " + xmlFile);
+        }
+
+
         try {
             InputStream inputStream = new FileInputStream(new File("src/resources/ex1-cigarets.xml"));
             w = deserializeFrom(inputStream);
             //System.out.println("name of first country is: " + countries.getCountry().get(0).getName());
         } catch (JAXBException | FileNotFoundException e) {
-            e.printStackTrace();
+            throw e;
         }
-
+        //entitys
         for(PRDEntity e : w.getPRDEntities().getPRDEntity()){
-            m_entitiesDifenichan.add(new EntityDifenichan(e));
+            m_entitiesDifenichan.put(e.getName(), new EntityDifenichan(e));
         }
-        for(PRDRule rule : w.getPRDRules().getPRDRule()){
-            m_rules.add(new Rule(rule));
-        }
-
+        //environment values
         for(PRDEnvProperty envProperty : w.getPRDEvironment().getPRDEnvProperty()){
+            if(m_environments.containsKey(envProperty.getPRDName())){
+                throw new allReadyExistsException("enviroments varuble " + envProperty.getPRDName() + " all ready exists");
+            }
             if(envProperty.getType().equals("decimal")) {
                 m_environments.put(envProperty.getPRDName(), new DecimalProperty(envProperty));
             }
@@ -104,11 +127,18 @@ public class World {
             }
         }
 
-        Utilites.Init(m_environments);
+        //rules
+        for(PRDRule rule : w.getPRDRules().getPRDRule()){
+            m_rules.add(new Rule(rule));
+        }
+
+
+
+
     }
 
     public void setSimulation(){
-        for(EntityDifenichan entityDifenichan : m_entitiesDifenichan){
+        for(EntityDifenichan entityDifenichan : m_entitiesDifenichan.values()){
             for(int i = 0; i < entityDifenichan.getAmount(); i++){
                 m_entities.add(new Entity(entityDifenichan));
             }
