@@ -103,7 +103,7 @@ public class World implements Serializable {
 
 
         try {
-            InputStream inputStream = new FileInputStream(new File("src/resources/ex1-cigarets.xml"));
+            InputStream inputStream = new FileInputStream(new File(xmlFile));
             w = deserializeFrom(inputStream);
             //System.out.println("name of first country is: " + countries.getCountry().get(0).getName());
         } catch (JAXBException | FileNotFoundException e) {
