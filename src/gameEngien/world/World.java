@@ -83,9 +83,8 @@ public class World implements Serializable {
 
     //public void setEnviroment(String name, )
 
-    public void loadFile()throws NoSuchFileException , UnsupportedFileTypeException, allReadyExistsException, InvalidValue, JAXBException, FileNotFoundException {
+    public void loadFile(String xmlFile)throws NoSuchFileException , UnsupportedFileTypeException, allReadyExistsException, InvalidValue, JAXBException, FileNotFoundException {
         PRDWorld w = new PRDWorld();
-        String xmlFile = "src/resources/ex1-cigarets.xml";
 
         Path path = Paths.get(xmlFile);
         if (Files.exists(path) && Files.isRegularFile(path)) {

@@ -14,9 +14,9 @@ public class gameEngine {
     World cuurentSimuletion;
     int simulationNum = 0;
 
-    public void lodSimuletion() throws NoSuchFileException, UnsupportedFileTypeException, InvalidValue, allReadyExistsException , JAXBException, FileNotFoundException {
+    public void lodSimuletion(String fileName) throws NoSuchFileException, UnsupportedFileTypeException, InvalidValue, allReadyExistsException , JAXBException, FileNotFoundException {
         cuurentSimuletion = new World();
-        cuurentSimuletion.loadFile();
+        cuurentSimuletion.loadFile(fileName);
         cuurentSimuletion.setSimulation();
         worldsList.add(cuurentSimuletion);
     }
