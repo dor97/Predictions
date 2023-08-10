@@ -1,5 +1,6 @@
 package gameEngien.rule;
 
+import DTO.DTORuleData;
 import gameEngien.entity.Entity;
 import gameEngien.generated.PRDAction;
 import gameEngien.generated.PRDRule;
@@ -95,5 +96,16 @@ public class Rule implements Serializable {
     
     public int getTick(){
         return m_ticks;
+    }
+
+    public DTORuleData makeDtoRule(){
+        DTORuleData DTO = new DTORuleData(m_name, m_ticks, m_probability);
+
+        for(ActionInterface action : m_actions){
+            DTO.addActionName("");
+            DTO.increaseNumberOfActionByOne();
+        }
+
+        return DTO;
     }
 }

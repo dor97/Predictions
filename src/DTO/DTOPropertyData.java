@@ -21,4 +21,28 @@ public class DTOPropertyData {
         m_highRange = highRange;
         m_lowRange = lowRange;
     }
+
+    public String getName(){
+        return propertyName;
+    }
+
+    public DTOPropertyType getType(){
+        return propertyType;
+    }
+
+    public boolean haveRange(){
+        return m_haveRange;
+    }
+
+    public boolean isRandomlyInatiated(){
+        return m_RandomlyInatiated;
+    }
+
+    public double getHighRange(){
+        return m_highRange;
+    }
+
+    public double getLowRange(){
+        return m_lowRange;
+    }
 }

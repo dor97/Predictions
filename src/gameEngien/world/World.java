@@ -1,5 +1,8 @@
 package gameEngien.world;
 
+import DTO.DTOSimulationDetails;
+import DTO.DTOTerminationData;
+import DTO.terminationType;
 import gameEngien.UnsupportedFileTypeException;
 import gameEngien.allReadyExistsException;
 import gameEngien.entity.Entity;
@@ -109,6 +112,28 @@ public class World implements Serializable {
     }
 
     //public void setEnviroment(String name, )
+
+    public DTOSimulationDetails getSimulationDetails(){
+        DTOSimulationDetails DTO = new DTOSimulationDetails();
+
+        for(EntityDifenichan entity : m_entitiesDifenichan.values()){
+            DTO.addEntity(entity.makeDtoEntity());
+        }
+
+        for(Rule rule : m_rules){
+            DTO.addRule(rule.makeDtoRule());
+        }
+
+        if(m_ticks.getType() != null){
+            DTO.addTermination(new DTOTerminationData(terminationType.TICKS, m_ticks.getInt()));
+        }
+
+        if(m_secondToWork.getType() != null){
+            DTO.addTermination(new DTOTerminationData(terminationType.SECOND, m_secondToWork.getInt()));
+        }
+
+        return DTO;
+    }
 
     public void loadFile(String xmlFile)throws NoSuchFileException , UnsupportedFileTypeException, allReadyExistsException, InvalidValue, JAXBException, FileNotFoundException {
         PRDWorld xmlWorld = new PRDWorld();

@@ -6,9 +6,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class DTOEntityData {
-    String EntityName;
-    int m_amount;
-    List<DTOPropertyData> PropertList = new ArrayList<>();
+    private String EntityName;
+    private int m_amount;
+    private List<DTOPropertyData> PropertList = new ArrayList<>();
 
     public DTOEntityData(String name, int amount){
         EntityName = name;
@@ -17,5 +17,17 @@ public class DTOEntityData {
 
     public void addProperty(DTOPropertyData property){
         PropertList.add(property);
+    }
+
+    public String getName(){
+        return EntityName;
+    }
+
+    public int getAmount(){
+        return m_amount;
+    }
+
+    public List<DTOPropertyData> getPropertList(){
+        return PropertList;
     }
 }
