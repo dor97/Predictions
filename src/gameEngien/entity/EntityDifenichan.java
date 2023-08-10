@@ -1,5 +1,6 @@
 package gameEngien.entity;
 
+import DTO.DTOEntityData;
 import gameEngien.allReadyExistsException;
 import gameEngien.generated.PRDEntity;
 import gameEngien.generated.PRDProperty;
@@ -42,6 +43,16 @@ public class EntityDifenichan implements Serializable {
 
     public Map<String, propertyDifenichan> getPropertys(){
         return  m_propertys;
+    }
+
+    public DTOEntityData makeDtoEntity(){
+        DTOEntityData DTO = new DTOEntityData(m_name, m_amount);
+
+        for(propertyDifenichan property : m_propertys.values()){
+            DTO.addProperty(property.makeDtoProperty());
+        }
+
+        return DTO;
     }
 
 }

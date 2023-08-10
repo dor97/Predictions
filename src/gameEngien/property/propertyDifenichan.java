@@ -1,5 +1,8 @@
 package gameEngien.property;
 
+import DTO.DTOEntityData;
+import DTO.DTOPropertyData;
+import DTO.DTOPropertyType;
 import gameEngien.generated.PRDProperty;
 import gameEngien.rule.action.increase.exprecn;
 import gameEngien.rule.action.increase.exprecnType;
@@ -12,11 +15,13 @@ public class propertyDifenichan implements Serializable {
     private double m_lowRange, m_highRang;
     private boolean m_randomlyIneceat;
     private exprecn m_init;
+    private boolean haveRange = false;
 
     public propertyDifenichan(PRDProperty p){
         m_name = p.getPRDName();
         m_type = myType(p.getType());
         if(p.getPRDRange() != null) {
+            haveRange = true;
             m_lowRange = p.getPRDRange().getFrom();
             m_highRang = p.getPRDRange().getTo();
             if(m_highRang < m_lowRange){
@@ -73,6 +78,27 @@ public class propertyDifenichan implements Serializable {
             return  null;
             //exepcen
         }
+    }
+
+    public DTOPropertyData makeDtoProperty(){
+        DTOPropertyType type;
+        if(m_type == exprecnType.INT) {
+            type = DTOPropertyType.INT;
+        } else if (m_type ==exprecnType.FLOAT) {
+            type = DTOPropertyType.FLOAT;
+        } else if (m_type == exprecnType.STRING) {
+            type = DTOPropertyType.STRING;
+        } else {
+            type = DTOPropertyType.BOOL;
+        }
+        DTOPropertyData DTO;
+        if(haveRange){
+            DTO = new DTOPropertyData(m_name, type, haveRange, m_randomlyIneceat, m_highRang, m_lowRange);
+        }
+        else{
+            DTO = new DTOPropertyData(m_name, type, haveRange, m_randomlyIneceat);
+        }
+        return DTO;
     }
 
 }
