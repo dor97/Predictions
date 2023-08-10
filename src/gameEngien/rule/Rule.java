@@ -78,7 +78,7 @@ public class Rule implements Serializable {
     public void addAction(ActionInterface ActionToAdd){
         m_actions.add(ActionToAdd);
     }
-    public boolean activeRule(Entity entity){
+    public boolean activeRule(Entity entity)throws InvalidValue{
         for(ActionInterface action : m_actions){
             if(action.getEntityName().equals(entity.getName()) && (entity.isPropertyExists(action.getPropertyName()) || action.getPropertyName() == null)){
                 if (action.activateAction(entity)){

@@ -27,7 +27,7 @@ public class set extends action implements Serializable {
 
     private void cheackUserInput() throws InvalidValue {
         checkEntityAndPropertyExist();
-        checkCompatibilityBetweenPropertyAndExpression();
+        //checkCompatibilityBetweenPropertyAndExpression(); //disable because if exercise requirements
     }
 
     private void checkCompatibilityBetweenPropertyAndExpression() throws InvalidValue{
@@ -76,7 +76,7 @@ public class set extends action implements Serializable {
         if(!isEntityDifenichanExists(m_entity)){
             throw new OBJECT_NOT_EXIST("In action set the entity " + m_entity + " does not exist.");
         }
-        if(!getEntityDifenichan(m_entity).getPropertys().containsValue(m_property)){
+        if(!getEntityDifenichan(m_entity).getPropertys().containsKey(m_property)){
             throw new OBJECT_NOT_EXIST("In action set the property " + m_property + "of entity " + m_entity +" does not exist.");
         }
     }
@@ -93,7 +93,6 @@ public class set extends action implements Serializable {
 
     @Override
     public boolean activateAction(Entity i_entity) {
-
         if(m_value.getType() == exprecnType.INT){
             i_entity.getProperty(m_property).setProperty(m_value.getInt());
         } else if (m_value.getType() == exprecnType.FLOAT) {
@@ -107,14 +106,11 @@ public class set extends action implements Serializable {
                     temp.setValue(environment(m_value.getParams(0).getString()));
                     if(temp.getType() == exprecnType.INT) {
                         i_entity.getProperty(m_property).setProperty(temp.getInt());
-                    }
-                    else if (temp.getType() == exprecnType.FLOAT) {
+                    } else if (temp.getType() == exprecnType.FLOAT) {
                         i_entity.getProperty(m_property).setProperty(temp.getFloat());
-                    }
-                    else if (temp.getType() == exprecnType.BOOL){
+                    } else if (temp.getType() == exprecnType.BOOL){
                         i_entity.getProperty(m_property).setProperty(temp.getBool());
-                    }
-                    else{
+                    } else{
                         i_entity.getProperty(m_property).setProperty(temp.getString());
                     }
                 }
@@ -140,7 +136,6 @@ public class set extends action implements Serializable {
                         i_entity.getProperty(m_property).setProperty(m_value.getFloat());
                     } else if (m_value.getType() == exprecnType.BOOL) {
                         i_entity.getProperty(m_property).setProperty(m_value.getBool());
-
                     } else{
                         i_entity.getProperty(m_property).setProperty(m_value.getString());
                     }

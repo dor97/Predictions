@@ -3,6 +3,7 @@ package gameEngien.rule.action.increase;
 import gameEngien.entity.Entity;
 import gameEngien.property.propertyInterface.PropertyInterface;
 import gameEngien.rule.action.actionInterface.ActionInterface;
+import org.omg.CORBA.DynAnyPackage.InvalidValue;
 
 import java.io.Serializable;
 
@@ -18,7 +19,7 @@ public class action implements ActionInterface, Serializable {
     }
 
     @Override
-    public boolean activateAction(Entity entity) {
+    public boolean activateAction(Entity entity)throws InvalidValue {
         return false;
     }
 

@@ -21,7 +21,7 @@ public class gameEngine {
         worldsList.add(cuurentSimuletion);
     }
 
-    public void activeSimultion(){
+    public void activeSimultion()throws InvalidValue{
         cuurentSimuletion.startSimolesan();
     }
 

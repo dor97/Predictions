@@ -56,7 +56,7 @@ public class condition extends action implements Serializable {
         }
     }
     @Override
-    public boolean activateAction(Entity entity) {
+    public boolean activateAction(Entity entity) throws InvalidValue{
         if (m_subCon.getBoolValue(entity)) {
             for (ActionInterface action : m_then) {
                 //if(action.getEntityName() == entity.getName() && entity.isPropertyExists(action.getPropertyName())){

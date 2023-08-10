@@ -14,6 +14,7 @@ import gameEngien.rule.Rule;
 import gameEngien.rule.action.actionInterface.ActionInterface;
 import gameEngien.rule.action.increase.addValue;
 import gameEngien.rule.action.increase.calculation;
+import gameEngien.rule.action.increase.exprecn;
 import gameEngien.utilites.Utilites;
 import org.omg.CORBA.DynAnyPackage.InvalidValue;
 
@@ -25,6 +26,8 @@ import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.*;
 
 public class World implements Serializable {
@@ -33,7 +36,8 @@ public class World implements Serializable {
 
     private Map<String, EntityDifenichan> m_entitiesDifenichan = new HashMap<>();
     private Map<String, PropertyInterface> m_environments = new HashMap<>();
-    private int m_time = 0;
+    private exprecn m_ticks = null;
+    private exprecn m_secondToWork = null;
 
     private final static String JAXB_XML_GAME_PACKAGE_NAME = "gameEngien.generated";
 
@@ -63,13 +67,32 @@ public class World implements Serializable {
 
     }
 
-    public void startSimolesan(){
-        Utilites.Init(m_environments, m_entitiesDifenichan);
+    public void startSimolesan()throws InvalidValue{
+        //Utilites.Init(m_environments, m_entitiesDifenichan);
         List<Entity> toRemove = new ArrayList<>();
         Random random = new Random();
-        for(int i = 0; i < 240; ++i){
+
+//        for(int i = 0; i < m_ticks.getInt(); ++i){
+//            for(Rule r : m_rules) {
+//                if(i % r.getTick() == 0 && random.nextDouble() < r.getProbability()) {
+//                    for (Entity entity : m_entities) {
+//                        if (r.activeRule(entity)) {
+//                            toRemove.add(entity);
+//                            break;
+//                        }
+//                    }
+//                }
+//            }
+//            for(Entity entity : toRemove){
+//                m_entities.remove(entity);
+//            }
+//        }
+
+        int currTick = 0, currTime = 0;
+        Instant start = Instant.now();
+        while ((m_ticks.getType() == null || currTick < m_ticks.getInt()) && (m_secondToWork == null || Duration.between(start, Instant.now()).getSeconds() < m_secondToWork.getInt())){
             for(Rule r : m_rules) {
-                if(i % r.getTick() == 0 && random.nextDouble() < r.getProbability()) {
+                if(currTick % r.getTick() == 0 && random.nextDouble() < r.getProbability()) {
                     for (Entity entity : m_entities) {
                         if (r.activeRule(entity)) {
                             toRemove.add(entity);
@@ -81,43 +104,40 @@ public class World implements Serializable {
             for(Entity entity : toRemove){
                 m_entities.remove(entity);
             }
+            currTick++;
         }
     }
 
     //public void setEnviroment(String name, )
 
     public void loadFile(String xmlFile)throws NoSuchFileException , UnsupportedFileTypeException, allReadyExistsException, InvalidValue, JAXBException, FileNotFoundException {
-        PRDWorld w = new PRDWorld();
+        PRDWorld xmlWorld = new PRDWorld();
 
         Path path = Paths.get(xmlFile);
         if (Files.exists(path) && Files.isRegularFile(path)) {
             // Check if the file extension is .xml
             String fileName = path.getFileName().toString();
-            if (fileName.endsWith(".xml")) {
-                System.out.println("File exists and is an XML file.");
-            } else {
-                //System.out.println("File exists but is not an XML file.");
+            if (!fileName.endsWith(".xml")) {
                 throw new UnsupportedFileTypeException("Not an XML file: " + xmlFile);
             }
         } else {
-            //System.out.println("File does not exist or is not a regular file.");
             throw new NoSuchFileException("File does not exist: " + xmlFile);
         }
 
-
         try {
             InputStream inputStream = new FileInputStream(new File(xmlFile));
-            w = deserializeFrom(inputStream);
-            //System.out.println("name of first country is: " + countries.getCountry().get(0).getName());
+            xmlWorld = deserializeFrom(inputStream);
         } catch (JAXBException | FileNotFoundException e) {
             throw e;
         }
+
         //entitys
-        for(PRDEntity e : w.getPRDEntities().getPRDEntity()){
+        for(PRDEntity e : xmlWorld.getPRDEntities().getPRDEntity()){
             m_entitiesDifenichan.put(e.getName(), new EntityDifenichan(e));
         }
+
         //environment values
-        for(PRDEnvProperty envProperty : w.getPRDEvironment().getPRDEnvProperty()){
+        for(PRDEnvProperty envProperty : xmlWorld.getPRDEvironment().getPRDEnvProperty()){
             if(m_environments.containsKey(envProperty.getPRDName())){
                 throw new allReadyExistsException("enviroments varuble " + envProperty.getPRDName() + " all ready exists");
             }
@@ -132,14 +152,24 @@ public class World implements Serializable {
             }
         }
 
+        Utilites.Init(m_environments, m_entitiesDifenichan);
+
         //rules
-        for(PRDRule rule : w.getPRDRules().getPRDRule()){
+        for(PRDRule rule : xmlWorld.getPRDRules().getPRDRule()){
             m_rules.add(new Rule(rule));
         }
 
+        m_ticks = new exprecn();
+        Optional<Integer> time = Optional.ofNullable(((PRDByTicks)(xmlWorld.getPRDTermination().getPRDByTicksOrPRDBySecond().get(0))).getCount());
+        time.ifPresent((t) -> m_ticks.setValue(t));
 
+        m_secondToWork = new exprecn();
+        Optional<Integer> second = Optional.ofNullable(((PRDBySecond)xmlWorld.getPRDTermination().getPRDByTicksOrPRDBySecond().get(1)).getCount());
+        second.ifPresent((s) -> m_secondToWork.setValue(s));
 
-
+        if(m_ticks.getType() == null && m_secondToWork.getType() == null){
+            throw new InvalidValue("No termination method was added");
+        }
     }
 
     public void setSimulation(){

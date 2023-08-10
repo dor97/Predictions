@@ -7,7 +7,7 @@ public class exprecn implements Serializable {
     private Float valueFloat = null;
     private String valueString = null;
     private Boolean valueBool = null;
-    private exprecnType m_type;
+    private exprecnType m_type = null;
 
     public exprecn(){
 

@@ -14,9 +14,9 @@ import java.io.InputStream;
 public class Main {
     public static void main(String[] args) {
         String fileName = "src/resources/ex1-cigarets.xml";
+        gameEngine g = new gameEngine();
         try {
-            gameEngine g = new gameEngine();
-            if (false) {
+            if (true) {
                 g.lodSimuletion(fileName);
                 g.activeSimultion();
                 g.saveSystemState();
@@ -25,7 +25,7 @@ public class Main {
             }
         }
         catch (Exception e){
-
+            System.out.println(e.getMessage());
         }
 
 

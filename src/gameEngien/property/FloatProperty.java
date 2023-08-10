@@ -60,4 +60,8 @@ public class FloatProperty extends Property implements Serializable {
     public void setProperty(float v){
         m_property = v;
     }
+    @Override
+    public void setProperty(int v){
+        m_property = v;
+    }
 }

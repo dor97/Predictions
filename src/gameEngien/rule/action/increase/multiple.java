@@ -31,7 +31,7 @@ public class multiple implements subCondition, Serializable {
         }
     }
     @Override
-    public boolean getBoolValue(Entity entity){
+    public boolean getBoolValue(Entity entity)throws InvalidValue{
         if(m_logical == logicalOp.AND){
             for(subCondition condition : m_conditions){
                 if(condition.getBoolValue(entity) == false){

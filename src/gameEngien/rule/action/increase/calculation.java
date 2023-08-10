@@ -16,11 +16,7 @@ import static gameEngien.utilites.Utilites.getEntityDifenichan;
 public class calculation extends action implements Serializable {
     private String m_entity;
     private String m_property;
-    //private Entity m_e;
-    //private PropertyInterface m_p;
     private String m_value1, m_value2;
-    //private typeOfExprecen m_v1Type, m_v2Type;
-    //private PropertyInterface m_v1 = null, m_v2 = null;
     private exprecnWithFunc m_v1, m_v2;
     private boolean isMultiply = true;
     exprecn v1Exprecn = new exprecn(), v2Exprecn = new exprecn();
@@ -116,7 +112,7 @@ public class calculation extends action implements Serializable {
         if(!isEntityDifenichanExists(m_entity)){
             throw new OBJECT_NOT_EXIST("In action increase the entity " + m_entity + " does not exist.");
         }
-        if(!getEntityDifenichan(m_entity).getPropertys().containsValue(m_property)){
+        if(!getEntityDifenichan(m_entity).getPropertys().containsKey(m_property)){
             throw new OBJECT_NOT_EXIST("In action increase the property " + m_property + "of entity " + m_entity +" does not exist.");
         }
     }
