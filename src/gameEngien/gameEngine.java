@@ -1,5 +1,6 @@
 package gameEngien;
 
+import DTO.DTOSimulationDetails;
 import gameEngien.world.World;
 import org.omg.CORBA.DynAnyPackage.InvalidValue;
 
@@ -43,5 +44,9 @@ public class gameEngine {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public DTOSimulationDetails getSimulationDetails(){
+        return cuurentSimuletion.getSimulationDetails();
     }
 }
