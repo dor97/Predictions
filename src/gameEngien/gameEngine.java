@@ -50,4 +50,6 @@ public class gameEngine {
     public DTOSimulationDetails getSimulationDetails(){
         return cuurentSimuletion.getSimulationDetails();
     }
+
+    public List<DTOEnvironmentVariables> getEnvironmentDetails(){ return cuurentSimuletion.getEnvironmentDetails();}
 }
