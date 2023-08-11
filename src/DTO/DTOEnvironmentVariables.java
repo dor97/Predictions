@@ -5,11 +5,11 @@ import gameEngien.rule.action.increase.exprecnType;
 
 public class DTOEnvironmentVariables {
 
-    String m_variableName;
-    DTOPropertyType m_variableType;
-    double m_highRange, m_lowRange;
-    boolean m_haveRange, m_RandomlyInatiated;
-    exprecn value;
+    private String m_variableName;
+    private DTOPropertyType m_variableType;
+    private double m_highRange, m_lowRange;
+    private boolean m_haveRange, m_RandomlyInatiated;
+    private String value;
 
 
     public DTOEnvironmentVariables(String name, DTOPropertyType type, boolean haveRange){
@@ -68,5 +68,9 @@ public class DTOEnvironmentVariables {
             m_variableType = DTOPropertyType.BOOL;
         }
         //exepcen
+    }
+
+    public String getValue(){
+        return value;
     }
 }

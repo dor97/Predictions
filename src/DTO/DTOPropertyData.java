@@ -1,10 +1,10 @@
 package DTO;
 
 public class DTOPropertyData {
-    String propertyName;
-    DTOPropertyType propertyType;
-    double m_highRange, m_lowRange;
-    boolean m_haveRange, m_RandomlyInatiated;
+    private String propertyName;
+    private DTOPropertyType propertyType;
+    private double m_highRange, m_lowRange;
+    private boolean m_haveRange, m_RandomlyInatiated;
 
     public DTOPropertyData(String name, DTOPropertyType type, boolean haveRange, boolean RandomlyInatiated){
         propertyName = name;

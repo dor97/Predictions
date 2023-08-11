@@ -38,6 +38,7 @@ public class World implements Serializable {
     private Map<String, EntityDifenichan> m_entitiesDifenichan = new HashMap<>();
     private Map<String, PropertyInterface> m_environments = new HashMap<>();
     private Map<String, EnvironmentDifenichan> m_environmentsDifenichen = new HashMap<>();
+    private Map<String, DTOEnvironmentVariables> m_enviromentsDto = new HashMap<>();
     private exprecn m_ticks = null;
     private exprecn m_secondToWork = null;
 
@@ -178,20 +179,20 @@ public class World implements Serializable {
         }
 
         //environment values
-        for(PRDEnvProperty envProperty : xmlWorld.getPRDEvironment().getPRDEnvProperty()){
-            if(m_environments.containsKey(envProperty.getPRDName())){
-                throw new allReadyExistsException("enviroments varuble " + envProperty.getPRDName() + " all ready exists");
-            }
-            if(envProperty.getType().equals("decimal")) {
-                m_environments.put(envProperty.getPRDName(), new DecimalProperty(envProperty));
-            } else if(envProperty.getType().equals("float")){
-                m_environments.put(envProperty.getPRDName(), new FloatProperty(envProperty));
-            } else if (envProperty.getType().equals("string")) {
-                m_environments.put(envProperty.getPRDName(), new StringProperty(envProperty));
-            } else if (envProperty.getType().equals("boolean")) {
-                m_environments.put(envProperty.getPRDName(), new BooleanProperty(envProperty));
-            }
-        }
+//        for(PRDEnvProperty envProperty : xmlWorld.getPRDEvironment().getPRDEnvProperty()){
+//            if(m_environments.containsKey(envProperty.getPRDName())){
+//                throw new allReadyExistsException("enviroments varuble " + envProperty.getPRDName() + " all ready exists");
+//            }
+//            if(envProperty.getType().equals("decimal")) {
+//                m_environments.put(envProperty.getPRDName(), new DecimalProperty(envProperty));
+//            } else if(envProperty.getType().equals("float")){
+//                m_environments.put(envProperty.getPRDName(), new FloatProperty(envProperty));
+//            } else if (envProperty.getType().equals("string")) {
+//                m_environments.put(envProperty.getPRDName(), new StringProperty(envProperty));
+//            } else if (envProperty.getType().equals("boolean")) {
+//                m_environments.put(envProperty.getPRDName(), new BooleanProperty(envProperty));
+//            }
+//        }
 
         Utilites.Init(m_environments, m_entitiesDifenichan);
 
@@ -213,7 +214,25 @@ public class World implements Serializable {
         }
     }
 
-    public void setSimulation(){
+    public void addEnvironmentDto(DTOEnvironmentVariables dtoEnvironmentVariables) throws InvalidValue{
+        if(m_environmentsDifenichen.containsKey(dtoEnvironmentVariables.getVariableName())){
+            m_environmentsDifenichen.get(dtoEnvironmentVariables.getVariableName()).setWithDto(dtoEnvironmentVariables);
+        }
+    }
+
+    public void setSimulation()throws InvalidValue{
+        for(EnvironmentDifenichan entityDifenichan : m_environmentsDifenichen.values()){
+            if(entityDifenichan.getType().equals("decimal")) {
+                m_environments.put(entityDifenichan.getName(), new DecimalProperty(entityDifenichan));
+            } else if(entityDifenichan.getType().equals("float")){
+                m_environments.put(entityDifenichan.getName(), new FloatProperty(entityDifenichan));
+            } else if (entityDifenichan.getType().equals("string")) {
+                m_environments.put(entityDifenichan.getName(), new StringProperty(entityDifenichan));
+            } else if (entityDifenichan.getType().equals("boolean")) {
+                m_environments.put(entityDifenichan.getName(), new BooleanProperty(entityDifenichan));
+            }
+        }
+
         for(EntityDifenichan entityDifenichan : m_entitiesDifenichan.values()){
             for(int i = 0; i < entityDifenichan.getAmount(); i++){
                 m_entities.add(new Entity(entityDifenichan));

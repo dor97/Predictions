@@ -3,6 +3,7 @@ package gameEngien.entity;
 import gameEngien.property.*;
 import gameEngien.property.propertyInterface.PropertyInterface;
 import gameEngien.rule.action.increase.exprecnType;
+import org.omg.CORBA.DynAnyPackage.InvalidValue;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -13,19 +14,24 @@ public class Entity implements Serializable {
     private Map<String, PropertyInterface> m_propertys;
 
 
-    public Entity(EntityDifenichan entity){
+    public Entity(EntityDifenichan entity) throws InvalidValue {
         m_name = entity.getName();
         m_propertys = new HashMap<>();
-        for(propertyDifenichan propertyDifenichan : entity.getPropertys().values()){
-            if(propertyDifenichan.getType() == exprecnType.INT){
-                m_propertys.put(propertyDifenichan.getName(), new DecimalProperty(propertyDifenichan));
-            } else if(propertyDifenichan.getType() == exprecnType.FLOAT){
-                m_propertys.put(propertyDifenichan.getName(), new FloatProperty(propertyDifenichan));
-            } else if (propertyDifenichan.getType() == exprecnType.STRING) {
-                m_propertys.put(propertyDifenichan.getName(), new StringProperty(propertyDifenichan));
-            } else if (propertyDifenichan.getType() == exprecnType.BOOL) {
-                m_propertys.put(propertyDifenichan.getName(), new BooleanProperty(propertyDifenichan));
+        try {
+            for (propertyDifenichan propertyDifenichan : entity.getPropertys().values()) {
+                if (propertyDifenichan.getType() == exprecnType.INT) {
+                    m_propertys.put(propertyDifenichan.getName(), new DecimalProperty(propertyDifenichan));
+                } else if (propertyDifenichan.getType() == exprecnType.FLOAT) {
+                    m_propertys.put(propertyDifenichan.getName(), new FloatProperty(propertyDifenichan));
+                } else if (propertyDifenichan.getType() == exprecnType.STRING) {
+                    m_propertys.put(propertyDifenichan.getName(), new StringProperty(propertyDifenichan));
+                } else if (propertyDifenichan.getType() == exprecnType.BOOL) {
+                    m_propertys.put(propertyDifenichan.getName(), new BooleanProperty(propertyDifenichan));
+                }
             }
+        }
+        catch (InvalidValue e){
+            throw new InvalidValue(e.getMessage() + ". referred in entity " + m_name);
         }
     }
 

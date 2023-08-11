@@ -28,6 +28,21 @@ public class BooleanProperty extends Property implements Serializable {
         }
     }
 
+    public BooleanProperty(EnvironmentDifenichan environmentDifenichan){
+        super(propertyType.BOOL);
+        m_name = environmentDifenichan.getName();
+        if (environmentDifenichan.getType() != exprecnType.BOOL){
+            //exception
+        }
+        if(environmentDifenichan.isRandom()){
+            Random random = new Random();
+            m_property = random.nextBoolean();
+        }
+        else{
+            m_property = environmentDifenichan.getInit().getBool();
+        }
+    }
+
     public BooleanProperty(PRDEnvProperty envProperty){
         super(propertyType.BOOL);
         m_name = envProperty.getPRDName();

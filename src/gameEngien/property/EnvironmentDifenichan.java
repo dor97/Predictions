@@ -7,20 +7,21 @@ import gameEngien.generated.PRDEnvProperty;
 import gameEngien.generated.PRDProperty;
 import gameEngien.rule.action.increase.exprecn;
 import gameEngien.rule.action.increase.exprecnType;
+import org.omg.CORBA.DynAnyPackage.InvalidValue;
 
 public class EnvironmentDifenichan {
     private String m_name;
     private exprecnType m_type;
     private double m_lowRange, m_highRang;
-    private boolean m_randomlyIneceat;
+    private boolean m_randomlyIneceat = true;
     private exprecn m_init;
-    private boolean haveRange = false;
+    private boolean m_haveRange = false;
 
     public EnvironmentDifenichan(PRDEnvProperty p){
         m_name = p.getPRDName();
         m_type = myType(p.getType());
         if(p.getPRDRange() != null) {
-            haveRange = true;
+            m_haveRange = true;
             m_lowRange = p.getPRDRange().getFrom();
             m_highRang = p.getPRDRange().getTo();
             if(m_highRang < m_lowRange){
@@ -91,12 +92,51 @@ public class EnvironmentDifenichan {
             type = DTOPropertyType.BOOL;
         }
         DTOEnvironmentVariables DTO;
-        if(haveRange){
-            DTO = new DTOEnvironmentVariables(m_name, type, haveRange, m_highRang, m_lowRange);
+        if(m_haveRange){
+            DTO = new DTOEnvironmentVariables(m_name, type, m_haveRange, m_highRang, m_lowRange);
         }
         else{
-            DTO = new DTOEnvironmentVariables(m_name, type, haveRange);
+            DTO = new DTOEnvironmentVariables(m_name, type, m_haveRange);
         }
         return DTO;
+    }
+
+    public void setWithDto(DTOEnvironmentVariables environmentVariables) throws InvalidValue{
+        m_init.convertValueInString(environmentVariables.getValue());
+
+        if(m_init.getType() != getDtoType(environmentVariables.getVariableType())){
+            throw new InvalidValue("In environment variabale " + m_name + " got wrong value type");
+        }
+
+        if(m_haveRange){
+            if(m_init.getType() == exprecnType.INT){
+                if(m_init.getInt() > m_highRang || m_init.getInt() < m_lowRange){
+                    throw new InvalidValue("In environment variabale " + m_name + " got value out of range");
+                }
+            } else if (m_init.getType() == exprecnType.FLOAT) {
+                if(m_init.getFloat() > m_highRang || m_init.getFloat() < m_lowRange){
+                    throw new InvalidValue("In environment variabale " + m_name + " got value out of range");
+                }
+            }else {
+                throw new InvalidValue("In environment variabale " + m_name + " of type " + m_type + " got range");
+            }
+        }
+        m_randomlyIneceat = false;
+    }
+
+    public exprecnType getDtoType(DTOPropertyType propertyType){
+        if(propertyType == DTOPropertyType.INT){
+            return exprecnType.INT;
+        } else if (propertyType == DTOPropertyType.FLOAT) {
+            return exprecnType.FLOAT;
+        } else if (propertyType == DTOPropertyType.STRING) {
+            return exprecnType.STRING;
+        }else {
+            return exprecnType.BOOL;
+        }
+    }
+
+    public boolean haveRange(){
+        return m_haveRange;
     }
 }

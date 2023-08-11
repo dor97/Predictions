@@ -6,6 +6,7 @@ import DTO.DTOPropertyType;
 import gameEngien.generated.PRDProperty;
 import gameEngien.rule.action.increase.exprecn;
 import gameEngien.rule.action.increase.exprecnType;
+import org.omg.CORBA.DynAnyPackage.InvalidValue;
 
 import java.io.Serializable;
 
@@ -17,7 +18,7 @@ public class propertyDifenichan implements Serializable {
     private exprecn m_init;
     private boolean haveRange = false;
 
-    public propertyDifenichan(PRDProperty p){
+    public propertyDifenichan(PRDProperty p) throws InvalidValue{
         m_name = p.getPRDName();
         m_type = myType(p.getType());
         if(p.getPRDRange() != null) {
@@ -35,7 +36,7 @@ public class propertyDifenichan implements Serializable {
         m_init = new exprecn();
         m_init.convertValueInString(p.getPRDValue().getInit());
         if(m_type != m_init.getType()){
-            //exepcen
+            throw new InvalidValue("In property " + m_name + " got a wrong type value");
         }
 
     }
@@ -58,6 +59,10 @@ public class propertyDifenichan implements Serializable {
 
     public boolean isRandom(){
         return m_randomlyIneceat;
+    }
+
+    public boolean haveRange(){
+        return haveRange;
     }
 
     public String getName(){

@@ -3,6 +3,7 @@ package gameEngien.property;
 import gameEngien.generated.PRDEnvProperty;
 import gameEngien.property.propertyInterface.propertyType;
 import gameEngien.rule.action.increase.exprecnType;
+import org.omg.CORBA.DynAnyPackage.InvalidValue;
 
 import java.io.Serializable;
 import java.util.Random;
@@ -12,18 +13,22 @@ public class FloatProperty extends Property implements Serializable {
     private String m_name;
     private float m_property;
     private Double m_lowRange, m_highRang;
+    private boolean haveRange;
 
-    public FloatProperty(propertyDifenichan propertyDifenichan){
+    public FloatProperty(propertyDifenichan propertyDifenichan) throws InvalidValue{
         super(propertyType.FLOAT);
         m_name = propertyDifenichan.getName();
-        m_lowRange = propertyDifenichan.getLowRange();
-        m_highRang = propertyDifenichan.getHighRange();
+        haveRange = propertyDifenichan.haveRange();
+        if(haveRange) {
+            m_lowRange = propertyDifenichan.getLowRange();
+            m_highRang = propertyDifenichan.getHighRange();
+        }
         if(propertyDifenichan.getType() != exprecnType.FLOAT){
             //exepcen
         }
         if(propertyDifenichan.isRandom()){
             Random random = new Random();
-            if(m_lowRange != null){
+            if(haveRange){
                 m_property = (float) (random.nextFloat() * (m_highRang - m_lowRange) + m_lowRange);
             }
             else{
@@ -32,6 +37,37 @@ public class FloatProperty extends Property implements Serializable {
         }
         else {
             m_property = propertyDifenichan.getInit().getFloat();
+            if(haveRange && (m_property > m_highRang || m_property < m_lowRange)){
+                throw new InvalidValue("In property " + m_name + " value if out of range");
+            }
+        }
+    }
+
+    public FloatProperty(EnvironmentDifenichan environmentDifenichan) throws InvalidValue{
+        super(propertyType.FLOAT);
+        m_name = environmentDifenichan.getName();
+        haveRange = environmentDifenichan.haveRange();
+        if(haveRange) {
+            m_lowRange = environmentDifenichan.getLowRange();
+            m_highRang = environmentDifenichan.getHighRange();
+        }
+        if(environmentDifenichan.getType() != exprecnType.FLOAT){
+            //exepcen
+        }
+        if(environmentDifenichan.isRandom()){
+            Random random = new Random();
+            if(haveRange){
+                m_property = (float) (random.nextFloat() * (m_highRang - m_lowRange) + m_lowRange);
+            }
+            else{
+                m_property = random.nextInt() + random.nextFloat();
+            }
+        }
+        else {
+            m_property = environmentDifenichan.getInit().getFloat();
+            if(haveRange && (m_property > m_highRang || m_property < m_lowRange)){
+                throw new InvalidValue("In property " + m_name + " value if out of range");
+            }
         }
     }
 

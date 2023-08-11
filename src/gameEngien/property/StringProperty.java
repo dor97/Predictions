@@ -27,6 +27,21 @@ public class StringProperty extends Property implements Serializable {
         }
     }
 
+    public StringProperty(EnvironmentDifenichan environmentDifenichan){
+        super(propertyType.STRING);
+        m_name = environmentDifenichan.getName();
+        if (environmentDifenichan.getType() != exprecnType.STRING){
+            //exception
+        }
+        if(environmentDifenichan.isRandom()){
+            final int maxTabsInRandomString = 50;
+            m_property = generateRandomString(maxTabsInRandomString);
+        }
+        else{
+            m_property = environmentDifenichan.getInit().getString();
+        }
+    }
+
     public StringProperty(PRDEnvProperty envProperty){
         super(propertyType.STRING);
         m_name = envProperty.getPRDName();
