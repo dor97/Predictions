@@ -70,12 +70,13 @@ public class addValue extends action implements Serializable {  //increase or de
 
     private void checkExpressionIfFunction() throws InvalidValue{
         if (m_by.getString().equals("environment")) {
-            exprecn temp = new exprecn();
-            temp.setValue(environment(m_by.getParams(0).getString()));
-            if (temp.getType() == exprecnType.STRING || temp.getType() == exprecnType.BOOL) {
+            //exprecn temp = new exprecn();
+            //temp.setValue(environment(m_by.getParams(0).getString()));
+            exprecnType temp = getEnvironmentType(m_by.getParams(0).getString());
+            if (temp == exprecnType.STRING || temp == exprecnType.BOOL) {
                 throw new InvalidValue("In action " + actionName + " the value by is of the wrong type");
             }
-            if (temp.getType() == exprecnType.FLOAT && getEntityDifenichan(m_entity).getPropertys().get(m_property).getType() == exprecnType.INT) {
+            if (temp == exprecnType.FLOAT && getEntityDifenichan(m_entity).getPropertys().get(m_property).getType() == exprecnType.INT) {
                 throw new InvalidValue("In action " + actionName + " the property and the value by are not compatible");
             }
         }

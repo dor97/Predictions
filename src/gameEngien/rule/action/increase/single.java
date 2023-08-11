@@ -56,9 +56,10 @@ public class single implements subCondition, Serializable {
 
     private void checkExpressionIfFunction() throws InvalidValue{
         if (m_exprecn.getString().equals("environment")) {
-            exprecn temp = new exprecn();
-            temp.setValue(environment(m_exprecn.getParams(0).getString()));
-            if (temp.getType() == exprecnType.STRING || temp.getType() == exprecnType.BOOL) {
+            //exprecn temp = new exprecn();
+            //temp.setValue(environment(m_exprecn.getParams(0).getString()));
+            exprecnType temp = getEnvironmentType(m_exprecn.getParams(0).getString());
+            if (temp == exprecnType.STRING || temp == exprecnType.BOOL) {
                 throw new InvalidValue("In action condition in single value is of the wrong type");
             }
         }

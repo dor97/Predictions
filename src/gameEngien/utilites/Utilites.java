@@ -4,6 +4,7 @@ import gameEngien.entity.Entity;
 import gameEngien.entity.EntityDifenichan;
 import gameEngien.property.EnvironmentDifenichan;
 import gameEngien.property.propertyInterface.PropertyInterface;
+import gameEngien.rule.action.increase.exprecnType;
 
 import java.util.*;
 
@@ -26,6 +27,10 @@ public class Utilites {
 
     public static boolean isEnvironmentExist(String name) {
         return m_environmentsDifenichan.containsKey(name);// != null ? true : false;
+    }
+
+    public static exprecnType getEnvironmentType(String name){
+        return m_environmentsDifenichan.get(name).getType();
     }
 
     public static int random(int num) {
