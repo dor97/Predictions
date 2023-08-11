@@ -8,13 +8,15 @@ import java.util.*;
 
 public class Utilites {
     //private static List<Entity> m_entities;
+    private static Map<String, EntityDifenichan> m_environmentsDifenichan;
     private static Map<String, PropertyInterface> m_environments;
     private static Map<String, EntityDifenichan> m_entityDifenichan;
 
 
-    public static void Init(Map<String, PropertyInterface> environments, Map<String, EntityDifenichan> entityDifenichan){
+    public static void Init(Map<String, PropertyInterface> environments, Map<String, EntityDifenichan> entityDifenichan, Map<String, EntityDifenichan> environmentsDifenichan){
         m_environments = environments;
         m_entityDifenichan = entityDifenichan;
+        m_environmentsDifenichan = environmentsDifenichan;
     }
 
     public static Object environment(String name) {
@@ -22,7 +24,7 @@ public class Utilites {
     }
 
     public static boolean isEnvironmentExist(String name) {
-        return m_environments.get(name).getValue() != null ? true : false;
+        return m_environmentsDifenichan.containsKey(name);// != null ? true : false;
     }
 
     public static int random(int num) {

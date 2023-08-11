@@ -38,7 +38,7 @@ public class World implements Serializable {
     private Map<String, EntityDifenichan> m_entitiesDifenichan = new HashMap<>();
     private Map<String, PropertyInterface> m_environments = new HashMap<>();
     private Map<String, EnvironmentDifenichan> m_environmentsDifenichen = new HashMap<>();
-    private Map<String, DTOEnvironmentVariables> m_enviromentsDto = new HashMap<>();
+    //private Map<String, DTOEnvironmentVariables> m_enviromentsDto = new HashMap<>();
     private exprecn m_ticks = null;
     private exprecn m_secondToWork = null;
 
@@ -65,7 +65,7 @@ public class World implements Serializable {
         PropertyInterface env2 = new DecimalProperty("ep2", 4, 0, 200);
         m_environments.put(env.getName(), env);
         m_environments.put(env2.getName(), env2);
-        Utilites.Init(m_environments, m_entitiesDifenichan);
+        Utilites.Init(m_environments, m_entitiesDifenichan, m_entitiesDifenichan);
 
 
     }
@@ -194,7 +194,7 @@ public class World implements Serializable {
 //            }
 //        }
 
-        Utilites.Init(m_environments, m_entitiesDifenichan);
+        Utilites.Init(m_environments, m_entitiesDifenichan, m_entitiesDifenichan);
 
         //rules
         for(PRDRule rule : xmlWorld.getPRDRules().getPRDRule()){

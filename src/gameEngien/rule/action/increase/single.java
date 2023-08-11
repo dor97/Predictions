@@ -31,7 +31,7 @@ public class single implements subCondition, Serializable {
     private void cheackUserInput() throws InvalidValue {
         checkEntityAndPropertyExist();
         checkTypeValid();
-        //checkCompatibilityBetweenPropertyAndExpression();   //disable because if exercise requirements
+        //checkCompatibilityBetweenPropertyAndExpression();   //disable because it is exercise requirements
     }
 
     private void checkCompatibilityBetweenPropertyAndExpression() throws InvalidValue{
