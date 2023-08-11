@@ -2,18 +2,19 @@ package gameEngien.utilites;
 
 import gameEngien.entity.Entity;
 import gameEngien.entity.EntityDifenichan;
+import gameEngien.property.EnvironmentDifenichan;
 import gameEngien.property.propertyInterface.PropertyInterface;
 
 import java.util.*;
 
 public class Utilites {
     //private static List<Entity> m_entities;
-    private static Map<String, EntityDifenichan> m_environmentsDifenichan;
+    private static Map<String, EnvironmentDifenichan> m_environmentsDifenichan;
     private static Map<String, PropertyInterface> m_environments;
     private static Map<String, EntityDifenichan> m_entityDifenichan;
 
 
-    public static void Init(Map<String, PropertyInterface> environments, Map<String, EntityDifenichan> entityDifenichan, Map<String, EntityDifenichan> environmentsDifenichan){
+    public static void Init(Map<String, PropertyInterface> environments, Map<String, EntityDifenichan> entityDifenichan, Map<String, EnvironmentDifenichan> environmentsDifenichan){
         m_environments = environments;
         m_entityDifenichan = entityDifenichan;
         m_environmentsDifenichan = environmentsDifenichan;

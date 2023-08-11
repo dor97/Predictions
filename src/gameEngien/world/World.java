@@ -65,7 +65,7 @@ public class World implements Serializable {
         PropertyInterface env2 = new DecimalProperty("ep2", 4, 0, 200);
         m_environments.put(env.getName(), env);
         m_environments.put(env2.getName(), env2);
-        Utilites.Init(m_environments, m_entitiesDifenichan, m_entitiesDifenichan);
+        Utilites.Init(m_environments, m_entitiesDifenichan, m_environmentsDifenichen);
 
 
     }
@@ -194,7 +194,7 @@ public class World implements Serializable {
 //            }
 //        }
 
-        Utilites.Init(m_environments, m_entitiesDifenichan, m_entitiesDifenichan);
+        Utilites.Init(m_environments, m_entitiesDifenichan, m_environmentsDifenichen);
 
         //rules
         for(PRDRule rule : xmlWorld.getPRDRules().getPRDRule()){
