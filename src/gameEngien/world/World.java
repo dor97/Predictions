@@ -1,5 +1,6 @@
 package gameEngien.world;
 
+import DTO.DTOEnvironmentVariables;
 import DTO.DTOSimulationDetails;
 import DTO.DTOTerminationData;
 import DTO.terminationType;
@@ -8,10 +9,7 @@ import gameEngien.allReadyExistsException;
 import gameEngien.entity.Entity;
 import gameEngien.entity.EntityDifenichan;
 import gameEngien.generated.*;
-import gameEngien.property.BooleanProperty;
-import gameEngien.property.DecimalProperty;
-import gameEngien.property.FloatProperty;
-import gameEngien.property.StringProperty;
+import gameEngien.property.*;
 import gameEngien.property.propertyInterface.PropertyInterface;
 import gameEngien.rule.Rule;
 import gameEngien.rule.action.actionInterface.ActionInterface;
@@ -39,6 +37,7 @@ public class World implements Serializable {
 
     private Map<String, EntityDifenichan> m_entitiesDifenichan = new HashMap<>();
     private Map<String, PropertyInterface> m_environments = new HashMap<>();
+    private Map<String, EnvironmentDifenichan> m_environmentsDifenichen = new HashMap<>();
     private exprecn m_ticks = null;
     private exprecn m_secondToWork = null;
 
@@ -135,6 +134,16 @@ public class World implements Serializable {
         return DTO;
     }
 
+    public List<DTOEnvironmentVariables> getEnvironmentDetails(){
+        List<DTOEnvironmentVariables> DTOList = new ArrayList<>();
+
+        for(EnvironmentDifenichan environmentDifenichan : m_environmentsDifenichen.values()){
+            DTOList.add(environmentDifenichan.makeDtoEnvironment());
+        }
+
+        return DTOList;
+    }
+
     public void loadFile(String xmlFile)throws NoSuchFileException , UnsupportedFileTypeException, allReadyExistsException, InvalidValue, JAXBException, FileNotFoundException {
         PRDWorld xmlWorld = new PRDWorld();
 
@@ -159,6 +168,13 @@ public class World implements Serializable {
         //entitys
         for(PRDEntity e : xmlWorld.getPRDEntities().getPRDEntity()){
             m_entitiesDifenichan.put(e.getName(), new EntityDifenichan(e));
+        }
+
+        for(PRDEnvProperty p : xmlWorld.getPRDEvironment().getPRDEnvProperty()){
+            if(m_environmentsDifenichen.containsKey(p.getPRDName())){
+                throw new allReadyExistsException("environment varuble " + p.getPRDName() + " all ready exists.");
+            }
+            m_environmentsDifenichen.put(p.getPRDName(), new EnvironmentDifenichan(p));
         }
 
         //environment values

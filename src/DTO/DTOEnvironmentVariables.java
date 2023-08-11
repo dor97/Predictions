@@ -12,18 +12,16 @@ public class DTOEnvironmentVariables {
     exprecn value;
 
 
-    public DTOEnvironmentVariables(String name, DTOPropertyType type, boolean haveRange, boolean RandomlyInatiated){
+    public DTOEnvironmentVariables(String name, DTOPropertyType type, boolean haveRange){
         m_variableName = name;
         m_variableType = type;
         m_haveRange = haveRange;
-        m_RandomlyInatiated = RandomlyInatiated;
     }
 
-    public DTOEnvironmentVariables(String name, DTOPropertyType type, boolean haveRange, boolean RandomlyInatiated, double highRange, double lowRange){
+    public DTOEnvironmentVariables(String name, DTOPropertyType type, boolean haveRange, double highRange, double lowRange){
         m_variableName = name;
         m_variableType = type;
         m_haveRange = haveRange;
-        m_RandomlyInatiated = RandomlyInatiated;
         m_highRange = highRange;
         m_lowRange = lowRange;
     }
