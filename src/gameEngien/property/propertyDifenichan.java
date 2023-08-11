@@ -26,7 +26,7 @@ public class propertyDifenichan implements Serializable {
             m_lowRange = p.getPRDRange().getFrom();
             m_highRang = p.getPRDRange().getTo();
             if(m_highRang < m_lowRange){
-                //excepcen
+                throw new InvalidValue("In property " + m_name + " the value in 'to' is bigger than the one in 'from'.");
             }
         }
         m_randomlyIneceat = p.getPRDValue().isRandomInitialize();

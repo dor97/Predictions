@@ -40,7 +40,7 @@ public class DecimalProperty extends Property implements Serializable {
         else {
             m_property = propertyDifenichan.getInit().getInt();
             if(haveRange && (m_property > m_highRang || m_property < m_lowRange)){
-                throw new InvalidValue("In property " + m_name + " value if out of range");
+                throw new InvalidValue("In property " + m_name + " value is out of range");
             }
         }
 
@@ -67,7 +67,7 @@ public class DecimalProperty extends Property implements Serializable {
         else {
             m_property = environmentDifenichan.getInit().getInt();
             if(haveRange && (m_property > m_highRang || m_property < m_lowRange)){
-                throw new InvalidValue("In property " + m_name + " value if out of range");
+                throw new InvalidValue("In property " + m_name + " value is out of range");
             }
         }
     }

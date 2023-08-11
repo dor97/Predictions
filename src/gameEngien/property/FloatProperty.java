@@ -38,7 +38,7 @@ public class FloatProperty extends Property implements Serializable {
         else {
             m_property = propertyDifenichan.getInit().getFloat();
             if(haveRange && (m_property > m_highRang || m_property < m_lowRange)){
-                throw new InvalidValue("In property " + m_name + " value if out of range");
+                throw new InvalidValue("In property " + m_name + " value is out of range");
             }
         }
     }
@@ -66,7 +66,7 @@ public class FloatProperty extends Property implements Serializable {
         else {
             m_property = environmentDifenichan.getInit().getFloat();
             if(haveRange && (m_property > m_highRang || m_property < m_lowRange)){
-                throw new InvalidValue("In property " + m_name + " value if out of range");
+                throw new InvalidValue("In property " + m_name + " value is out of range");
             }
         }
     }

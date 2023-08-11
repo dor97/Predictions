@@ -6,6 +6,7 @@ import gameEngien.generated.PRDEntity;
 import gameEngien.generated.PRDProperty;
 import gameEngien.property.propertyDifenichan;
 import gameEngien.property.propertyInterface.PropertyInterface;
+import org.omg.CORBA.DynAnyPackage.InvalidValue;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -18,7 +19,7 @@ public class EntityDifenichan implements Serializable {
     private int m_amount;
     private Map<String, propertyDifenichan> m_propertys;
 
-    public EntityDifenichan(PRDEntity e) throws allReadyExistsException{
+    public EntityDifenichan(PRDEntity e) throws allReadyExistsException, InvalidValue{
         m_name = e.getName();
         m_amount = e.getPRDPopulation();
         m_propertys = new HashMap<>();
@@ -26,7 +27,11 @@ public class EntityDifenichan implements Serializable {
             if(m_propertys.containsKey(p.getPRDName())){
                 throw new allReadyExistsException("property varuble " + p.getPRDName() + " all ready exists in entity" + e.getName());
             }
-            m_propertys.put(p.getPRDName(), new propertyDifenichan(p));
+            try {
+                m_propertys.put(p.getPRDName(), new propertyDifenichan(p));
+            }catch (InvalidValue invalidValue){
+                throw new InvalidValue(invalidValue.getMessage() + ". referred in entity " + m_name);
+            }
         }
     }
 
