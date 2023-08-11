@@ -57,8 +57,4 @@ public class DTOEnvironmentVariables {
     public String getValue(){
         return m_value;
     }
-
-    public String getValue(){
-        return value;
-    }
 }
