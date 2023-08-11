@@ -1,9 +1,12 @@
 package UI.ConsoleUI;
 
+import DTO.*;
 import gameEngien.gameEngine;
 
 import java.nio.file.NoSuchFileException;
+import java.util.ArrayList;
 import java.util.InputMismatchException;
+import java.util.List;
 import java.util.Scanner;
 
 public class ConsoleUI {
@@ -16,47 +19,80 @@ public class ConsoleUI {
 
         while (userChoice != 5){
 
-            validAction = executeUserChoice (userChoice);
-
-            if (validAction == false){
-                showMenu();
-                userChoice = readInput();
-            }
-
+            executeUserChoice (userChoice);
+            showMenu();
+            userChoice = readInput();
         }
     }
-    private static boolean executeUserChoice(int userChoice) {
-
-        boolean validAction = false;
+    private static void executeUserChoice(int userChoice) {
 
         if (userChoice == 1){
-            validAction = uploadXMLFile();
+            uploadXMLFile();
         }
 
         else if (userChoice == 2){
-            validAction = displaySimulationDetails();
+            displaySimulationDetails();
         }
 
         else if (userChoice == 3){
-            validAction = runSimulation();
+            runSimulation();
         }
 
         else if (userChoice == 4){
-            validAction = displayPastSimulationDetails();
+            displayPastSimulationDetails();
         }
 
-        return validAction;
     }
-    private static boolean displayPastSimulationDetails() {
-        return false;
+    private static void displayPastSimulationDetails() {
     }
-    private static boolean runSimulation() {
-        return false;
+    private static void runSimulation() {
     }
-    private static boolean displaySimulationDetails() {
-        return false;
+    private static void displaySimulationDetails() {
+
+        DTOSimulationDetails dtoSimulationDetails = m_gameEngine.getSimulationDetails();
+        List <DTOEntityData> dtoEntityData = dtoSimulationDetails.getEntitysList();
+        List < DTORuleData> dtoRuleData = dtoSimulationDetails.getRulesList();
+        List < DTOTerminationData> dtoTerminationData = dtoSimulationDetails.getTerminationList();
+
+        printEntitiesDetails(dtoEntityData);
+        printRulesDetails(dtoRuleData);
+        printTerminationDetails(dtoTerminationData);
+
     }
-    private static boolean uploadXMLFile() {
+
+    private static void printTerminationDetails(List<DTOTerminationData> dtoTerminationData) {
+    }
+
+    private static void printRulesDetails(List<DTORuleData> dtoRuleData) {
+    }
+
+    private static void printEntitiesDetails(List<DTOEntityData> dtoEntityData) {
+
+        System.out.println("Entities:");
+        List<DTOPropertyData> dtoPropertyData = new ArrayList<>();
+        for (DTOEntityData entity : dtoEntityData) {
+            System.out.println("Entity Name: " + entity.getName());
+            System.out.println("Amount Of Entities: " + entity.getAmount());
+            System.out.println("Properties:");
+            dtoPropertyData = entity.getPropertList();
+            for (DTOPropertyData property : dtoPropertyData){
+                System.out.println("Property Name: " + property.getName());
+                System.out.println("Property Type: " +property.getType());
+                if (property.haveRange()){
+                    System.out.println("Property Range is: " +property.getLowRange() + "-" + property.getHighRange());
+                }
+                if (property.isRandomlyInatiated()){
+                    System.out.println("Property has random initiate.");
+                }
+                else{
+                    System.out.println("Property has not random initiate.");
+                }
+            }
+        }
+    }
+
+
+    private static void uploadXMLFile() {
 
         boolean validFile = false;
         Scanner scanner = new Scanner(System.in);
@@ -67,17 +103,14 @@ public class ConsoleUI {
                 String fileName = scanner.nextLine();
                 m_gameEngine.lodSimuletion(fileName);
                 validFile = true;
+                System.out.println("File Upload Successfully");
             } catch (ArithmeticException e) {
                 System.out.println(e.getMessage());
-                return validFile;
             } catch (Exception e) {
-                scanner.nextLine();
                 System.out.println(e.getMessage());
                 System.out.println("Please Enter full path of your XML file:");
             }
         }
-
-        return validFile;
     }
     private static int readInput() {
 

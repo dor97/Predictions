@@ -1,5 +1,6 @@
 package gameEngien;
 
+import DTO.DTOEnvironmentVariables;
 import DTO.DTOSimulationDetails;
 import gameEngien.world.World;
 import org.omg.CORBA.DynAnyPackage.InvalidValue;
