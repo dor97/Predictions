@@ -2,6 +2,8 @@ package UI.ConsoleUI;
 
 import DTO.*;
 import gameEngien.gameEngine;
+import gameEngien.world.World;
+import org.omg.CORBA.DynAnyPackage.InvalidValue;
 
 import java.nio.file.NoSuchFileException;
 import java.util.ArrayList;
@@ -41,12 +43,46 @@ public class ConsoleUI {
         else if (userChoice == 4){
             displayPastSimulationDetails();
         }
-
     }
     private static void displayPastSimulationDetails() {
+
+//        for (World simulation : m_gameEngine.getSimulationsList()){
+//            System.out.println(simulation.getSimulationId());
+//        }
     }
     private static void runSimulation() {
+        List <DTOEnvironmentVariables> environmentVariables = m_gameEngine.getEnvironmentDetails();
+        printEnvironmentVariablesAndSetValue(environmentVariables);
+
     }
+
+    private static void printEnvironmentVariablesAndSetValue(List<DTOEnvironmentVariables> environmentVariables) {
+
+        Scanner scanner = new Scanner(System.in);
+        System.out.println();
+        System.out.println("Environment Variables:");
+
+
+        for (DTOEnvironmentVariables env_variable : environmentVariables) {
+            System.out.println("Environment Variable Name : " + env_variable.getVariableName());
+            System.out.println("Environment Variable Type : " + env_variable.getVariableType());
+            if (env_variable.haveRange()){
+                System.out.println("Environment Variable Range is: " +env_variable.getLowRange() + "-" + env_variable.getHighRange());
+            }
+            System.out.println("Please Set Value : ");
+            env_variable.setValue(scanner.nextLine());
+            try{
+                m_gameEngine.addEnvironmentDto(env_variable);
+                System.out.println("Value Set Successfully");
+            }catch (InvalidValue e){
+                System.out.println(e.getMessage());
+                System.out.println("Please Set Value : ");
+                env_variable.setValue(scanner.nextLine());
+            }
+        }
+        System.out.println();
+    }
+
     private static void displaySimulationDetails() {
 
         DTOSimulationDetails dtoSimulationDetails = m_gameEngine.getSimulationDetails();
@@ -57,25 +93,43 @@ public class ConsoleUI {
         printEntitiesDetails(dtoEntityData);
         printRulesDetails(dtoRuleData);
         printTerminationDetails(dtoTerminationData);
-
     }
-
     private static void printTerminationDetails(List<DTOTerminationData> dtoTerminationData) {
-    }
+        System.out.println();
+        System.out.println("Termination conditions:");
 
+        for (DTOTerminationData t_condition : dtoTerminationData) {
+            System.out.println("Number Of " + t_condition.getType() + ": " + t_condition.getCount());
+        }
+        System.out.println();
+    }
     private static void printRulesDetails(List<DTORuleData> dtoRuleData) {
-    }
 
+        System.out.println();
+        System.out.println("Rules:");
+
+        for (DTORuleData rule : dtoRuleData) {
+            System.out.println("Rule Name: " + rule.getRuleName());
+            System.out.println("Number of Ticks : " + rule.getTicksToWorkAt());
+            System.out.println("Probability : " + rule.getProbabilityToWork());
+            System.out.println("Number of Actions : " + rule.getNumOfAction());
+
+            System.out.println("Actions :");
+
+            for (String action : rule.getActionsName()){
+                System.out.println("Action Name: " + action);
+            }
+        }
+    }
     private static void printEntitiesDetails(List<DTOEntityData> dtoEntityData) {
 
+        System.out.println();
         System.out.println("Entities:");
-        List<DTOPropertyData> dtoPropertyData = new ArrayList<>();
         for (DTOEntityData entity : dtoEntityData) {
             System.out.println("Entity Name: " + entity.getName());
             System.out.println("Amount Of Entities: " + entity.getAmount());
             System.out.println("Properties:");
-            dtoPropertyData = entity.getPropertList();
-            for (DTOPropertyData property : dtoPropertyData){
+            for (DTOPropertyData property : entity.getPropertList()){
                 System.out.println("Property Name: " + property.getName());
                 System.out.println("Property Type: " +property.getType());
                 if (property.haveRange()){
@@ -85,13 +139,11 @@ public class ConsoleUI {
                     System.out.println("Property has random initiate.");
                 }
                 else{
-                    System.out.println("Property has not random initiate.");
+                    System.out.println("Property doesn't have random initiate.");
                 }
             }
         }
     }
-
-
     private static void uploadXMLFile() {
 
         boolean validFile = false;

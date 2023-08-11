@@ -52,4 +52,13 @@ public class gameEngine {
     }
 
     public List<DTOEnvironmentVariables> getEnvironmentDetails(){ return cuurentSimuletion.getEnvironmentDetails();}
+
+    public List<World> getSimulationsList(){
+        return worldsList;
+    }
+
+    public void addEnvironmentDto(DTOEnvironmentVariables dtoEnvironmentVariables) throws InvalidValue {
+
+        cuurentSimuletion.addEnvironmentDto(dtoEnvironmentVariables);
+    }
 }
