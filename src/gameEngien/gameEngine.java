@@ -58,7 +58,6 @@ public class gameEngine {
     }
 
     public void addEnvironmentDto(DTOEnvironmentVariables dtoEnvironmentVariables) throws InvalidValue {
-
         cuurentSimuletion.addEnvironmentDto(dtoEnvironmentVariables);
     }
 }
