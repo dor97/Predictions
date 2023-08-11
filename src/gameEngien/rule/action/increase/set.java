@@ -62,9 +62,10 @@ public class set extends action implements Serializable {
 
     private void checkExpressionIfFunction() throws InvalidValue {
         if (m_value.getString().equals("environment")) {
-            exprecn temp = new exprecn();
-            temp.setValue(environment(m_value.getParams(0).getString()));
-            if (getEntityDifenichan(m_entity).getPropertys().get(m_property).getType() != m_value.getType()) {
+            //exprecn temp = new exprecn();
+            //temp.setValue(environment(m_value.getParams(0).getString()));
+            exprecnType temp = getEnvironmentType(m_value.getParams(0).getString());
+            if (getEntityDifenichan(m_entity).getPropertys().get(m_property).getType() != temp) {
                 if (!(getEntityDifenichan(m_entity).getPropertys().get(m_property).getType() == exprecnType.FLOAT && m_value.getType() == exprecnType.INT)) {
                     throw new InvalidValue("In action set the value is of the wrong type");
                 }

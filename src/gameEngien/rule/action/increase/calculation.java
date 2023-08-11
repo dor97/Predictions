@@ -88,12 +88,13 @@ public class calculation extends action implements Serializable {
 
     private void checkExpressionIfFunction(exprecnWithFunc arg) throws InvalidValue{
         if (arg.getString().equals("environment")) {
-            exprecn temp = new exprecn();
-            temp.setValue(environment(arg.getParams(0).getString()));
-            if (temp.getType() == exprecnType.STRING || temp.getType() == exprecnType.BOOL) {
+            //exprecn temp = new exprecn();
+            //temp.setValue(environment(arg.getParams(0).getString()));
+            exprecnType temp = getEnvironmentType(arg.getParams(0).getString());
+            if (temp == exprecnType.STRING || temp == exprecnType.BOOL) {
                 throw new InvalidValue("In action calculation one of the expression is of the wrong type");
             }
-            if (temp.getType() == exprecnType.FLOAT && getEntityDifenichan(m_entity).getPropertys().get(m_property).getType() == exprecnType.INT) {
+            if (temp == exprecnType.FLOAT && getEntityDifenichan(m_entity).getPropertys().get(m_property).getType() == exprecnType.INT) {
                 throw new InvalidValue("In action calculation the property and one of the expression are not compatible");
             }
         }
