@@ -9,7 +9,7 @@ public class DTOEnvironmentVariables {
     private DTOPropertyType m_variableType;
     private double m_highRange, m_lowRange;
     private boolean m_haveRange, m_RandomlyInatiated;
-    private String value;
+    private String m_value;
 
 
     public DTOEnvironmentVariables(String name, DTOPropertyType type, boolean haveRange){
@@ -50,23 +50,11 @@ public class DTOEnvironmentVariables {
         return m_lowRange;
     }
 
-    public void setValue(Object value){
-        if(value instanceof Integer){
-            value = (Integer) value;
-            m_variableType = DTOPropertyType.INT;
-        }
-        if(value instanceof Float){
-            value = (Float) value;
-            m_variableType = DTOPropertyType.FLOAT;
-        }
-        if(value instanceof String){
-            value = (String)value;
-            m_variableType = DTOPropertyType.STRING;
-        }
-        if(value instanceof  Boolean){
-            value = (Boolean)value;
-            m_variableType = DTOPropertyType.BOOL;
-        }
-        //exepcen
+    public void setValue(String value){
+        m_value = value;
+    }
+
+    public String getValue(){
+        return m_value;
     }
 }
