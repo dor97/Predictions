@@ -9,21 +9,19 @@ public class DTOEnvironmentVariables {
     DTOPropertyType m_variableType;
     double m_highRange, m_lowRange;
     boolean m_haveRange, m_RandomlyInatiated;
-    exprecn value;
+    String m_value;
 
 
-    public DTOEnvironmentVariables(String name, DTOPropertyType type, boolean haveRange, boolean RandomlyInatiated){
+    public DTOEnvironmentVariables(String name, DTOPropertyType type, boolean haveRange){
         m_variableName = name;
         m_variableType = type;
         m_haveRange = haveRange;
-        m_RandomlyInatiated = RandomlyInatiated;
     }
 
-    public DTOEnvironmentVariables(String name, DTOPropertyType type, boolean haveRange, boolean RandomlyInatiated, double highRange, double lowRange){
+    public DTOEnvironmentVariables(String name, DTOPropertyType type, boolean haveRange, double highRange, double lowRange){
         m_variableName = name;
         m_variableType = type;
         m_haveRange = haveRange;
-        m_RandomlyInatiated = RandomlyInatiated;
         m_highRange = highRange;
         m_lowRange = lowRange;
     }
@@ -52,23 +50,11 @@ public class DTOEnvironmentVariables {
         return m_lowRange;
     }
 
-    public void setValue(Object value){
-        if(value instanceof Integer){
-            value = (Integer) value;
-            m_variableType = DTOPropertyType.INT;
-        }
-        if(value instanceof Float){
-            value = (Float) value;
-            m_variableType = DTOPropertyType.FLOAT;
-        }
-        if(value instanceof String){
-            value = (String)value;
-            m_variableType = DTOPropertyType.STRING;
-        }
-        if(value instanceof  Boolean){
-            value = (Boolean)value;
-            m_variableType = DTOPropertyType.BOOL;
-        }
-        //exepcen
+    public String getValue(){
+        return m_value;
+    }
+
+    public void setValue(String value){
+        m_value = value;
     }
 }
