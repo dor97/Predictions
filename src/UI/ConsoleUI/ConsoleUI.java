@@ -61,9 +61,11 @@ public class ConsoleUI {
         Scanner scanner = new Scanner(System.in);
         System.out.println();
         System.out.println("Environment Variables:");
+        boolean validAction;
 
 
         for (DTOEnvironmentVariables env_variable : environmentVariables) {
+            validAction = false;
             System.out.println("Environment Variable Name : " + env_variable.getVariableName());
             System.out.println("Environment Variable Type : " + env_variable.getVariableType());
             if (env_variable.haveRange()){
@@ -71,14 +73,18 @@ public class ConsoleUI {
             }
             System.out.println("Please Set Value : ");
             env_variable.setValue(scanner.nextLine());
-            try{
-                m_gameEngine.addEnvironmentDto(env_variable);
-                System.out.println("Value Set Successfully");
-            }catch (InvalidValue e){
-                System.out.println(e.getMessage());
-                System.out.println("Please Set Value : ");
-                env_variable.setValue(scanner.nextLine());
+            while (!validAction){
+                try{
+                    m_gameEngine.addEnvironmentDto(env_variable);
+                    System.out.println("Value Set Successfully");
+                    validAction = true;
+                }catch (InvalidValue e){
+                    System.out.println(e.getMessage());
+                    System.out.println("Please Set Value : ");
+                    env_variable.setValue(scanner.nextLine());
+                }
             }
+
         }
         System.out.println();
     }
