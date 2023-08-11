@@ -246,4 +246,9 @@ public class World implements Serializable {
         return (PRDWorld) u.unmarshal(in);
     }
 
+    public void checkIfEnvVariableIsValid(DTOEnvironmentVariables env_variable) {
+
+        exprecn exp = new exprecn();
+        String value = env_variable.getValue();
+    }
 }

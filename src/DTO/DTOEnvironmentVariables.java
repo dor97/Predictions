@@ -69,8 +69,4 @@ public class DTOEnvironmentVariables {
         }
         //exepcen
     }
-
-    public String getValue(){
-        return value;
-    }
 }
