@@ -1,5 +1,6 @@
 package gameEngien.property;
 
+import DTO.DTOEnvironmentVariablesValues;
 import gameEngien.property.propertyInterface.PropertyInterface;
 import gameEngien.property.propertyInterface.propertyType;
 import org.omg.CORBA.INVALID_ACTIVITY;
@@ -47,5 +48,10 @@ public class Property implements PropertyInterface, Serializable {
     @Override
     public void setProperty(String v) {
         throw new INVALID_ACTIVITY("Trying to set value of property type " + m_type + " with string value");
+    }
+
+    @Override
+    public DTOEnvironmentVariablesValues makeDtoEnvironment(){
+        return new DTOEnvironmentVariablesValues(getName(), getValue());
     }
 }

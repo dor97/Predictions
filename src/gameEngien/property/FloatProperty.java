@@ -1,5 +1,6 @@
 package gameEngien.property;
 
+import DTO.DTOEnvironmentVariablesValues;
 import gameEngien.generated.PRDEnvProperty;
 import gameEngien.property.propertyInterface.propertyType;
 import gameEngien.rule.action.increase.exprecnType;
@@ -100,4 +101,8 @@ public class FloatProperty extends Property implements Serializable {
     public void setProperty(int v){
         m_property = v;
     }
+//    @Override
+//    public DTOEnvironmentVariablesValues makeDtoEnvironment(){
+//        return new DTOEnvironmentVariablesValues(m_name, m_property);
+//    }
 }

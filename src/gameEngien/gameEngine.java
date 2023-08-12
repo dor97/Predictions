@@ -1,9 +1,6 @@
 package gameEngien;
 
-import DTO.DTOEnvironmentVariables;
-import DTO.DTOSimulation;
-import DTO.DTOSimulationDetails;
-import DTO.DTOSimulationDetailsPostRun;
+import DTO.*;
 import com.sun.org.apache.xml.internal.security.signature.ReferenceNotInitializedException;
 import gameEngien.world.World;
 import org.omg.CORBA.DynAnyPackage.InvalidValue;
@@ -33,11 +30,14 @@ public class gameEngine {
         }
     }
 
+    public List<DTOEnvironmentVariablesValues> setSimulation()throws InvalidValue{
+        return cuurentSimuletion.setSimulation();
+    }
+
     public void activeSimulation()throws InvalidValue, ReferenceNotInitializedException{
         if(cuurentSimuletion == null){
             throw new ReferenceNotInitializedException("Simulation wasn't load");
         }
-        cuurentSimuletion.setSimulation();
         cuurentSimuletion.startSimolesan();
         worldsList.put(simulationNum, cuurentSimuletion);
         simulationNum++;

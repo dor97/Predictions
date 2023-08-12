@@ -302,7 +302,7 @@ public class World implements Serializable {
         }
     }
 
-    public void setSimulation()throws InvalidValue{
+    public List<DTOEnvironmentVariablesValues> setSimulation()throws InvalidValue{
         for(EnvironmentDifenichan entityDifenichan : m_environmentsDifenichen.values()){
             if(entityDifenichan.getType().equals("decimal")) {
                 m_environments.put(entityDifenichan.getName(), new DecimalProperty(entityDifenichan));
@@ -315,11 +315,18 @@ public class World implements Serializable {
             }
         }
 
+        List<DTOEnvironmentVariablesValues> environmentVariablesValues = new ArrayList<>();
+        for(PropertyInterface env : m_environments.values()){
+            environmentVariablesValues.add(env.makeDtoEnvironment());
+        }
+
         for(EntityDifenichan entityDifenichan : m_entitiesDifenichan.values()){
             for(int i = 0; i < entityDifenichan.getAmount(); i++){
                 m_entities.add(new Entity(entityDifenichan));
             }
         }
+
+        return environmentVariablesValues;
     }
 
     private static PRDWorld deserializeFrom(InputStream in) throws JAXBException {

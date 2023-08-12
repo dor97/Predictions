@@ -1,5 +1,7 @@
 package gameEngien.property.propertyInterface;
 
+import DTO.DTOEnvironmentVariablesValues;
+
 public interface PropertyInterface {
 
     public propertyType getType();
@@ -11,4 +13,5 @@ public interface PropertyInterface {
     public void setProperty(float v);
     public void setProperty(boolean v);
     public void setProperty(String v);
+    public DTOEnvironmentVariablesValues makeDtoEnvironment();
 }

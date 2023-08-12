@@ -1,5 +1,7 @@
 package gameEngien.property;
 
+import DTO.DTOEnvironmentVariables;
+import DTO.DTOEnvironmentVariablesValues;
 import gameEngien.generated.PRDEnvProperty;
 import gameEngien.property.Property;
 import gameEngien.property.propertyDifenichan;
@@ -106,4 +108,8 @@ public class DecimalProperty extends Property implements Serializable {
     public void setProperty(int v){
         m_property = v;
     }
+//    @Override
+//    public DTOEnvironmentVariablesValues makeDtoEnvironment(){
+//        return new DTOEnvironmentVariablesValues(m_name, m_property);
+//    }
 }
