@@ -82,8 +82,9 @@ public class FloatProperty extends Property implements Serializable {
 
     @Override
     public void addToProperty(float add){
-        if(m_property + add <= m_highRang && m_property + add >= m_lowRange)
+        if(!haveRange || (m_property + add <= m_highRang && m_property + add >= m_lowRange)) {
             m_property += add;
+        }
     }
     @Override
     public String getName(){
@@ -98,8 +99,10 @@ public class FloatProperty extends Property implements Serializable {
         m_property = v;
     }
     @Override
-    public void setProperty(int v){
-        m_property = v;
+    public void setProperty(int value){
+        if(!haveRange || (value <= m_highRang && value >= m_lowRange)){
+            m_property = value;
+        }
     }
 //    @Override
 //    public DTOEnvironmentVariablesValues makeDtoEnvironment(){

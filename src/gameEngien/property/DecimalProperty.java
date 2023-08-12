@@ -93,7 +93,7 @@ public class DecimalProperty extends Property implements Serializable {
 
     @Override
     public void addToProperty(int add){
-        if(m_property + add <= m_highRang && m_property + add >= m_lowRange)
+        if(!haveRange || (m_property + add <= m_highRang && m_property + add >= m_lowRange))
             m_property += add;
     }
     @Override
@@ -105,8 +105,10 @@ public class DecimalProperty extends Property implements Serializable {
         return m_property;
     }
     @Override
-    public void setProperty(int v){
-        m_property = v;
+    public void setProperty(int value){
+        if(!haveRange || (value <= m_highRang && value >= m_lowRange)){
+            m_property = value;
+        }
     }
 //    @Override
 //    public DTOEnvironmentVariablesValues makeDtoEnvironment(){

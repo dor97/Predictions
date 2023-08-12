@@ -9,8 +9,6 @@ import java.io.Serializable;
 import java.util.Random;
 
 public class BooleanProperty extends Property implements Serializable {
-
-
     private String m_name;
     private boolean m_property;
 
