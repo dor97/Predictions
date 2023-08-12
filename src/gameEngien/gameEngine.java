@@ -27,7 +27,6 @@ public class gameEngine {
         try {
             cuurentSimuletion = new World();
             cuurentSimuletion.loadFile(fileName);
-            cuurentSimuletion.setSimulation();
         }catch (Exception e){
             cuurentSimuletion = null;
             throw e;
@@ -38,6 +37,7 @@ public class gameEngine {
         if(cuurentSimuletion == null){
             throw new ReferenceNotInitializedException("Simulation wasn't load");
         }
+        cuurentSimuletion.setSimulation();
         cuurentSimuletion.startSimolesan();
         worldsList.put(simulationNum, cuurentSimuletion);
         simulationNum++;
