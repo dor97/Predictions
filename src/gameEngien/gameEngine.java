@@ -87,8 +87,8 @@ public class gameEngine {
         return new DTOSimulation(simulations);
     }
 
-    public DTOSimulationDetailsPostRun getPostRunData() {
-        return cuurentSimuletion.getPostRunData();
+    public DTOSimulationDetailsPostRun getPostRunData(int id) {
+        return worldsList.get(id).getPostRunData();
     }
 
 
