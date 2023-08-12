@@ -1,7 +1,12 @@
 package gameEngien.entity;
 
+import DTO.DTOEntityData;
+import DTO.DTOEntityHistogram;
+import DTO.DTOPropertyHistogram;
+import DTO.DTOPropertyType;
 import gameEngien.property.*;
 import gameEngien.property.propertyInterface.PropertyInterface;
+import gameEngien.property.propertyInterface.propertyType;
 import gameEngien.rule.action.increase.exprecnType;
 import org.omg.CORBA.DynAnyPackage.InvalidValue;
 
@@ -55,6 +60,32 @@ public class Entity implements Serializable {
 
     public void addProperty(PropertyInterface propertyToAdd){
         m_propertys.put(propertyToAdd.getName(), propertyToAdd);
+    }
+
+    public DTOEntityHistogram makeDtoEntity(){
+        DTOEntityHistogram DTO = new DTOEntityHistogram(m_name);
+
+        for(PropertyInterface property : m_propertys.values()){
+            DTO.addProperty(new DTOPropertyHistogram(property.getName(), property.getValue(), getDTOPropertyType(property)));
+        }
+
+        return DTO;
+    }
+
+    private DTOPropertyType getDTOPropertyType(PropertyInterface propertyInterface){
+        DTOPropertyType type;
+
+        if(propertyInterface.getType() == propertyType.INT) {
+            type = DTOPropertyType.INT;
+        } else if (propertyInterface.getType() ==propertyType.FLOAT) {
+            type = DTOPropertyType.FLOAT;
+        } else if (propertyInterface.getType() == propertyType.STRING) {
+            type = DTOPropertyType.STRING;
+        } else {
+            type = DTOPropertyType.BOOL;
+        }
+
+        return type;
     }
 
     //public void actionOnProperty(PropertyInterface p){

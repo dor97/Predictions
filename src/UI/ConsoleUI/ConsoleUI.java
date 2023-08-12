@@ -159,7 +159,7 @@ public class ConsoleUI {
         while (!validFile) {
             try {
                 String fileName = scanner.nextLine();
-                m_gameEngine.lodSimuletion(fileName);
+                m_gameEngine.loadSimulation(fileName);
                 validFile = true;
                 System.out.println("File Upload Successfully");
             } catch (ArithmeticException e) {

@@ -1,34 +1,51 @@
 package gameEngien;
 
 import DTO.DTOEnvironmentVariables;
+import DTO.DTOSimulation;
 import DTO.DTOSimulationDetails;
+import DTO.DTOSimulationDetailsPostRun;
+import com.sun.org.apache.xml.internal.security.signature.ReferenceNotInitializedException;
 import gameEngien.world.World;
 import org.omg.CORBA.DynAnyPackage.InvalidValue;
 
+import javax.naming.NoInitialContextException;
 import javax.xml.bind.JAXBException;
 import java.io.*;
 import java.nio.file.NoSuchFileException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 public class gameEngine {
-    List<World> worldsList = new ArrayList<>();
+    Map<Integer, World> worldsList = new HashMap<>();
     World cuurentSimuletion;
-    int simulationNum = 0;
+    Integer simulationNum = 0;
 
-    public void lodSimuletion(String fileName) throws NoSuchFileException, UnsupportedFileTypeException, InvalidValue, allReadyExistsException , JAXBException, FileNotFoundException {
-        cuurentSimuletion = new World();
-        cuurentSimuletion.loadFile(fileName);
-        cuurentSimuletion.setSimulation();
-        worldsList.add(cuurentSimuletion);
+    public void loadSimulation(String fileName) throws NoSuchFileException, UnsupportedFileTypeException, InvalidValue, allReadyExistsException , JAXBException, FileNotFoundException {
+        try {
+            cuurentSimuletion = new World();
+            cuurentSimuletion.loadFile(fileName);
+            cuurentSimuletion.setSimulation();
+        }catch (Exception e){
+            cuurentSimuletion = null;
+            throw e;
+        }
     }
 
-    public void activeSimultion()throws InvalidValue{
+    public void activeSimulation()throws InvalidValue, ReferenceNotInitializedException{
+        if(cuurentSimuletion == null){
+            throw new ReferenceNotInitializedException("Simulation wasn't load");
+        }
         cuurentSimuletion.startSimolesan();
+        worldsList.put(simulationNum, cuurentSimuletion);
+        simulationNum++;
     }
 
-    public void saveSystemState(){
-        try (FileOutputStream fileOut = new FileOutputStream("serializedObject.ser");
+    public void saveSystemState(String simulationName){
+        String fileName = simulationName + ".ser";
+        try (FileOutputStream fileOut = new FileOutputStream(fileName); //"serializedObject.ser"
              ObjectOutputStream out = new ObjectOutputStream(fileOut)) {
 
             out.writeObject(worldsList);
@@ -37,11 +54,13 @@ public class gameEngine {
         }
     }
 
-    public void loadSystemState(){
-        try (FileInputStream fileIn = new FileInputStream("serializedObject.ser");
+    public void loadSystemState(String simulationName){
+        String fileName = simulationName + ".ser";
+        try (FileInputStream fileIn = new FileInputStream(fileName); // serializedObject.ser
              ObjectInputStream in = new ObjectInputStream(fileIn)) {
 
-            worldsList = (List<World>) in.readObject();
+            worldsList = (Map<Integer, World>) in.readObject();
+            simulationNum = worldsList.keySet().size();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -53,11 +72,24 @@ public class gameEngine {
 
     public List<DTOEnvironmentVariables> getEnvironmentDetails(){ return cuurentSimuletion.getEnvironmentDetails();}
 
-    public List<World> getSimulationsList(){
-        return worldsList;
-    }
-
     public void addEnvironmentDto(DTOEnvironmentVariables dtoEnvironmentVariables) throws InvalidValue {
         cuurentSimuletion.addEnvironmentDto(dtoEnvironmentVariables);
     }
-}
+
+    public DTOSimulation getSimulationDto() throws NoInitialContextException {
+//        Map<Integer, String> simulations = new HashMap<>();
+//
+//        for(Integer id : worldsList.keySet()){
+//            simulations.put(id, worldsList.get(id).getSimulationTime());
+//        }
+
+        Map<Integer, String> simulations = worldsList.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, worldEntry -> worldEntry.getValue().getSimulationTime()));
+        return new DTOSimulation(simulations);
+    }
+
+    public DTOSimulationDetailsPostRun getPostRunData() {
+        return cuurentSimuletion.getPostRunData();
+    }
+
+
+    }

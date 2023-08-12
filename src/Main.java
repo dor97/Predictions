@@ -17,11 +17,11 @@ public class Main {
         gameEngine g = new gameEngine();
         try {
             if (true) {
-                g.lodSimuletion(fileName);
-                g.activeSimultion();
-                g.saveSystemState();
+                g.loadSimulation(fileName);
+                g.activeSimulation();
+                g.saveSystemState("serializedObject");
             } else {
-                g.loadSystemState();
+                g.loadSystemState("serializedObject");
             }
         }
         catch (Exception e){

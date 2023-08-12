@@ -1,9 +1,6 @@
 package gameEngien.world;
 
-import DTO.DTOEnvironmentVariables;
-import DTO.DTOSimulationDetails;
-import DTO.DTOTerminationData;
-import DTO.terminationType;
+import DTO.*;
 import gameEngien.UnsupportedFileTypeException;
 import gameEngien.allReadyExistsException;
 import gameEngien.entity.Entity;
@@ -18,7 +15,9 @@ import gameEngien.rule.action.increase.calculation;
 import gameEngien.rule.action.increase.exprecn;
 import gameEngien.utilites.Utilites;
 import org.omg.CORBA.DynAnyPackage.InvalidValue;
+import org.omg.CosNaming.NamingContextPackage.NotFound;
 
+import javax.naming.NoInitialContextException;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
@@ -27,9 +26,11 @@ import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class World implements Serializable {
     private List<Rule> m_rules = new ArrayList<>();
@@ -41,6 +42,8 @@ public class World implements Serializable {
     //private Map<String, DTOEnvironmentVariables> m_enviromentsDto = new HashMap<>();
     private exprecn m_ticks = null;
     private exprecn m_secondToWork = null;
+    private SimpleDateFormat format = new SimpleDateFormat("dd-mm-yyyy | hh.mm.ss");
+    private String simulationTime = null;
 
     private final static String JAXB_XML_GAME_PACKAGE_NAME = "gameEngien.generated";
 
@@ -91,6 +94,7 @@ public class World implements Serializable {
 //            }
 //        }
 
+        simulationTime = format.format(new Date());
         int currTick = 0, currTime = 0;
         Instant start = Instant.now();
         while ((m_ticks.getType() == null || currTick < m_ticks.getInt()) && (m_secondToWork == null || Duration.between(start, Instant.now()).getSeconds() < m_secondToWork.getInt())){
@@ -111,7 +115,81 @@ public class World implements Serializable {
         }
     }
 
+    public String getSimulationTime(){
+        if(simulationTime == null){
+            throw new RuntimeException("Didn't ran the simulation");
+        }
+        return simulationTime;
+    }
+
     //public void setEnviroment(String name, )
+
+    public DTOSimulationDetailsPostRun getPostRunData(){
+        DTOSimulationDetailsPostRun simulationDetailsPostRun = new DTOSimulationDetailsPostRun();
+
+        final Map<String, Integer> entityAmountPostRun = m_entities.stream().collect(Collectors.groupingBy(entity -> entity.getName(), Collectors.summingInt(e -> 1)));
+        List<DTOEntityPostRun> entityPostRuns = m_entitiesDifenichan.values().stream().map(entityDifenichan -> new DTOEntityPostRun(entityDifenichan.getName(), entityDifenichan.getAmount(), entityAmountPostRun.get(entityDifenichan.getName()))).collect(Collectors.toList());
+        simulationDetailsPostRun.setEntitiesPostRuns(entityPostRuns);
+
+        Map<String, List<DTOEntityHistogram>>entitiesHistogram = m_entities.stream().map(entity -> entity.makeDtoEntity()).collect(Collectors.groupingBy(entityHistogram -> entityHistogram.getName()));
+        simulationDetailsPostRun.setEntitiesHistogram(entitiesHistogram);
+
+        return simulationDetailsPostRun;
+    }
+
+    public DTOSimulationDetailsPostRun getPostRunData2(){
+        DTOSimulationDetailsPostRun simulationDetailsPostRun = new DTOSimulationDetailsPostRun();
+
+        //////////////////////////////////////////////////////////////////////////////////
+
+        Map<String, Integer> entityAmountPostRun = new HashMap<>();
+
+        for(Entity entity : m_entities){
+            if(!entityAmountPostRun.containsKey(entity.getName())){
+                entityAmountPostRun.put(entity.getName(), 1);
+            }
+            else{
+                entityAmountPostRun.put(entity.getName(), entityAmountPostRun.get(entity.getName()) + 1);
+            }
+        }
+
+        for(EntityDifenichan entityDifenichan : m_entitiesDifenichan.values()){
+            simulationDetailsPostRun.addEntityPostRun(new DTOEntityPostRun(entityDifenichan.getName(), entityDifenichan.getAmount(), entityAmountPostRun.get(entityDifenichan.getName())));
+            //entityPostRuns.add(new DTOEntityPostRun(entityDifenichan.getName(), entityDifenichan.getAmount(), entityAmountPostRun.get(entityDifenichan.getName())));
+        }
+
+        ////////////////////////////////////////////////////////////////////////
+        for(Entity entity : m_entities){
+            simulationDetailsPostRun.addEntitiesHistigram(entity.makeDtoEntity());
+//            if(!entitiesHistogram.containsKey(entity.getName())){
+//                List<DTOEntityHistogram> temp = new ArrayList<>();
+//                temp.add(entity.makeDtoEntity());
+//                entitiesHistogram.put(entity.getName(), temp);
+//            }
+//            else{
+//                List<DTOEntityHistogram> temp = entitiesHistogram.get(entity.getName());
+//                temp.add(entity.makeDtoEntity());
+//                //entitiesHistogram.put(entity.getName(), temp);    // ???
+//            }
+        }
+
+
+        ////////////////////////////////////
+        //DTOHistogram logic
+//        String entity = "", property = "";
+//        Map<Object, Integer> histogram = new HashMap<>();
+//
+//        for(DTOEntityHistogram entityHistogram : entitiesHistogram.get(entity)){
+//            if(!histogram.containsKey(entityHistogram.getProperty(property).getValue())){
+//                histogram.put(entityHistogram.getProperty(property).getValue(), 1);
+//            }
+//            else{
+//                histogram.put(entityHistogram.getProperty(property).getValue(), histogram.get(entityHistogram.getProperty(property).getValue()) + 1);
+//            }
+//        }
+
+        return simulationDetailsPostRun;
+    }
 
     public DTOSimulationDetails getSimulationDetails(){
         DTOSimulationDetails DTO = new DTOSimulationDetails();
@@ -148,6 +226,7 @@ public class World implements Serializable {
     public void loadFile(String xmlFile)throws NoSuchFileException , UnsupportedFileTypeException, allReadyExistsException, InvalidValue, JAXBException, FileNotFoundException {
         PRDWorld xmlWorld = new PRDWorld();
 
+        //load file
         Path path = Paths.get(xmlFile);
         if (Files.exists(path) && Files.isRegularFile(path)) {
             // Check if the file extension is .xml
@@ -170,10 +249,10 @@ public class World implements Serializable {
         for(PRDEntity e : xmlWorld.getPRDEntities().getPRDEntity()){
             m_entitiesDifenichan.put(e.getName(), new EntityDifenichan(e));
         }
-
+        //environment
         for(PRDEnvProperty p : xmlWorld.getPRDEvironment().getPRDEnvProperty()){
             if(m_environmentsDifenichen.containsKey(p.getPRDName())){
-                throw new allReadyExistsException("environment varuble " + p.getPRDName() + " all ready exists.");
+                throw new allReadyExistsException("environment variables " + p.getPRDName() + " all ready exists.");
             }
             m_environmentsDifenichen.put(p.getPRDName(), new EnvironmentDifenichan(p));
         }
@@ -217,6 +296,9 @@ public class World implements Serializable {
     public void addEnvironmentDto(DTOEnvironmentVariables dtoEnvironmentVariables) throws InvalidValue{
         if(m_environmentsDifenichen.containsKey(dtoEnvironmentVariables.getVariableName())){
             m_environmentsDifenichen.get(dtoEnvironmentVariables.getVariableName()).setWithDto(dtoEnvironmentVariables);
+        }
+        else{
+            throw new InvalidValue("Got a non exising environment variables name");
         }
     }
 
