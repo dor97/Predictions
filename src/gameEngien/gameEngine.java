@@ -76,7 +76,7 @@ public class gameEngine {
         cuurentSimuletion.addEnvironmentDto(dtoEnvironmentVariables);
     }
 
-    public DTOSimulation getSimulationDto() throws NoInitialContextException {
+    public DTOSimulation getSimulationDto() {
 //        Map<Integer, String> simulations = new HashMap<>();
 //
 //        for(Integer id : worldsList.keySet()){

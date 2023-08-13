@@ -117,7 +117,8 @@ public class World implements Serializable {
 
     public String getSimulationTime(){
         if(simulationTime == null){
-            throw new RuntimeException("Didn't ran the simulation");
+            simulationTime = "The simulation haven't ran yet";
+            //throw new RuntimeException("Didn't run the simulation");
         }
         return simulationTime;
     }
