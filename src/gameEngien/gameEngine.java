@@ -83,7 +83,7 @@ public class gameEngine {
 //            simulations.put(id, worldsList.get(id).getSimulationTime());
 //        }
 
-        Map<Integer, String> simulations = worldsList.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, worldEntry -> worldEntry.getValue().getSimulationTime()));
+        Map<Integer, String> simulations = worldsList.entrySet().stream().filter(worldEntry -> worldEntry.getValue().getSimulationTime() != null).collect(Collectors.toMap(Map.Entry::getKey, worldEntry -> worldEntry.getValue().getSimulationTime()));
         return new DTOSimulation(simulations);
     }
 

@@ -116,16 +116,22 @@ public class World implements Serializable {
     }
 
     public String getSimulationTime(){
-        if(simulationTime == null){
-            simulationTime = "The simulation haven't ran yet";
-            //throw new RuntimeException("Didn't run the simulation");
-        }
+//        String res = simulationTime;
+//        if(res == null){
+//            res = "The simulation haven't ran yet";
+//            //throw new RuntimeException("Didn't run the simulation");
+//        }
+//        return res;
         return simulationTime;
     }
 
     //public void setEnviroment(String name, )
 
     public DTOSimulationDetailsPostRun getPostRunData(){
+        if(simulationTime == null){
+            throw new RuntimeException("The simulation haven't ran yet");
+        }
+
         DTOSimulationDetailsPostRun simulationDetailsPostRun = new DTOSimulationDetailsPostRun();
 
         final Map<String, Integer> entityAmountPostRun = m_entities.stream().collect(Collectors.groupingBy(entity -> entity.getName(), Collectors.summingInt(e -> 1)));
