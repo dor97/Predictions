@@ -9,7 +9,9 @@ import gameEngien.rule.action.increase.exprecn;
 import gameEngien.rule.action.increase.exprecnType;
 import org.omg.CORBA.DynAnyPackage.InvalidValue;
 
-public class EnvironmentDifenichan {
+import java.io.Serializable;
+
+public class EnvironmentDifenichan implements Serializable {
     private String m_name;
     private exprecnType m_type;
     private double m_lowRange, m_highRang;
