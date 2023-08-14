@@ -13,6 +13,7 @@ import gameEngien.rule.action.actionInterface.ActionInterface;
 import gameEngien.rule.action.increase.addValue;
 import gameEngien.rule.action.increase.calculation;
 import gameEngien.rule.action.increase.exprecn;
+import gameEngien.rule.action.increase.exprecnType;
 import gameEngien.utilites.Utilites;
 import org.omg.CORBA.DynAnyPackage.InvalidValue;
 import org.omg.CosNaming.NamingContextPackage.NotFound;
@@ -311,13 +312,13 @@ public class World implements Serializable {
 
     public List<DTOEnvironmentVariablesValues> setSimulation()throws InvalidValue{
         for(EnvironmentDifenichan entityDifenichan : m_environmentsDifenichen.values()){
-            if(entityDifenichan.getType().equals("decimal")) {
+            if(entityDifenichan.getType() == exprecnType.INT) {         //.equals("decimal")
                 m_environments.put(entityDifenichan.getName(), new DecimalProperty(entityDifenichan));
-            } else if(entityDifenichan.getType().equals("float")){
+            } else if(entityDifenichan.getType() == exprecnType.FLOAT){     //.equals("float")
                 m_environments.put(entityDifenichan.getName(), new FloatProperty(entityDifenichan));
-            } else if (entityDifenichan.getType().equals("string")) {
+            } else if (entityDifenichan.getType() == exprecnType.STRING) {      //.equals("string")
                 m_environments.put(entityDifenichan.getName(), new StringProperty(entityDifenichan));
-            } else if (entityDifenichan.getType().equals("boolean")) {
+            } else if (entityDifenichan.getType() == exprecnType.BOOL) {        //.equals("boolean")
                 m_environments.put(entityDifenichan.getName(), new BooleanProperty(entityDifenichan));
             }
         }
