@@ -1,6 +1,7 @@
 package gameEngien;
 
 import DTO.*;
+import com.sun.org.apache.bcel.internal.generic.RET;
 import com.sun.org.apache.xml.internal.security.signature.ReferenceNotInitializedException;
 import gameEngien.world.World;
 import org.omg.CORBA.DynAnyPackage.InvalidValue;
@@ -18,7 +19,7 @@ import java.util.stream.Collectors;
 public class gameEngine {
     Map<Integer, World> worldsList = new HashMap<>();
     World cuurentSimuletion;
-    Integer simulationNum = 0;
+    Integer simulationNum = 1;
 
     public void loadSimulation(String fileName) throws NoSuchFileException, UnsupportedFileTypeException, InvalidValue, allReadyExistsException , JAXBException, FileNotFoundException {
         try {
@@ -34,13 +35,15 @@ public class gameEngine {
         return cuurentSimuletion.setSimulation();
     }
 
-    public void activeSimulation()throws InvalidValue, ReferenceNotInitializedException{
+    public int activeSimulation()throws InvalidValue, ReferenceNotInitializedException{
+        int old_simulationNumber = simulationNum;
         if(cuurentSimuletion == null){
             throw new ReferenceNotInitializedException("Simulation wasn't load");
         }
         cuurentSimuletion.startSimolesan();
         worldsList.put(simulationNum, cuurentSimuletion);
         simulationNum++;
+        return old_simulationNumber;
     }
 
     public void saveSystemState(String simulationName){

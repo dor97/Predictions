@@ -1,15 +1,13 @@
 package UI.ConsoleUI;
 
 import DTO.*;
+import com.sun.org.apache.xml.internal.security.signature.ReferenceNotInitializedException;
 import gameEngien.gameEngine;
 import gameEngien.world.World;
 import org.omg.CORBA.DynAnyPackage.InvalidValue;
 
 import java.nio.file.NoSuchFileException;
-import java.util.ArrayList;
-import java.util.InputMismatchException;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
 
 public class ConsoleUI {
     private static gameEngine m_gameEngine;
@@ -41,23 +39,134 @@ public class ConsoleUI {
         }
 
         else if (userChoice == 4){
-            displayPastSimulationDetails();
+            try{
+                displayPastSimulationDetails();
+            }catch (NoSuchElementException e){
+             System.out.println(e.getMessage());
+            }
         }
     }
     private static void displayPastSimulationDetails() {
 
-//        for (World simulation : m_gameEngine.getSimulationsList()){
-//            System.out.println(simulation.getSimulationId());
-//        }
+        int maxID = getMaxID();
+        if (maxID == 0){
+            throw new NoSuchElementException("You must upload XML file to the System before you ask for past simulation details.");
+        }
+        int userInput_id = 0;
+        int userInput_display = 0;
+        boolean validInput = false;
+        Scanner scanner = new Scanner(System.in);
+        displaySimulationsOptions();
+
+        while (!validInput){
+            try {
+                userInput_id = scanner.nextInt();
+                if (userInput_id < 1 || userInput_id > maxID) {
+                    throw new IllegalArgumentException("Invalid input. you must choose number from the options.");
+                }
+                validInput = true;
+            }catch (InputMismatchException e){
+                scanner.nextLine();
+                System.out.println("Invalid input. Please enter a valid input.");
+                displaySimulationsOptions();
+            }catch (IllegalArgumentException e){
+                scanner.nextLine();
+                System.out.println(e.getMessage());
+                displaySimulationsOptions();
+            }
+        }
+        validInput = false;
+
+        while (!validInput){
+            System.out.println("Please Choose Display Mode:");
+            System.out.println("1. Entities quantity.");
+            System.out.println("2. Properties Histogram.");
+            try {
+                userInput_display = scanner.nextInt();
+                if (userInput_display < 1 || userInput_display > 2){
+                    throw new IllegalArgumentException("Invalid input. you must choose the number from the options.");
+                }
+                validInput =true;
+            }catch (InputMismatchException e){
+                System.out.println("Invalid input. Please enter a valid input.");
+                scanner.nextLine();
+            }catch (IllegalArgumentException e){
+                System.out.println(e.getMessage());
+                scanner.nextLine();
+            }
+        }
+
+        if (userInput_display == 1){
+            printEntitiesQuantity(userInput_id);
+        }
+        else if (userInput_display == 2){
+            printPropertiesHistogram();
+        }
+
+    }
+
+    private static void printPropertiesHistogram() {
+
+    }
+
+    private static void printEntitiesQuantity(int id) {
+
+        DTOSimulationDetailsPostRun postRun = m_gameEngine.getPostRunData(id);
+        System.out.println("sda");
+    }
+
+    private static int getMaxID() {
+        int maxID = 0;
+        for (Map.Entry<Integer,String> simulation : m_gameEngine.getSimulationDto().getSimulations().entrySet()){
+            if (simulation.getKey() > maxID){
+                maxID = simulation.getKey();
+            }
+        }
+
+        return maxID;
+    }
+    private static void displaySimulationsOptions(){
+        System.out.println("Please Choose Simulation By ID: ");
+        for (Map.Entry<Integer,String> simulation : m_gameEngine.getSimulationDto().getSimulations().entrySet()){
+            System.out.println("ID : " + simulation.getKey());
+            System.out.println("Run Date : " + simulation.getValue());
+            System.out.println();
+        }
     }
     private static void runSimulation() {
+        Scanner scanner = new Scanner(System.in);
+        int simuladtion_id;
         List <DTOEnvironmentVariables> environmentVariables = m_gameEngine.getEnvironmentDetails();
+
         printEnvironmentVariablesAndSetValue(environmentVariables);
-
+        System.out.println("Press Enter to run the simulation : ");
+        scanner.nextLine();
+        try {
+            List <DTOEnvironmentVariablesValues> environmentVariablesValues = m_gameEngine.setSimulation();
+            printEnvironmentVariablesValues(environmentVariablesValues);
+        }catch (InvalidValue e){
+            System.out.println(e.getMessage());
+        }
+        try {
+            simuladtion_id= m_gameEngine.activeSimulation();
+            System.out.println("Simulation ID : " + simuladtion_id);
+        }catch (InvalidValue | ReferenceNotInitializedException e){
+            System.out.println(e.getMessage());
+        }
     }
+    private static void printEnvironmentVariablesValues(List<DTOEnvironmentVariablesValues> environmentVariablesValues) {
 
+        System.out.println();
+
+        for (DTOEnvironmentVariablesValues env_variable_value : environmentVariablesValues){
+            System.out.println("Environment Variable Name : " + env_variable_value.getName());
+            System.out.println("Environment Variable Value : " + env_variable_value.getValue());
+            System.out.println();
+        }
+    }
     private static void printEnvironmentVariablesAndSetValue(List<DTOEnvironmentVariables> environmentVariables) {
 
+        String userInput;
         Scanner scanner = new Scanner(System.in);
         System.out.println();
         System.out.println("Environment Variables:");
@@ -71,24 +180,31 @@ public class ConsoleUI {
             if (env_variable.haveRange()){
                 System.out.println("Environment Variable Range is: " +env_variable.getLowRange() + "-" + env_variable.getHighRange());
             }
-            System.out.println("Please Set Value : ");
-            env_variable.setValue(scanner.nextLine());
-            while (!validAction){
-                try{
-                    m_gameEngine.addEnvironmentDto(env_variable);
-                    System.out.println("Value Set Successfully");
-                    validAction = true;
-                }catch (InvalidValue e){
-                    System.out.println(e.getMessage());
-                    System.out.println("Please Set Value : ");
-                    env_variable.setValue(scanner.nextLine());
+            System.out.println("Please Set Value (if you don't want to set press enter) : ");
+            userInput = scanner.nextLine();
+            if (!userInput.isEmpty()){
+                env_variable.setValue(userInput);
+                while (!validAction){
+                    try{
+                        m_gameEngine.addEnvironmentDto(env_variable);
+                        System.out.println("Values Set Successfully");
+                        validAction = true;
+                    }catch (InvalidValue e){
+                        System.out.println(e.getMessage());
+                        System.out.println("Please Set Value (if you don't want to set press enter) : ");
+                        userInput = scanner.nextLine();
+                        if (!userInput.isEmpty()){
+                            env_variable.setValue(userInput);
+                        }
+                        else {
+                            validAction = true;
+                        }
+                    }
                 }
             }
-
         }
         System.out.println();
     }
-
     private static void displaySimulationDetails() {
 
         DTOSimulationDetails dtoSimulationDetails = m_gameEngine.getSimulationDetails();
@@ -161,7 +277,8 @@ public class ConsoleUI {
                 String fileName = scanner.nextLine();
                 m_gameEngine.loadSimulation(fileName);
                 validFile = true;
-                System.out.println("File Upload Successfully");
+                System.out.println("File Uploaded Successfully");
+                System.out.println();
             } catch (ArithmeticException e) {
                 System.out.println(e.getMessage());
             } catch (Exception e) {
@@ -174,10 +291,9 @@ public class ConsoleUI {
 
         Scanner scanner = new Scanner(System.in);
         boolean validInput = false;
-        boolean inRange = false;
         int choice =0;
 
-        while (!validInput && !inRange){
+        while (!validInput){
             try {
                 choice = scanner.nextInt();
 
