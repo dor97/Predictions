@@ -4,10 +4,10 @@ public class DTOEntityPostRun {
     private String m_name;
     private int m_amountPreRun, m_amountPostRun;
 
-    public DTOEntityPostRun(String name, int amountPreRun, int amountPostRun){
+    public DTOEntityPostRun(String name, int amountPreRun, Integer amountPostRun){
         m_name = name;
         m_amountPreRun = amountPreRun;
-        m_amountPostRun = amountPostRun;
+        m_amountPostRun = amountPostRun != null ? amountPostRun : 0;
     }
 
     public DTOEntityPostRun(String name, int amountPreRun){
