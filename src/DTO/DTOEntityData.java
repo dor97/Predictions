@@ -1,7 +1,5 @@
 package DTO;
 
-import gameEngien.entity.Entity;
-
 import java.util.ArrayList;
 import java.util.List;
 

@@ -2,7 +2,7 @@ package UI.ConsoleUI;
 
 import DTO.*;
 import com.sun.org.apache.xml.internal.security.signature.ReferenceNotInitializedException;
-import gameEngien.gameEngine;
+import Engine.gameEngine;
 import org.omg.CORBA.DynAnyPackage.InvalidValue;
 
 import java.util.*;

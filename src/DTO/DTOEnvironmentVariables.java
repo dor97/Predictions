@@ -1,8 +1,5 @@
 package DTO;
 
-import gameEngien.rule.action.increase.exprecn;
-import gameEngien.rule.action.increase.exprecnType;
-
 public class DTOEnvironmentVariables {
 
     private String m_variableName;

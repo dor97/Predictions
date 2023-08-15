@@ -1,0 +1,69 @@
+package Engine.world.entity;
+
+import DTO.DTOEntityData;
+import DTO.DTOEntitysProperties;
+import DTO.DTOProperty;
+import Engine.allReadyExistsException;
+import Engine.generated.PRDEntity;
+import Engine.generated.PRDProperty;
+import Engine.world.entity.property.propertyDifenichan;
+import org.omg.CORBA.DynAnyPackage.InvalidValue;
+
+import java.io.Serializable;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+public class EntityDifenichan implements Serializable {
+    private String m_name;
+    private int m_amount;
+    private Map<String, propertyDifenichan> m_propertys;
+
+    public EntityDifenichan(PRDEntity e) throws allReadyExistsException, InvalidValue{
+        m_name = e.getName();
+        m_amount = e.getPRDPopulation();
+        m_propertys = new HashMap<>();
+        for(PRDProperty p : e.getPRDProperties().getPRDProperty()){
+            if(m_propertys.containsKey(p.getPRDName())){
+                throw new allReadyExistsException("property varuble " + p.getPRDName() + " all ready exists in entity" + e.getName());
+            }
+            try {
+                m_propertys.put(p.getPRDName(), new propertyDifenichan(p));
+            }catch (InvalidValue invalidValue){
+                throw new InvalidValue(invalidValue.getMessage() + ". referred in entity " + m_name);
+            }
+        }
+    }
+
+    public void addProperty(propertyDifenichan propertyToAdd){
+        m_propertys.put(propertyToAdd.getName(), propertyToAdd);
+    }
+
+    public int getAmount(){
+        return m_amount;
+    }
+    public String getName(){
+        return  m_name;
+    }
+
+    public Map<String, propertyDifenichan> getPropertys(){
+        return  m_propertys;
+    }
+
+    public DTOEntityData makeDtoEntity(){
+        DTOEntityData DTO = new DTOEntityData(m_name, m_amount);
+
+        for(propertyDifenichan property : m_propertys.values()){
+            DTO.addProperty(property.makeDtoProperty());
+        }
+
+        return DTO;
+    }
+
+    public DTOEntitysProperties makeDtoEntitysProperties(){
+        List<DTOProperty> properties = m_propertys.values().stream().map(propertyDifenichan -> new DTOProperty(propertyDifenichan.getName())).collect(Collectors.toList());
+        return new DTOEntitysProperties(m_name, properties);
+    }
+
+}
