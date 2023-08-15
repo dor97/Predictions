@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public class gameEngine {
+public class Engine {
     Map<Integer, World> worldsList = new HashMap<>();
     World cuurentSimuletion;
     Integer simulationNum = 1;

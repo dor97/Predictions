@@ -1,11 +1,11 @@
-import Engine.gameEngine;
+import Engine.Engine;
 
 // Press Shift twice to open the Search Everywhere dialog and type `show whitespaces`,
 // then press Enter. You can now see whitespace characters in your code.
 public class Main {
     public static void main(String[] args) {
         String fileName = "src/resources/ex1-cigarets.xml";
-        gameEngine g = new gameEngine();
+        Engine g = new Engine();
         try {
             if (true) {
                 g.loadSimulation(fileName);

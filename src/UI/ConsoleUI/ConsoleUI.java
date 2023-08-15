@@ -2,16 +2,16 @@ package UI.ConsoleUI;
 
 import DTO.*;
 import com.sun.org.apache.xml.internal.security.signature.ReferenceNotInitializedException;
-import Engine.gameEngine;
+import Engine.Engine;
 import org.omg.CORBA.DynAnyPackage.InvalidValue;
 
 import java.util.*;
 
 public class ConsoleUI {
-    private static gameEngine m_gameEngine;
+    private static Engine m_Engine;
     public static void main(String args[]) {
         boolean validAction = true;
-        m_gameEngine = new gameEngine();
+        m_Engine = new Engine();
         showMenu();
         int userChoice = readInput();
 
@@ -105,7 +105,7 @@ public class ConsoleUI {
 
     private static void printPropertiesHistogram(int id) {
 
-        DTOSimulationDetailsPostRun postRun = m_gameEngine.getPostRunData(id);
+        DTOSimulationDetailsPostRun postRun = m_Engine.getPostRunData(id);
         System.out.println("Please Select Entity :");
         int userInput = 0;
         int i =1;
@@ -234,7 +234,7 @@ public class ConsoleUI {
 
     private static void printEntitiesQuantity(int id) {
 
-        DTOSimulationDetailsPostRun postRun = m_gameEngine.getPostRunData(id);
+        DTOSimulationDetailsPostRun postRun = m_Engine.getPostRunData(id);
         for(DTOEntityPostRun entity : postRun.getEntitiesPostRun()){
             System.out.println("Entity Name : " + entity.getName());
             System.out.println("Amount Pre Run : " + entity.getAmountPreRun());
@@ -245,7 +245,7 @@ public class ConsoleUI {
 
     private static int getMaxID() {
         int maxID = 0;
-        for (Map.Entry<Integer,String> simulation : m_gameEngine.getSimulationDto().getSimulations().entrySet()){
+        for (Map.Entry<Integer,String> simulation : m_Engine.getSimulationDto().getSimulations().entrySet()){
             if (simulation.getKey() > maxID){
                 maxID = simulation.getKey();
             }
@@ -255,7 +255,7 @@ public class ConsoleUI {
     }
     private static void displaySimulationsOptions(){
         System.out.println("Please Choose Simulation By ID: ");
-        for (Map.Entry<Integer,String> simulation : m_gameEngine.getSimulationDto().getSimulations().entrySet()){
+        for (Map.Entry<Integer,String> simulation : m_Engine.getSimulationDto().getSimulations().entrySet()){
             System.out.println("ID : " + simulation.getKey());
             System.out.println("Run Date : " + simulation.getValue());
             System.out.println();
@@ -264,19 +264,19 @@ public class ConsoleUI {
     private static void runSimulation() {
         Scanner scanner = new Scanner(System.in);
         int simuladtion_id;
-        List <DTOEnvironmentVariables> environmentVariables = m_gameEngine.getEnvironmentDetails();
+        List <DTOEnvironmentVariables> environmentVariables = m_Engine.getEnvironmentDetails();
 
         printEnvironmentVariablesAndSetValue(environmentVariables);
         System.out.println("Press Enter to run the simulation : ");
         scanner.nextLine();
         try {
-            List <DTOEnvironmentVariablesValues> environmentVariablesValues = m_gameEngine.setSimulation();
+            List <DTOEnvironmentVariablesValues> environmentVariablesValues = m_Engine.setSimulation();
             printEnvironmentVariablesValues(environmentVariablesValues);
         }catch (InvalidValue e){
             System.out.println(e.getMessage());
         }
         try {
-            simuladtion_id= m_gameEngine.activeSimulation();
+            simuladtion_id= m_Engine.activeSimulation();
             System.out.println("Simulation ID : " + simuladtion_id);
         }catch (InvalidValue | ReferenceNotInitializedException e){
             System.out.println(e.getMessage());
@@ -314,7 +314,7 @@ public class ConsoleUI {
                 env_variable.setValue(userInput);
                 while (!validAction){
                     try{
-                        m_gameEngine.addEnvironmentDto(env_variable);
+                        m_Engine.addEnvironmentDto(env_variable);
                         System.out.println("Values Set Successfully");
                         validAction = true;
                     }catch (InvalidValue e){
@@ -335,7 +335,7 @@ public class ConsoleUI {
     }
     private static void displaySimulationDetails() {
 
-        DTOSimulationDetails dtoSimulationDetails = m_gameEngine.getSimulationDetails();
+        DTOSimulationDetails dtoSimulationDetails = m_Engine.getSimulationDetails();
         List <DTOEntityData> dtoEntityData = dtoSimulationDetails.getEntitysList();
         List < DTORuleData> dtoRuleData = dtoSimulationDetails.getRulesList();
         List < DTOTerminationData> dtoTerminationData = dtoSimulationDetails.getTerminationList();
@@ -403,7 +403,7 @@ public class ConsoleUI {
         while (!validFile) {
             try {
                 String fileName = scanner.nextLine();
-                m_gameEngine.loadSimulation(fileName);
+                m_Engine.loadSimulation(fileName);
                 validFile = true;
                 System.out.println("File Uploaded Successfully");
                 System.out.println();
