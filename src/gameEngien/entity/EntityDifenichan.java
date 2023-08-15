@@ -1,6 +1,8 @@
 package gameEngien.entity;
 
 import DTO.DTOEntityData;
+import DTO.DTOEntitysProperties;
+import DTO.DTOProperty;
 import gameEngien.allReadyExistsException;
 import gameEngien.generated.PRDEntity;
 import gameEngien.generated.PRDProperty;
@@ -13,6 +15,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class EntityDifenichan implements Serializable {
     private String m_name;
@@ -58,6 +61,11 @@ public class EntityDifenichan implements Serializable {
         }
 
         return DTO;
+    }
+
+    public DTOEntitysProperties makeDtoEntitysProperties(){
+        List<DTOProperty> properties = m_propertys.values().stream().map(propertyDifenichan -> new DTOProperty(propertyDifenichan.getName())).collect(Collectors.toList());
+        return new DTOEntitysProperties(m_name, properties);
     }
 
 }

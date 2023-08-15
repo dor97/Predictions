@@ -4,8 +4,10 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class DTOSimulationDetailsPostRun {
-    List<DTOEntityPostRun> m_entitiesPostRuns = new ArrayList<>();
-    Map<String, List<DTOEntityHistogram>> m_entitiesHistogram = new HashMap<>();
+    private List<DTOEntityPostRun> m_entitiesPostRuns = new ArrayList<>();
+    private Map<String, List<DTOEntityHistogram>> m_entitiesHistogram = new HashMap<>();
+
+    private Map<String, DTOEntitysProperties> m_entitysProperties = new HashMap<>();
 
     public void addEntityPostRun(DTOEntityPostRun entityPostRun){
         m_entitiesPostRuns.add(entityPostRun);
@@ -28,6 +30,10 @@ public class DTOSimulationDetailsPostRun {
         m_entitiesPostRuns = entitiesPostRuns;
     }
 
+    public void setEntitysProperties(Map<String, DTOEntitysProperties> entitysProperties){
+        m_entitysProperties = entitysProperties;
+    }
+
     public void setEntitiesHistogram(Map<String, List<DTOEntityHistogram>> entitiesHistogram){
         m_entitiesHistogram = entitiesHistogram;
     }
@@ -46,5 +52,13 @@ public class DTOSimulationDetailsPostRun {
 //        return histogram;
         return m_entitiesHistogram.get(entity).stream().collect(Collectors.groupingBy(entityHistogram -> entityHistogram.getProperty(property).getValue(), Collectors.summingInt(e -> 1)));   //Collectors.counting()
 
+    }
+
+    public List<DTOEntityPostRun> getEntitiesPostRun(){
+        return m_entitiesPostRuns;
+    }
+
+    public Map<String, DTOEntitysProperties> getEntitysProperties(){
+        return m_entitysProperties;
     }
 }

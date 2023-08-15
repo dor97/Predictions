@@ -43,7 +43,7 @@ public class World implements Serializable {
     //private Map<String, DTOEnvironmentVariables> m_enviromentsDto = new HashMap<>();
     private exprecn m_ticks = null;
     private exprecn m_secondToWork = null;
-    private SimpleDateFormat format = new SimpleDateFormat("dd-mm-yyyy | hh.mm.ss");
+    private SimpleDateFormat format = new SimpleDateFormat("dd-MM-yyyy | hh.mm.ss");
     private String simulationTime = null;
 
     private final static String JAXB_XML_GAME_PACKAGE_NAME = "gameEngien.generated";
@@ -138,9 +138,18 @@ public class World implements Serializable {
         final Map<String, Integer> entityAmountPostRun = m_entities.stream().collect(Collectors.groupingBy(entity -> entity.getName(), Collectors.summingInt(e -> 1)));
         List<DTOEntityPostRun> entityPostRuns = m_entitiesDifenichan.values().stream().map(entityDifenichan -> new DTOEntityPostRun(entityDifenichan.getName(), entityDifenichan.getAmount(), entityAmountPostRun.get(entityDifenichan.getName()))).collect(Collectors.toList());
         simulationDetailsPostRun.setEntitiesPostRuns(entityPostRuns);
-
-        Map<String, List<DTOEntityHistogram>>entitiesHistogram = m_entities.stream().map(entity -> entity.makeDtoEntity()).collect(Collectors.groupingBy(entityHistogram -> entityHistogram.getName()));
+        Map<String, List<DTOEntityHistogram>>entitiesHistogram = m_entitiesDifenichan.keySet().stream().collect(Collectors.toMap(entityDifenichanName -> entityDifenichanName,
+                entityDifenichanName -> m_entities.stream()
+                        .filter(entity -> entity.getName().equals(entityDifenichanName))
+                        .map(entity -> entity.makeDtoEntity())
+                        .collect(Collectors.toList())
+        ));
+        //Map<String, List<DTOEntityHistogram>>entitiesHistogram = m_entities.stream().map(entity -> entity.makeDtoEntity()).collect(Collectors.groupingBy(entityHistogram -> entityHistogram.getName()));
         simulationDetailsPostRun.setEntitiesHistogram(entitiesHistogram);
+
+
+        Map<String, DTOEntitysProperties> entitysPropertiesMap = m_entitiesDifenichan.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, entity -> entity.getValue().makeDtoEntitysProperties()));
+        simulationDetailsPostRun.setEntitysProperties(entitysPropertiesMap);
 
         return simulationDetailsPostRun;
     }
