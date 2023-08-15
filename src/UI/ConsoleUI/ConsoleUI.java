@@ -3,10 +3,8 @@ package UI.ConsoleUI;
 import DTO.*;
 import com.sun.org.apache.xml.internal.security.signature.ReferenceNotInitializedException;
 import gameEngien.gameEngine;
-import gameEngien.world.World;
 import org.omg.CORBA.DynAnyPackage.InvalidValue;
 
-import java.nio.file.NoSuchFileException;
 import java.util.*;
 
 public class ConsoleUI {
@@ -100,19 +98,149 @@ public class ConsoleUI {
             printEntitiesQuantity(userInput_id);
         }
         else if (userInput_display == 2){
-            printPropertiesHistogram();
+            printPropertiesHistogram(userInput_id);
         }
 
     }
 
-    private static void printPropertiesHistogram() {
+    private static void printPropertiesHistogram(int id) {
 
+        DTOSimulationDetailsPostRun postRun = m_gameEngine.getPostRunData(id);
+        System.out.println("Please Select Entity :");
+        int userInput = 0;
+        int i =1;
+        boolean validInput = false;
+        Scanner scanner = new Scanner(System.in);
+        diaplayEntitiesOptions(postRun);
+
+        while (!validInput){
+            try {
+                userInput = scanner.nextInt();
+
+                if (userInput < 1 || userInput > postRun.getEntitiesPostRun().size()) {
+                    throw new IllegalArgumentException("Invalid input. you must choose number from the options.");
+                }
+                validInput = true;
+
+            } catch (InputMismatchException e) {
+                scanner.nextLine();
+                System.out.println("Invalid input. Please enter a valid input.");
+                diaplayEntitiesOptions(postRun);
+            }catch (IllegalArgumentException e) {
+                scanner.nextLine();
+                System.out.println(e.getMessage());
+                diaplayEntitiesOptions(postRun);
+            }
+        }
+
+        String Entity = findEntityByUserID(userInput, postRun);
+        int propertiesNumber = printPropertiesOfEntity(Entity, postRun);
+        int propertyOption = getPropertyInput(postRun, propertiesNumber, Entity);
+        String property = findPropertyByOption(propertyOption, postRun, Entity);
+        printHistogram(postRun.getHistogram(Entity, property));
+
+
+    }
+
+    private static void printHistogram(Map<Object, Integer> histogram) {
+
+        for (Map.Entry<Object, Integer> value : histogram.entrySet()){
+            System.out.println( value.getKey() + ":" + value.getValue());
+        }
+    }
+
+    private static String findPropertyByOption(int propertyOption, DTOSimulationDetailsPostRun postRun, String entity) {
+        int i = 1;
+        String propertyName = "";
+
+        for (Map.Entry<String, DTOEntitysProperties> property : postRun.getEntitysProperties().entrySet()){
+            if (Objects.equals(entity, property.getKey())){
+                for (DTOProperty entityProp : property.getValue().getProperties()){
+                    if (i == propertyOption){
+                        propertyName = entityProp.getName();
+                        break;
+                    }
+                    i++;
+                }
+            }
+        }
+        return propertyName;
+
+    }
+
+    private static int getPropertyInput(DTOSimulationDetailsPostRun postRun, int propertiesNumber, String entity) {
+
+        boolean validInput = false;
+        Scanner scanner = new Scanner(System.in);
+        int userInput = 0;
+        while (!validInput) {
+            try {
+                userInput = scanner.nextInt();
+
+                if (userInput < 1 || userInput > propertiesNumber) {
+                    throw new IllegalArgumentException("Invalid input. you must choose number from the options.");
+                }
+                validInput = true;
+
+            } catch (InputMismatchException e) {
+                scanner.nextLine();
+                System.out.println("Invalid input. Please enter a valid input.");
+                printPropertiesOfEntity(entity, postRun);
+            } catch (IllegalArgumentException e) {
+                scanner.nextLine();
+                System.out.println(e.getMessage());
+                printPropertiesOfEntity(entity, postRun);
+            }
+        }
+        return userInput;
+    }
+
+    private static int printPropertiesOfEntity(String entity, DTOSimulationDetailsPostRun postRun) {
+
+        int i = 1;
+        System.out.println("Please Choose Property:");
+        for (Map.Entry<String, DTOEntitysProperties> property : postRun.getEntitysProperties().entrySet()){
+            if (Objects.equals(entity, property.getKey())){
+                for (DTOProperty entityProp : property.getValue().getProperties()){
+                    System.out.println(i+ "." + entityProp.getName());
+                    i++;
+                }
+            }
+        }
+        return i - 1;
+    }
+
+    private static String findEntityByUserID(int userInput, DTOSimulationDetailsPostRun postRun) {
+
+        int i= 1;
+        String entityName= "";
+        for(DTOEntityPostRun entity : postRun.getEntitiesPostRun()){
+            if (userInput == i){
+                entityName = entity.getName();
+                break;
+            }
+        }
+        return entityName;
+    }
+
+    private static void diaplayEntitiesOptions(DTOSimulationDetailsPostRun postRun) {
+
+        int i= 1;
+        for(DTOEntityPostRun entity : postRun.getEntitiesPostRun()){
+            System.out.println(i+ "." + entity.getName());
+            i++;
+        }
     }
 
     private static void printEntitiesQuantity(int id) {
 
         DTOSimulationDetailsPostRun postRun = m_gameEngine.getPostRunData(id);
-        System.out.println("sda");
+        for(DTOEntityPostRun entity : postRun.getEntitiesPostRun()){
+            System.out.println("Entity Name : " + entity.getName());
+            System.out.println("Amount Pre Run : " + entity.getAmountPreRun());
+            System.out.println("Amount Post Run : " + entity.getAmountPostRun());
+            System.out.println();
+        }
     }
 
     private static int getMaxID() {
