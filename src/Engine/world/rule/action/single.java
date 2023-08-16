@@ -121,7 +121,9 @@ public class single implements subCondition, Serializable {
                     if(temp.getType() == expressionType.INT) {
                         entity.getProperty(m_property).addToProperty(temp.getInt());
                     }
-                    throw new InvalidValue("In action condition in single value is of the wrong type");
+                    else{
+                        throw new InvalidValue("In action condition in single value is of the wrong type");
+                    }
                 }
             } else {
                 if (entity.isPropertyExists(m_exprecn.getString())) {

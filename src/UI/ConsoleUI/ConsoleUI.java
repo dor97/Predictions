@@ -102,7 +102,6 @@ public class ConsoleUI {
         }
 
     }
-
     private static void printPropertiesHistogram(int id) {
 
         DTOSimulationDetailsPostRun postRun = m_Engine.getPostRunData(id);
@@ -141,14 +140,12 @@ public class ConsoleUI {
 
 
     }
-
     private static void printHistogram(Map<Object, Integer> histogram) {
 
         for (Map.Entry<Object, Integer> value : histogram.entrySet()){
             System.out.println( value.getKey() + ":" + value.getValue());
         }
     }
-
     private static String findPropertyByOption(int propertyOption, DTOSimulationDetailsPostRun postRun, String entity) {
         int i = 1;
         String propertyName = "";
@@ -167,7 +164,6 @@ public class ConsoleUI {
         return propertyName;
 
     }
-
     private static int getPropertyInput(DTOSimulationDetailsPostRun postRun, int propertiesNumber, String entity) {
 
         boolean validInput = false;
@@ -194,7 +190,6 @@ public class ConsoleUI {
         }
         return userInput;
     }
-
     private static int printPropertiesOfEntity(String entity, DTOSimulationDetailsPostRun postRun) {
 
         int i = 1;
@@ -209,7 +204,6 @@ public class ConsoleUI {
         }
         return i - 1;
     }
-
     private static String findEntityByUserID(int userInput, DTOSimulationDetailsPostRun postRun) {
 
         int i= 1;
@@ -222,7 +216,6 @@ public class ConsoleUI {
         }
         return entityName;
     }
-
     private static void diaplayEntitiesOptions(DTOSimulationDetailsPostRun postRun) {
 
         int i= 1;
@@ -231,7 +224,6 @@ public class ConsoleUI {
             i++;
         }
     }
-
     private static void printEntitiesQuantity(int id) {
 
         DTOSimulationDetailsPostRun postRun = m_Engine.getPostRunData(id);
@@ -242,7 +234,6 @@ public class ConsoleUI {
             System.out.println();
         }
     }
-
     private static int getMaxID() {
         int maxID = 0;
         for (Map.Entry<Integer,String> simulation : m_Engine.getSimulationDto().getSimulations().entrySet()){
@@ -357,6 +348,7 @@ public class ConsoleUI {
 
         System.out.println();
         System.out.println("Rules:");
+
 
         for (DTORuleData rule : dtoRuleData) {
             System.out.println("Rule Name: " + rule.getRuleName());

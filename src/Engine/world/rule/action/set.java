@@ -125,9 +125,6 @@ public class set extends action implements Serializable {
                     }
                     //excepcen
                 }
-
-
-
             }
             else {
                 if(i_entity.isPropertyExists(m_property)){

@@ -44,7 +44,7 @@ public class World implements Serializable {
     private SimpleDateFormat format = new SimpleDateFormat("dd-MM-yyyy | hh.mm.ss");
     private String simulationTime = null;
 
-    private final static String JAXB_XML_GAME_PACKAGE_NAME = "gameEngien.generated";
+    private final static String JAXB_XML_GAME_PACKAGE_NAME = "Engine.generated";
 
 
     public void start(){

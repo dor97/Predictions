@@ -139,11 +139,10 @@ public class addValue extends action implements Serializable {  //increase or de
                     if(temp.getType() == expressionType.INT) {
                         entity.getProperty(m_property).addToProperty(sign * temp.getInt());
                     }
-                    throw new InvalidValue("In action " + actionName + "can't use value by");
+                    else{
+                        throw new InvalidValue("In action " + actionName + "can't use value by");
+                    }
                 }
-
-
-
             }
             else {
                 if(entity.isPropertyExists(m_by.getString())){
@@ -159,9 +158,10 @@ public class addValue extends action implements Serializable {  //increase or de
                         throw new InvalidValue("In action " + actionName + "can't use value by");
                     }
                 }
+                else {
+                    throw new InvalidValue("In action " + actionName + "can't use value by");
+                }
             }
-
-            throw new InvalidValue("In action " + actionName + "can't use value by");
         }
         else if (m_by.getType() == expressionType.BOOL){
             throw new InvalidValue("In action " + actionName + "can't use value by");

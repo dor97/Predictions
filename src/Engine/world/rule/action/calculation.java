@@ -154,7 +154,9 @@ public class calculation extends action implements Serializable {
                     if(temp.getType() == expressionType.INT) {
                         entity.getProperty(m_property).addToProperty(temp.getInt());
                     }
-                    throw new InvalidValue("In action calculation can't use value arg");
+                    else {
+                        throw new InvalidValue("In action calculation can't use value arg");
+                    }
                 }
 
 
@@ -169,6 +171,9 @@ public class calculation extends action implements Serializable {
                     } else {
                         throw new InvalidValue("In action calculation can't use value arg");
                     }
+                }
+                else {
+                    throw new InvalidValue("In action calculation can't use value arg");
                 }
             }
         } else if (v.getType() == expressionType.BOOL) {
