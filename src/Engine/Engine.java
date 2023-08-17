@@ -91,5 +91,7 @@ public class Engine {
         return worldsList.get(id).getPostRunData();
     }
 
-
+    public World getCurrentSimulation (){
+        return cuurentSimuletion;
     }
+}

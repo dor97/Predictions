@@ -8,32 +8,43 @@ import org.omg.CORBA.DynAnyPackage.InvalidValue;
 import java.util.*;
 
 public class ConsoleUI {
-    private static Engine m_Engine;
-    public static void main(String args[]) {
+    private Engine m_Engine;
+    public void start() {
+
         boolean validAction = true;
         m_Engine = new Engine();
+
         showMenu();
         int userChoice = readInput();
 
-        while (userChoice != 5){
+        while (userChoice != 7){
 
             executeUserChoice (userChoice);
             showMenu();
             userChoice = readInput();
         }
     }
-    private static void executeUserChoice(int userChoice) {
+    private void executeUserChoice(int userChoice) {
 
         if (userChoice == 1){
             uploadXMLFile();
         }
 
         else if (userChoice == 2){
-            displaySimulationDetails();
+            try{
+                displaySimulationDetails();
+            }catch (NoSuchElementException e){
+                System.out.println(e.getMessage());
+            }
+
         }
 
         else if (userChoice == 3){
-            runSimulation();
+            try{
+                runSimulation();
+            }catch (NoSuchElementException e){
+                System.out.println(e.getMessage());
+            }
         }
 
         else if (userChoice == 4){
@@ -43,12 +54,49 @@ public class ConsoleUI {
              System.out.println(e.getMessage());
             }
         }
+        else if (userChoice == 5){
+            try{
+                saveStateTofile();
+            }catch (NoSuchElementException e){
+                System.out.println(e.getMessage());
+            }
+        }
+        else if (userChoice == 6){
+            try {
+                loadStateFromFile();
+            }catch (NoSuchElementException e){
+                System.out.println(e.getMessage());
+            }
+        }
     }
-    private static void displayPastSimulationDetails() {
+
+    private void loadStateFromFile() {
+
+        Scanner scanner = new Scanner(System.in);
+        String input = "";
+        System.out.println("Please Enter full path of your file without extension:");
+        input = scanner.nextLine();
+        m_Engine.loadSystemState(input);
+
+    }
+
+    private void saveStateTofile() {
+
+        if (getMaxID() == 0){
+            throw new NoSuchElementException("You must upload XML file  to the System OR load the state from file before you ask to save the current state to file.");
+        }
+        Scanner scanner = new Scanner(System.in);
+        String input = "";
+        System.out.println("Please Enter full path of your file without extension: ");
+        input = scanner.nextLine();
+        m_Engine.saveSystemState(input);
+    }
+
+    private void displayPastSimulationDetails() {
 
         int maxID = getMaxID();
         if (maxID == 0){
-            throw new NoSuchElementException("You must upload XML file to the System before you ask for past simulation details.");
+            throw new NoSuchElementException("You must upload XML file to the System before you ask for display simulation details.");
         }
         int userInput_id = 0;
         int userInput_display = 0;
@@ -102,10 +150,11 @@ public class ConsoleUI {
         }
 
     }
-    private static void printPropertiesHistogram(int id) {
+    private void printPropertiesHistogram(int id) {
 
         DTOSimulationDetailsPostRun postRun = m_Engine.getPostRunData(id);
-        System.out.println("Please Select Entity :");
+        System.out.println("Please Select Entity:");
+        System.out.println("--------------------------");
         int userInput = 0;
         int i =1;
         boolean validInput = false;
@@ -140,13 +189,14 @@ public class ConsoleUI {
 
 
     }
-    private static void printHistogram(Map<Object, Integer> histogram) {
+    private void printHistogram(Map<Object, Integer> histogram) {
 
         for (Map.Entry<Object, Integer> value : histogram.entrySet()){
             System.out.println( value.getKey() + ":" + value.getValue());
         }
+        System.out.println();
     }
-    private static String findPropertyByOption(int propertyOption, DTOSimulationDetailsPostRun postRun, String entity) {
+    private String findPropertyByOption(int propertyOption, DTOSimulationDetailsPostRun postRun, String entity) {
         int i = 1;
         String propertyName = "";
 
@@ -164,7 +214,7 @@ public class ConsoleUI {
         return propertyName;
 
     }
-    private static int getPropertyInput(DTOSimulationDetailsPostRun postRun, int propertiesNumber, String entity) {
+    private int getPropertyInput(DTOSimulationDetailsPostRun postRun, int propertiesNumber, String entity) {
 
         boolean validInput = false;
         Scanner scanner = new Scanner(System.in);
@@ -190,10 +240,11 @@ public class ConsoleUI {
         }
         return userInput;
     }
-    private static int printPropertiesOfEntity(String entity, DTOSimulationDetailsPostRun postRun) {
+    private int printPropertiesOfEntity(String entity, DTOSimulationDetailsPostRun postRun) {
 
         int i = 1;
         System.out.println("Please Choose Property:");
+        System.out.println("----------------------------");
         for (Map.Entry<String, DTOEntitysProperties> property : postRun.getEntitysProperties().entrySet()){
             if (Objects.equals(entity, property.getKey())){
                 for (DTOProperty entityProp : property.getValue().getProperties()){
@@ -204,7 +255,7 @@ public class ConsoleUI {
         }
         return i - 1;
     }
-    private static String findEntityByUserID(int userInput, DTOSimulationDetailsPostRun postRun) {
+    private String findEntityByUserID(int userInput, DTOSimulationDetailsPostRun postRun) {
 
         int i= 1;
         String entityName= "";
@@ -216,7 +267,7 @@ public class ConsoleUI {
         }
         return entityName;
     }
-    private static void diaplayEntitiesOptions(DTOSimulationDetailsPostRun postRun) {
+    private void diaplayEntitiesOptions(DTOSimulationDetailsPostRun postRun) {
 
         int i= 1;
         for(DTOEntityPostRun entity : postRun.getEntitiesPostRun()){
@@ -224,7 +275,7 @@ public class ConsoleUI {
             i++;
         }
     }
-    private static void printEntitiesQuantity(int id) {
+    private void printEntitiesQuantity(int id) {
 
         DTOSimulationDetailsPostRun postRun = m_Engine.getPostRunData(id);
         for(DTOEntityPostRun entity : postRun.getEntitiesPostRun()){
@@ -234,7 +285,7 @@ public class ConsoleUI {
             System.out.println();
         }
     }
-    private static int getMaxID() {
+    private int getMaxID() {
         int maxID = 0;
         for (Map.Entry<Integer,String> simulation : m_Engine.getSimulationDto().getSimulations().entrySet()){
             if (simulation.getKey() > maxID){
@@ -244,15 +295,20 @@ public class ConsoleUI {
 
         return maxID;
     }
-    private static void displaySimulationsOptions(){
+    private void displaySimulationsOptions(){
         System.out.println("Please Choose Simulation By ID: ");
+        System.out.println("------------------------------------------");
         for (Map.Entry<Integer,String> simulation : m_Engine.getSimulationDto().getSimulations().entrySet()){
-            System.out.println("ID : " + simulation.getKey());
-            System.out.println("Run Date : " + simulation.getValue());
+            System.out.println("    ID : " + simulation.getKey());
+            System.out.println("    Run Date : " + simulation.getValue());
             System.out.println();
         }
     }
-    private static void runSimulation() {
+    private void runSimulation() {
+
+        if (m_Engine.getCurrentSimulation() == null){
+            throw new NoSuchElementException("You must upload XML file before you ask to run simulation");
+        }
         Scanner scanner = new Scanner(System.in);
         int simuladtion_id;
         List <DTOEnvironmentVariables> environmentVariables = m_Engine.getEnvironmentDetails();
@@ -269,11 +325,12 @@ public class ConsoleUI {
         try {
             simuladtion_id= m_Engine.activeSimulation();
             System.out.println("Simulation ID : " + simuladtion_id);
+            System.out.println();
         }catch (InvalidValue | ReferenceNotInitializedException e){
             System.out.println(e.getMessage());
         }
     }
-    private static void printEnvironmentVariablesValues(List<DTOEnvironmentVariablesValues> environmentVariablesValues) {
+    private void printEnvironmentVariablesValues(List<DTOEnvironmentVariablesValues> environmentVariablesValues) {
 
         System.out.println();
 
@@ -283,14 +340,14 @@ public class ConsoleUI {
             System.out.println();
         }
     }
-    private static void printEnvironmentVariablesAndSetValue(List<DTOEnvironmentVariables> environmentVariables) {
+    private void printEnvironmentVariablesAndSetValue(List<DTOEnvironmentVariables> environmentVariables) {
 
         String userInput;
         Scanner scanner = new Scanner(System.in);
         System.out.println();
         System.out.println("Environment Variables:");
+        System.out.println("----------------------------");
         boolean validAction;
-
 
         for (DTOEnvironmentVariables env_variable : environmentVariables) {
             validAction = false;
@@ -322,10 +379,15 @@ public class ConsoleUI {
                 }
             }
         }
-        System.out.println();
     }
-    private static void displaySimulationDetails() {
+    private void displaySimulationDetails() {
 
+//        if (getMaxID() == 0){
+//            throw new NoSuchElementException("You must upload XML file to the System before you ask for past simulation details.");
+//        }
+        if (m_Engine.getCurrentSimulation() == null){
+            throw new NoSuchElementException("You must upload XML file before you ask to display simulation details");
+        }
         DTOSimulationDetails dtoSimulationDetails = m_Engine.getSimulationDetails();
         List <DTOEntityData> dtoEntityData = dtoSimulationDetails.getEntitysList();
         List < DTORuleData> dtoRuleData = dtoSimulationDetails.getRulesList();
@@ -335,58 +397,67 @@ public class ConsoleUI {
         printRulesDetails(dtoRuleData);
         printTerminationDetails(dtoTerminationData);
     }
-    private static void printTerminationDetails(List<DTOTerminationData> dtoTerminationData) {
+    private void printTerminationDetails(List<DTOTerminationData> dtoTerminationData) {
         System.out.println();
         System.out.println("Termination conditions:");
+        System.out.println("----------------------------");
 
         for (DTOTerminationData t_condition : dtoTerminationData) {
             System.out.println("Number Of " + t_condition.getType() + ": " + t_condition.getCount());
         }
         System.out.println();
     }
-    private static void printRulesDetails(List<DTORuleData> dtoRuleData) {
+    private void printRulesDetails(List<DTORuleData> dtoRuleData) {
 
+        int i = 1;
         System.out.println();
         System.out.println("Rules:");
-
+        System.out.println("--------------");
 
         for (DTORuleData rule : dtoRuleData) {
             System.out.println("Rule Name: " + rule.getRuleName());
             System.out.println("Number of Ticks : " + rule.getTicksToWorkAt());
             System.out.println("Probability : " + rule.getProbabilityToWork());
             System.out.println("Number of Actions : " + rule.getNumOfAction());
+            System.out.println();
 
-            System.out.println("Actions :");
+            System.out.println("    Actions:");
+            System.out.println("    --------------");
 
             for (String action : rule.getActionsName()){
-                System.out.println("Action Name: " + action);
+                System.out.println("    Action Name: " + action);
             }
+            System.out.println();
         }
     }
-    private static void printEntitiesDetails(List<DTOEntityData> dtoEntityData) {
+    private void printEntitiesDetails(List<DTOEntityData> dtoEntityData) {
 
         System.out.println();
         System.out.println("Entities:");
+        System.out.println("--------------");
         for (DTOEntityData entity : dtoEntityData) {
             System.out.println("Entity Name: " + entity.getName());
             System.out.println("Amount Of Entities: " + entity.getAmount());
-            System.out.println("Properties:");
+            System.out.println();
+            System.out.println("    Properties:");
+            System.out.println("    --------------");
             for (DTOPropertyData property : entity.getPropertList()){
-                System.out.println("Property Name: " + property.getName());
-                System.out.println("Property Type: " +property.getType());
+                System.out.println("    Property Name: " + property.getName());
+                System.out.println("    Property Type: " +property.getType());
                 if (property.haveRange()){
-                    System.out.println("Property Range is: " +property.getLowRange() + "-" + property.getHighRange());
+                    System.out.println("    Property Range is: " +property.getLowRange() + "-" + property.getHighRange());
                 }
                 if (property.isRandomlyInatiated()){
-                    System.out.println("Property has random initiate.");
+                    System.out.println("    Property has random initiate.");
                 }
                 else{
-                    System.out.println("Property doesn't have random initiate.");
+                    System.out.println("    Property doesn't have random initiate.");
                 }
+                System.out.println();
             }
         }
     }
-    private static void uploadXMLFile() {
+    private void uploadXMLFile() {
 
         boolean validFile = false;
         Scanner scanner = new Scanner(System.in);
@@ -397,7 +468,7 @@ public class ConsoleUI {
                 String fileName = scanner.nextLine();
                 m_Engine.loadSimulation(fileName);
                 validFile = true;
-                System.out.println("File Uploaded Successfully");
+                System.out.println("File Uploaded Successfully!");
                 System.out.println();
             } catch (ArithmeticException e) {
                 System.out.println(e.getMessage());
@@ -407,7 +478,7 @@ public class ConsoleUI {
             }
         }
     }
-    private static int readInput() {
+    private int readInput() {
 
         Scanner scanner = new Scanner(System.in);
         boolean validInput = false;
@@ -417,8 +488,8 @@ public class ConsoleUI {
             try {
                 choice = scanner.nextInt();
 
-                if (choice < 1 || choice > 5) {
-                    throw new IllegalArgumentException("Invalid input. you must choose number between 1 and 5.");
+                if (choice < 1 || choice > 7) {
+                    throw new IllegalArgumentException("Invalid input. you must choose number between 1 and 7.");
                 }
 
                 validInput = true;
@@ -435,12 +506,14 @@ public class ConsoleUI {
         }
         return choice;
     }
-    private static void showMenu() {
+    private void showMenu() {
         System.out.println("Please choose one option by enter the number of option you want:");
         System.out.println("1. Upload XML file.");
         System.out.println("2. Display simulation details.");
         System.out.println("3. Run simulation.");
         System.out.println("4. Display past simulation details.");
-        System.out.println("5. Exit");
+        System.out.println("5. Save state to file.");
+        System.out.println("6. Load state from file.");
+        System.out.println("7. Exit");
     }
 }
