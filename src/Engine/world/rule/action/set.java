@@ -52,10 +52,10 @@ public class set extends action implements Serializable {
     }
 
     private void checkExpressionIfProperty() throws InvalidValue{
-        if (!getEntityDifenichan(m_entity).getPropertys().containsValue(m_value)) {  //value is string
+        if (!getEntityDifenichan(m_entity).getPropertys().containsKey(m_value.getString())) {  //value is string
             throw new InvalidValue("In action set the value is of the wrong type");
         }
-        if(getEntityDifenichan(m_entity).getPropertys().get(m_value).getType() != getEntityDifenichan(m_entity).getPropertys().get(m_property).getType()){
+        if(getEntityDifenichan(m_entity).getPropertys().get(m_value.getString()).getType() != getEntityDifenichan(m_entity).getPropertys().get(m_property).getType()){
             if(!(getEntityDifenichan(m_entity).getPropertys().get(m_property).getType() == expressionType.FLOAT && getEntityDifenichan(m_entity).getPropertys().get(m_value).getType() == expressionType.INT)){
                 throw new InvalidValue("In action set the value is a property of the wrong type");
             }

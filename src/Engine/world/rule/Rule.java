@@ -64,6 +64,9 @@ public class Rule implements Serializable {
             catch (ArithmeticException e){
                 throw new ArithmeticException(e.getMessage() + " referred to in rule " + m_name);
             }
+            catch (InvalidValue e){
+                throw new InvalidValue(e.getMessage() + " referred to in rule " + m_name);
+            }
             //catch (Exception e){
             //    throw new Exception(e.getMessage() + " referred to in rule " + m_name);
             //}

@@ -9,7 +9,16 @@ public class Main {
     public static void main(String[] args) {
         ConsoleUI consoleUI = new ConsoleUI();
         consoleUI.start();
-
+//        String s = "da";
+//        Integer x = 5;
+//        Float y = 5f;
+//        Float z = (float)x;
+//
+//        if(y == x){
+//            System.out.println("equals");
+//        }else{
+//            System.out.println("not equals");
+//        }
     }
 }
 

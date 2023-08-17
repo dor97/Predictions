@@ -31,15 +31,13 @@ public class calculation extends action implements Serializable {
 
     public calculation(PRDAction action) throws InvalidValue{
         m_entity = action.getEntity();
-        m_property = action.getProperty();
-        m_value1 = action.getPRDMultiply().getArg1();
-        m_value2 = action.getPRDMultiply().getArg2();
-        if(m_value1 == null){
-            action.getPRDDivide().getArg1();
-            isMultiply = false;
-        }
-        if(m_value2 == null){
-            action.getPRDDivide().getArg2();
+        m_property = action.getResultProp();
+        if(action.getPRDMultiply() != null){
+            m_value1 = action.getPRDMultiply().getArg1();
+            m_value2 = action.getPRDMultiply().getArg2();
+        }else{
+            m_value1 = action.getPRDDivide().getArg1();
+            m_value2 = action.getPRDDivide().getArg2();
             isMultiply = false;
         }
         m_v1 = new expressionWithFunc();
@@ -74,11 +72,11 @@ public class calculation extends action implements Serializable {
     }
 
     private void checkExpressionIfProperty(expressionWithFunc arg) throws InvalidValue{
-        if (!getEntityDifenichan(m_entity).getPropertys().containsValue(arg)) {
+        if (!getEntityDifenichan(m_entity).getPropertys().containsKey(arg.getString())) {
             throw new InvalidValue("In action calculation there is an expression of the wrong type");
         }
-        if(!(getEntityDifenichan(m_entity).getPropertys().get(arg).getType() == expressionType.INT)){
-            if(!(getEntityDifenichan(m_entity).getPropertys().get(arg).getType() == expressionType.FLOAT)){
+        if(!(getEntityDifenichan(m_entity).getPropertys().get(arg.getString()).getType() == expressionType.INT)){
+            if(!(getEntityDifenichan(m_entity).getPropertys().get(arg.getString()).getType() == expressionType.FLOAT)){
                 throw new InvalidValue("In action calculation one of the expression is a property of the wrong type");
             }
             if(!(getEntityDifenichan(m_entity).getPropertys().get(m_property).getType() == expressionType.FLOAT)){
@@ -112,10 +110,10 @@ public class calculation extends action implements Serializable {
 
     private void checkEntityAndPropertyExist(){
         if(!isEntityDifenichanExists(m_entity)){
-            throw new OBJECT_NOT_EXIST("In action increase the entity " + m_entity + " does not exist.");
+            throw new OBJECT_NOT_EXIST("In action calculation the entity " + m_entity + " does not exist.");
         }
         if(!getEntityDifenichan(m_entity).getPropertys().containsKey(m_property)){
-            throw new OBJECT_NOT_EXIST("In action increase the property " + m_property + "of entity " + m_entity +" does not exist.");
+            throw new OBJECT_NOT_EXIST("In action calculation the property " + m_property + " of entity " + m_entity +" does not exist.");
         }
     }
 

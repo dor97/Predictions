@@ -58,11 +58,11 @@ public class addValue extends action implements Serializable {  //increase or de
     }
 
     private void checkExpressionIfProperty() throws InvalidValue{
-        if (!getEntityDifenichan(m_entity).getPropertys().containsValue(m_by)) {
+        if (!getEntityDifenichan(m_entity).getPropertys().containsKey(m_by.getString())) {
             throw new InvalidValue("In action " + actionName + " the value by is of the wrong type");
         }
-        if(!(getEntityDifenichan(m_entity).getPropertys().get(m_by).getType() == expressionType.INT)){
-            if(!(getEntityDifenichan(m_entity).getPropertys().get(m_by).getType() == expressionType.FLOAT)){
+        if(!(getEntityDifenichan(m_entity).getPropertys().get(m_by.getString()).getType() == expressionType.INT)){
+            if(!(getEntityDifenichan(m_entity).getPropertys().get(m_by.getString()).getType() == expressionType.FLOAT)){
                 throw new InvalidValue("In action " + actionName + " the value by is a property of the wrong type");
             }
             if(!(getEntityDifenichan(m_entity).getPropertys().get(m_property).getType() == expressionType.FLOAT)){

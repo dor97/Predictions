@@ -76,7 +76,7 @@ public class ConsoleUI {
         String input = "";
         System.out.println("Please Enter full path of your file without extension:");
         input = scanner.nextLine();
-        m_Engine.loadSystemState(input);
+        //m_Engine.loadSystemState(input);
 
     }
 
@@ -89,7 +89,7 @@ public class ConsoleUI {
         String input = "";
         System.out.println("Please Enter full path of your file without extension: ");
         input = scanner.nextLine();
-        m_Engine.saveSystemState(input);
+        //m_Engine.saveSystemState(input);
     }
 
     private void displayPastSimulationDetails() {
