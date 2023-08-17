@@ -43,27 +43,35 @@ public class Engine {
         return old_simulationNumber;
     }
 
-    public void saveSystemState(String simulationName){
+    public void saveSystemState(String simulationName) throws FileNotFoundException, IOException{
         String fileName = simulationName + ".ser";
-        try (FileOutputStream fileOut = new FileOutputStream(fileName); //"serializedObject.ser"
-             ObjectOutputStream out = new ObjectOutputStream(fileOut)) {
+//        try (FileOutputStream fileOut = new FileOutputStream(fileName); //"serializedObject.ser"
+//             ObjectOutputStream out = new ObjectOutputStream(fileOut)) {
+//        }
+        FileOutputStream fileOut = new FileOutputStream(fileName); //"serializedObject.ser"
+        ObjectOutputStream out = new ObjectOutputStream(fileOut);
 
-            out.writeObject(worldsList);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        out.writeObject(worldsList);
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
     }
 
-    public void loadSystemState(String simulationName){
+    public void loadSystemState(String simulationName) throws FileNotFoundException, IOException, ClassNotFoundException{
         String fileName = simulationName + ".ser";
-        try (FileInputStream fileIn = new FileInputStream(fileName); // serializedObject.ser
-             ObjectInputStream in = new ObjectInputStream(fileIn)) {
+//        try (FileInputStream fileIn = new FileInputStream(fileName); // serializedObject.ser
+//             ObjectInputStream in = new ObjectInputStream(fileIn)) {
+            FileInputStream fileIn = new FileInputStream(fileName); // serializedObject.ser
+            ObjectInputStream in = new ObjectInputStream(fileIn);
 
             worldsList = (Map<Integer, World>) in.readObject();
             simulationNum = worldsList.keySet().size();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+//        }catch (FileNotFoundException e){
+//
+//        }
+//        catch (Exception e) {
+//            e.printStackTrace();
+//        }
     }
 
     public DTOSimulationDetails getSimulationDetails(){
