@@ -5,6 +5,8 @@ import com.sun.org.apache.xml.internal.security.signature.ReferenceNotInitialize
 import Engine.Engine;
 import org.omg.CORBA.DynAnyPackage.InvalidValue;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.*;
 
 public class ConsoleUI {
@@ -51,7 +53,7 @@ public class ConsoleUI {
             try{
                 displayPastSimulationDetails();
             }catch (NoSuchElementException e){
-             System.out.println(e.getMessage());
+                System.out.println(e.getMessage());
             }
         }
         else if (userChoice == 5){
@@ -76,27 +78,38 @@ public class ConsoleUI {
         String input = "";
         System.out.println("Please Enter full path of your file without extension:");
         input = scanner.nextLine();
-        //m_Engine.loadSystemState(input);
-
+        try{
+            m_Engine.loadSystemState(input);
+        }catch (FileNotFoundException e){
+            System.out.println(e.getMessage());
+        }catch (IOException | ClassNotFoundException e){
+            System.out.println(e.getMessage());
+        }
     }
 
     private void saveStateTofile() {
 
         if (getMaxID() == 0){
-            throw new NoSuchElementException("You must upload XML file  to the System OR load the state from file before you ask to save the current state to file.");
+            throw new NoSuchElementException("You must upload XML file to the System OR load the state from file before you ask to save the current state to file.");
         }
         Scanner scanner = new Scanner(System.in);
         String input = "";
         System.out.println("Please Enter full path of your file without extension: ");
         input = scanner.nextLine();
-        //m_Engine.saveSystemState(input);
+        try{
+            m_Engine.saveSystemState(input);
+        }catch (FileNotFoundException e){
+            System.out.println(e.getMessage());
+        }catch (IOException e){
+            System.out.println(e.getMessage());
+        }
     }
 
     private void displayPastSimulationDetails() {
 
         int maxID = getMaxID();
         if (maxID == 0){
-            throw new NoSuchElementException("You must upload XML file to the System before you ask for display simulation details.");
+            throw new NoSuchElementException("You must upload XML file to the System AND run OR load state from file before you ask to save system state.");
         }
         int userInput_id = 0;
         int userInput_display = 0;
@@ -382,9 +395,6 @@ public class ConsoleUI {
     }
     private void displaySimulationDetails() {
 
-//        if (getMaxID() == 0){
-//            throw new NoSuchElementException("You must upload XML file to the System before you ask for past simulation details.");
-//        }
         if (m_Engine.getCurrentSimulation() == null){
             throw new NoSuchElementException("You must upload XML file before you ask to display simulation details");
         }
