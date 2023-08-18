@@ -104,7 +104,7 @@ public class Rule implements Serializable {
         DTORuleData DTO = new DTORuleData(m_name, m_ticks, m_probability);
 
         for(ActionInterface action : m_actions){
-            DTO.addActionName("");
+            DTO.addActionName(action.getName());
             DTO.increaseNumberOfActionByOne();
         }
 

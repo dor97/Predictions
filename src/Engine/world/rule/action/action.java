@@ -7,6 +7,7 @@ import org.omg.CORBA.DynAnyPackage.InvalidValue;
 import java.io.Serializable;
 
 public class action implements ActionInterface, Serializable {
+    String actionName = "";
     @Override
     public String getEntityName() {
         return null;
@@ -25,5 +26,10 @@ public class action implements ActionInterface, Serializable {
     @Override
     public boolean setValues(PropertyInterface v1, PropertyInterface v2) {
         return false;
+    }
+
+    @Override
+    public String getName(){
+        return actionName;
     }
 }

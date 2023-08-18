@@ -10,4 +10,5 @@ public interface ActionInterface {
     public String getPropertyName();
     public boolean activateAction(Entity entity)throws InvalidValue;
     public boolean setValues(PropertyInterface v1, PropertyInterface v2);
+    public String getName();
     }

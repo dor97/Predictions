@@ -16,6 +16,7 @@ public class condition extends action implements Serializable {
 
     public condition(PRDAction action) throws InvalidValue {
         m_entity = action.getEntity();
+        actionName = action.getType();
         if(action.getPRDCondition().getSingularity().equals("multiple")){
             m_subCon = new multiple(action.getPRDCondition());
         }

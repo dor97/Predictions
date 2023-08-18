@@ -15,6 +15,7 @@ public class kill extends action implements Serializable {
 
     public kill(PRDAction action) throws  InvalidValue{
         m_entity = action.getEntity();
+        actionName = action.getType();
         cheackUserInput();
     }
 

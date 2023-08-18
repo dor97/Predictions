@@ -44,6 +44,7 @@ public class calculation extends action implements Serializable {
         m_v2 = new expressionWithFunc();
         m_v1.convertValueInString(m_value1);
         m_v2.convertValueInString(m_value2);
+        actionName = action.getType();
         cheackUserInput();
     }
 

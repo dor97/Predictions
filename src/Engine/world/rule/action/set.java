@@ -24,6 +24,7 @@ public class set extends action implements Serializable {
         m_entity = action.getEntity();
         m_property = action.getProperty();
         m_value.convertValueInString(action.getValue());
+        actionName = action.getType();
         cheackUserInput();
     }
 

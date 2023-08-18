@@ -17,7 +17,6 @@ public class addValue extends action implements Serializable {  //increase or de
     private String m_property;
     private expressionWithFunc m_by;
     int sign;
-    private String actionName = "";
 
     public addValue(String entity, String property, String by) {
         m_entity = entity;
