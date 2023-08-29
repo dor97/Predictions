@@ -3,11 +3,11 @@ package Engine.world.entity;
 import DTO.DTOEntityData;
 import DTO.DTOEntitysProperties;
 import DTO.DTOProperty;
+import Engine.InvalidValue;
 import Engine.allReadyExistsException;
 import Engine.generated.PRDEntity;
 import Engine.generated.PRDProperty;
 import Engine.world.entity.property.propertyDifenichan;
-import org.omg.CORBA.DynAnyPackage.InvalidValue;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -22,7 +22,8 @@ public class EntityDifenichan implements Serializable {
 
     public EntityDifenichan(PRDEntity e) throws allReadyExistsException, InvalidValue{
         m_name = e.getName();
-        m_amount = e.getPRDPopulation();
+        //m_amount = e.getPRDPopulation();
+        m_amount = 100;
         m_propertys = new HashMap<>();
         for(PRDProperty p : e.getPRDProperties().getPRDProperty()){
             if(m_propertys.containsKey(p.getPRDName())){

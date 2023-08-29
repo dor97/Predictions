@@ -9,6 +9,7 @@ import java.util.Random;
 public class BooleanProperty extends Property implements Serializable {
     private String m_name;
     private boolean m_property;
+    //private int lastTickChanged = 0;
 
     public BooleanProperty(propertyDifenichan propertyDifenichan) {
         super(propertyType.BOOL);
@@ -16,6 +17,28 @@ public class BooleanProperty extends Property implements Serializable {
         if (propertyDifenichan.getType() != expressionType.BOOL){
             //exception
         }
+        init(propertyDifenichan);
+/*        if(propertyDifenichan.isRandom()){
+            Random random = new Random();
+            m_property = random.nextBoolean();
+        }
+        else{
+            m_property = propertyDifenichan.getInit().getBool();
+        }*/
+    }
+
+    public BooleanProperty(propertyDifenichan propertyDifenichan,  PropertyInterface secondaryProperty){
+        super(propertyType.BOOL);
+        m_name = propertyDifenichan.getName();
+        if (secondaryProperty.getType() == propertyType.BOOL){
+            m_property = (boolean) secondaryProperty.getValue();
+        }
+        else{
+            init(propertyDifenichan);
+        }
+    }
+
+    private void init(propertyDifenichan propertyDifenichan){
         if(propertyDifenichan.isRandom()){
             Random random = new Random();
             m_property = random.nextBoolean();
@@ -55,9 +78,11 @@ public class BooleanProperty extends Property implements Serializable {
         return m_name;
     }
     @Override
-    public void setProperty(boolean i_property) {
+    public void setProperty(boolean i_property, int currTick) {
+        lastTickChanged = currTick;
         m_property = i_property;
     }
+
 //    @Override
 //    public DTOEnvironmentVariablesValues makeDtoEnvironment(){
 //        return new DTOEnvironmentVariablesValues(m_name, m_property);

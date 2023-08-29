@@ -1,13 +1,13 @@
 package Engine.world.rule;
 
 import DTO.DTORuleData;
+import Engine.utilites.Utilites;
 import Engine.world.entity.Entity;
 import Engine.generated.PRDAction;
 import Engine.generated.PRDRule;
 import Engine.world.rule.action.*;
-import org.omg.CORBA.DynAnyPackage.InvalidValue;
+import Engine.InvalidValue;
 import org.omg.CORBA.OBJECT_NOT_EXIST;
-
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -28,7 +28,7 @@ public class Rule implements Serializable {
         random = new Random();
     }
 
-    public Rule(PRDRule rule) throws InvalidValue {
+    public Rule(PRDRule rule, Utilites util) throws InvalidValue {
         m_name = rule.getName();
         try{
             m_ticks = rule.getPRDActivation().getTicks() != null ? rule.getPRDActivation().getTicks() : 1;
@@ -47,15 +47,15 @@ public class Rule implements Serializable {
         for(PRDAction action : rule.getPRDActions().getPRDAction()){
             try {
                 if (action.getType().equals("increase") || action.getType().equals("decrease")) {
-                    m_actions.add(new addValue(action));
+                    m_actions.add(new addValue(action, util, m_name));
                 } else if (action.getType().equals("calculation")) {
-                    m_actions.add(new calculation(action));
+                    m_actions.add(new calculation(action, util, m_name));
                 } else if (action.getType().equals("condition")) {
-                    m_actions.add(new condition(action));
+                    m_actions.add(new condition(action, util, m_name));
                 } else if (action.getType().equals("set")) {
-                    m_actions.add(new set(action));
+                    m_actions.add(new set(action, util, m_name));
                 } else if (action.getType().equals("kill")) {
-                    m_actions.add(new kill(action));
+                    m_actions.add(new kill(action, util, m_name));
                 }
             }
             catch (OBJECT_NOT_EXIST e){
@@ -81,15 +81,22 @@ public class Rule implements Serializable {
     public void addAction(ActionInterface ActionToAdd){
         m_actions.add(ActionToAdd);
     }
-    public boolean activeRule(Entity entity)throws InvalidValue{
-        for(ActionInterface action : m_actions){
-            if(action.getEntityName().equals(entity.getName()) && (entity.isPropertyExists(action.getPropertyName()) || action.getPropertyName() == null)){
-                if (action.activateAction(entity)){
-                    return true;
-                }
-            }
+//    public boolean activeRule(Entity entity)throws InvalidValue{
+//        for(ActionInterface action : m_actions){
+//            if(action.getEntityName().equals(entity.getName()) && (entity.isPropertyExists(action.getPropertyName()) || action.getPropertyName() == null)){
+//                if (action.activateAction(entity)){
+//                    return true;
+//                }
+//            }
+//        }
+//        return false;
+//    }
+
+    public List<ActionInterface> getActionToActive(int currTick){
+        if(currTick % getTick() == 0 && random.nextDouble() < getProbability()) {
+            return m_actions;
         }
-        return false;
+        return new ArrayList<>();
     }
     
     public double getProbability(){

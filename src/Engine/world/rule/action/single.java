@@ -1,32 +1,39 @@
 package Engine.world.rule.action;
 
+import Engine.utilites.Utilites;
 import Engine.world.entity.Entity;
 import Engine.generated.PRDCondition;
 import Engine.world.expression.expression;
 import Engine.world.expression.expressionType;
 import Engine.world.expression.expressionWithFunc;
-import org.omg.CORBA.DynAnyPackage.InvalidValue;
+import Engine.InvalidValue;
 import org.omg.CORBA.OBJECT_NOT_EXIST;
-
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Arrays;
 
-import static Engine.utilites.Utilites.*;
-import static Engine.utilites.Utilites.getEntityDifenichan;
 
 public class single implements subCondition, Serializable {
 
     enum opertor{ EQUAL, UNEQUAL, BIGGER, LITTLE}
-    private String m_entity;
-    private String m_property;
+    private String m_entityName;
+    private String m_propertyName;
     private opertor m_op;
     private expressionWithFunc m_exprecn;
+    private Utilites m_util;
+    private int m_currTick;
 
-    public single(PRDCondition condition) throws InvalidValue{
-        m_entity = condition.getEntity();
-        m_property = condition.getProperty();
+    public single(PRDCondition condition, Utilites util) throws InvalidValue{
+        m_entityName = condition.getEntity();
+        m_propertyName = condition.getProperty();
         m_op = getOpFromString(condition.getOperator());
-        m_exprecn = new expressionWithFunc();
-        m_exprecn.convertValueInString(condition.getValue());
+        m_exprecn = new expressionWithFunc(util);
+        try {
+            m_exprecn.convertValueInString(condition.getValue());
+        }catch (InvalidValue e){
+            throw new InvalidValue(e.getMessage() + ". In single in action condition");
+        }
+        m_util = util;
         cheackUserInput();
     }
 
@@ -48,10 +55,10 @@ public class single implements subCondition, Serializable {
     }
 
     private void checkExpressionIfProperty() throws InvalidValue{
-        if (!getEntityDifenichan(m_entity).getPropertys().containsKey(m_exprecn.getString())) {
+        if (!m_util.getEntityDifenichan(m_entityName).getPropertys().containsKey(m_exprecn.getString())) {
             throw new InvalidValue("In action condition in single value is of the wrong type");
         }
-        if(!(getEntityDifenichan(m_entity).getPropertys().get(m_exprecn.getString()).getType() == expressionType.INT || getEntityDifenichan(m_entity).getPropertys().get(m_exprecn).getType() == expressionType.FLOAT)){
+        if(!(m_util.getEntityDifenichan(m_entityName).getPropertys().get(m_exprecn.getString()).getType() == expressionType.INT || m_util.getEntityDifenichan(m_entityName).getPropertys().get(m_exprecn).getType() == expressionType.FLOAT)){
             throw new InvalidValue("In action condition in single value is a property of the wrong type");
         }
     }
@@ -60,7 +67,7 @@ public class single implements subCondition, Serializable {
         if (m_exprecn.getString().equals("environment")) {
             //exprecn temp = new exprecn();
             //temp.setValue(environment(m_exprecn.getParams(0).getString()));
-            expressionType temp = getEnvironmentType(m_exprecn.getParams(0).getString());
+            expressionType temp = m_util.getEnvironmentType(m_exprecn.getParams(0).getString());
             if (temp == expressionType.STRING || temp == expressionType.BOOL) {
                 throw new InvalidValue("In action condition in single value is of the wrong type");
             }
@@ -71,18 +78,18 @@ public class single implements subCondition, Serializable {
         if(m_exprecn.getType() == expressionType.BOOL){
             throw new InvalidValue("In action condition in single value is of the wrong type");
         }
-        if(getEntityDifenichan(m_entity).getPropertys().get(m_property).getType() == expressionType.STRING || getEntityDifenichan(m_entity).getPropertys().get(m_property).getType() == expressionType.BOOL){
+        if(m_util.getEntityDifenichan(m_entityName).getPropertys().get(m_propertyName).getType() == expressionType.STRING || m_util.getEntityDifenichan(m_entityName).getPropertys().get(m_propertyName).getType() == expressionType.BOOL){
             throw new InvalidValue("In action condition in single got a wrong type property");
         }
     }
 
     private void checkEntityAndPropertyExist(){
-        if(!isEntityDifenichanExists(m_entity)){
-            throw new OBJECT_NOT_EXIST("In action condition in single the entity " + m_entity + " does not exist.");
+        if(!m_util.isEntityDifenichanExists(m_entityName)){
+            throw new OBJECT_NOT_EXIST("In action condition in single the entity " + m_entityName + " does not exist.");
         }
-        if(!getEntityDifenichan(m_entity).getPropertys().containsKey(m_property)){
-            throw new OBJECT_NOT_EXIST("In action condition in single the property " + m_property + "of entity " + m_entity +" does not exist.");
-        }
+//        if(!m_util.getEntityDifenichan(m_entityName).getPropertys().containsKey(m_propertyName)){
+//            throw new OBJECT_NOT_EXIST("In action condition in single the property " + m_propertyName + "of entity " + m_entityName +" does not exist.");
+//        }
     }
 
     private opertor getOpFromString(String op){
@@ -98,57 +105,95 @@ public class single implements subCondition, Serializable {
         return opertor.LITTLE;  //do not get to here
     }
 
-    @Override
-    public boolean getBoolValue(Entity entity) throws InvalidValue{
-        expression propertyValue = new expression();
-        propertyValue.setValue(entity.getProperty(m_property).getValue());
-        if (m_exprecn.getType() == expressionType.INT || m_exprecn.getType() == expressionType.FLOAT || m_exprecn.getType() == expressionType.BOOL) {
-            return getOpValue(propertyValue, m_exprecn);    //cheak if propertyValue type string or bool later and throw excepcen
-        } else if (m_exprecn.getType() == expressionType.STRING) {
-            if (m_exprecn.isFunc()) {
-                if (m_exprecn.getValue().equals("environment")) {
-                    expression temp = new expression();
-                    temp.setValue(environment(m_exprecn.getParams(0).getString()));
-                    return getOpValue(propertyValue, temp);
-//                    if (temp.getType() == expressionType.INT || temp.getType() == expressionType.FLOAT) {
-//                        return getOpValue(propertyValue, temp);    //cheak if propertyValue type string of bool later and throw excepcen
-//                    }
-//                    else {
-//                        throw new InvalidValue("In action condition in single value is of the wrong type");
-//                    }
-                } else if(m_exprecn.getString().equals("random")){
-                    expression temp = new expression();
-                    temp.setValue(random(m_exprecn.getParams(0).getInt()));
-                    return getOpValue(propertyValue, temp);
-//                    if(temp.getType() == expressionType.INT) {
-//                        return getOpValue(propertyValue, m_exprecn);
-//                    }
-//                    else{
-//                        throw new InvalidValue("In action condition in single value is of the wrong type");
-//                    }
-                }
+    private boolean active(expression propertyValue, expressionWithFunc value, Entity entity)throws InvalidValue{
+        if (value.getType() == expressionType.INT || value.getType() == expressionType.FLOAT || value.getType() == expressionType.BOOL) {
+            return getOpValue(propertyValue, value);    //cheak if propertyValue type string or bool later and throw excepcen
+        } else if (value.getType() == expressionType.STRING) {
+            expressionWithFunc temp = value.decipherValue(entity, m_util, m_currTick);
+            if (temp == value) {
+                return getOpValue(propertyValue, value);
             } else {
-                if (entity.isPropertyExists(m_exprecn.getString())) {
-                    expression temp = new expression();
-                    temp.setValue(entity.getProperty(m_exprecn.getString()).getValue());
-                    return getOpValue(propertyValue, temp);
-//                    if (temp.getType() == expressionType.INT || temp.getType() == expressionType.FLOAT) {
-//                        return getOpValue(propertyValue, temp);    //cheak if propertyValue type string of bool later and trow excepcen
-//                    }
-//                    else {
-//                        throw new InvalidValue("In action condition in single property is of the wrong type");
-//                    }
-                }
-                else{
-                    return getOpValue(propertyValue, m_exprecn);
-                    //throw new InvalidValue("In action condition in single property is of the wrong type");
-                }
+                return active(propertyValue, temp, entity);
             }
-        } else if (m_exprecn.getType() == expressionType.BOOL) {
-            throw new InvalidValue("In action condition in single property is of the wrong type");
-            //return false; //excepcen
         }
-        return false;   //do not get to here
+        return  false; //do not get here
+    }
+
+    @Override
+    public boolean getBoolValue(Entity entity, Entity secondaryEntity, int currTick){
+        m_currTick = currTick;
+        expressionWithFunc propertyValue = new expressionWithFunc(m_util);
+        Entity temp = entity.getName().equals(m_entityName) ? entity : secondaryEntity;
+        propertyValue.setEntityParams(new ArrayList<>(Arrays.asList(temp)));
+        m_exprecn.setEntityParams(new ArrayList<>(Arrays.asList(temp)));
+        try {
+            propertyValue.convertValueInString(m_propertyName);
+            propertyValue = propertyValue.decipherValue(temp, m_util, m_currTick);
+        }catch (InvalidValue e){
+            throw new InvalidValue(e.getMessage() + ". In single in action condition");
+        }
+        return active(propertyValue, m_exprecn, temp);
+
+    }
+
+    @Override
+    public boolean getBoolValue(Entity entity, int currTick) throws InvalidValue{
+        m_currTick = currTick;
+        expressionWithFunc propertyValue = new expressionWithFunc(m_util);
+        propertyValue.setEntityParams(new ArrayList<>(Arrays.asList(entity)));
+        m_exprecn.setEntityParams(new ArrayList<>(Arrays.asList(entity)));
+        try {
+            propertyValue.convertValueInString(m_propertyName);
+            propertyValue = propertyValue.decipherValue(entity, m_util, m_currTick);
+        }catch (InvalidValue e){
+        throw new InvalidValue(e.getMessage() + ". In single in action condition");
+        }
+        return active(propertyValue, m_exprecn, entity);
+
+//        if (m_exprecn.getType() == expressionType.INT || m_exprecn.getType() == expressionType.FLOAT || m_exprecn.getType() == expressionType.BOOL) {
+//            return getOpValue(propertyValue, m_exprecn);    //cheak if propertyValue type string or bool later and throw excepcen
+//        } else if (m_exprecn.getType() == expressionType.STRING) {
+//            if (m_exprecn.isFunc()) {
+//                if (m_exprecn.getValue().equals("environment")) {
+//                    expression temp = new expression();
+//                    temp.setValue(m_util.environment(m_exprecn.getParams(0).getString()));
+//                    return getOpValue(propertyValue, temp);
+////                    if (temp.getType() == expressionType.INT || temp.getType() == expressionType.FLOAT) {
+////                        return getOpValue(propertyValue, temp);    //cheak if propertyValue type string of bool later and throw excepcen
+////                    }
+////                    else {
+////                        throw new InvalidValue("In action condition in single value is of the wrong type");
+////                    }
+//                } else if(m_exprecn.getString().equals("random")){
+//                    expression temp = new expression();
+//                    temp.setValue(m_util.random(m_exprecn.getParams(0).getInt()));
+//                    return getOpValue(propertyValue, temp);
+////                    if(temp.getType() == expressionType.INT) {
+////                        return getOpValue(propertyValue, m_exprecn);
+////                    }
+////                    else{
+////                        throw new InvalidValue("In action condition in single value is of the wrong type");
+////                    }
+//                }
+//            } else {
+//                if (entity.isPropertyExists(m_exprecn.getString())) {
+//                    expression temp = new expression();
+//                    temp.setValue(entity.getProperty(m_exprecn.getString()).getValue());
+//                    return getOpValue(propertyValue, temp);
+////                    if (temp.getType() == expressionType.INT || temp.getType() == expressionType.FLOAT) {
+////                        return getOpValue(propertyValue, temp);    //cheak if propertyValue type string of bool later and trow excepcen
+////                    }
+////                    else {
+////                        throw new InvalidValue("In action condition in single property is of the wrong type");
+////                    }
+//                }
+//                else{
+//                    return getOpValue(propertyValue, m_exprecn);
+//                    //throw new InvalidValue("In action condition in single property is of the wrong type");
+//                }
+//            }
+//        }
+//        return false;   //do not get to here
     }
 
     private boolean getOpValue(expression expression1, expression expression2)throws InvalidValue{

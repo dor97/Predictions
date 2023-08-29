@@ -7,7 +7,8 @@ import Engine.world.entity.property.*;
 import Engine.world.entity.property.PropertyInterface;
 import Engine.world.entity.property.propertyType;
 import Engine.world.expression.expressionType;
-import org.omg.CORBA.DynAnyPackage.InvalidValue;
+import Engine.InvalidValue;
+import Engine.world.space;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -16,6 +17,8 @@ import java.util.Map;
 public class Entity implements Serializable {
     private String m_name;
     private Map<String, PropertyInterface> m_propertys;
+
+    private space m_position = null;
 
 
     public Entity(EntityDifenichan entity) throws InvalidValue {
@@ -31,6 +34,40 @@ public class Entity implements Serializable {
                     m_propertys.put(propertyDifenichan.getName(), new StringProperty(propertyDifenichan));
                 } else if (propertyDifenichan.getType() == expressionType.BOOL) {
                     m_propertys.put(propertyDifenichan.getName(), new BooleanProperty(propertyDifenichan));
+                }
+            }
+        }
+        catch (InvalidValue e){
+            throw new InvalidValue(e.getMessage() + ". referred in entity " + m_name);
+        }
+    }
+
+    public Entity(EntityDifenichan entity, Map<String, PropertyInterface> secondaryEntityProperties) throws InvalidValue {
+        m_name = entity.getName();
+        m_propertys = new HashMap<>();
+        try {
+            for (propertyDifenichan propertyDifenichan : entity.getPropertys().values()) {
+                if(secondaryEntityProperties.containsKey(propertyDifenichan.getName())){
+                    if (propertyDifenichan.getType() == expressionType.INT) {
+                        m_propertys.put(propertyDifenichan.getName(), new DecimalProperty(propertyDifenichan, secondaryEntityProperties.get(propertyDifenichan.getName())));
+                    } else if (propertyDifenichan.getType() == expressionType.FLOAT) {
+                        m_propertys.put(propertyDifenichan.getName(), new FloatProperty(propertyDifenichan, secondaryEntityProperties.get(propertyDifenichan.getName())));
+                    } else if (propertyDifenichan.getType() == expressionType.STRING) {
+                        m_propertys.put(propertyDifenichan.getName(), new StringProperty(propertyDifenichan, secondaryEntityProperties.get(propertyDifenichan.getName())));
+                    } else if (propertyDifenichan.getType() == expressionType.BOOL) {
+                        m_propertys.put(propertyDifenichan.getName(), new BooleanProperty(propertyDifenichan, secondaryEntityProperties.get(propertyDifenichan.getName())));
+                    }
+                }
+                else {
+                    if (propertyDifenichan.getType() == expressionType.INT) {
+                        m_propertys.put(propertyDifenichan.getName(), new DecimalProperty(propertyDifenichan));
+                    } else if (propertyDifenichan.getType() == expressionType.FLOAT) {
+                        m_propertys.put(propertyDifenichan.getName(), new FloatProperty(propertyDifenichan));
+                    } else if (propertyDifenichan.getType() == expressionType.STRING) {
+                        m_propertys.put(propertyDifenichan.getName(), new StringProperty(propertyDifenichan));
+                    } else if (propertyDifenichan.getType() == expressionType.BOOL) {
+                        m_propertys.put(propertyDifenichan.getName(), new BooleanProperty(propertyDifenichan));
+                    }
                 }
             }
         }
@@ -87,7 +124,18 @@ public class Entity implements Serializable {
         return type;
     }
 
+    public Map<String, PropertyInterface> getProperties(){
+        return m_propertys;
+    }
     //public void actionOnProperty(PropertyInterface p){
     //    p.addToProperty();
     //}
+
+    public void setPosition(space position){
+        m_position = position;
+    }
+
+    public space getPosition(){
+        return m_position;
+    }
 }

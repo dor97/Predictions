@@ -2,7 +2,7 @@ package Engine.world.entity.property;
 
 import Engine.generated.PRDEnvProperty;
 import Engine.world.expression.expressionType;
-import org.omg.CORBA.DynAnyPackage.InvalidValue;
+import Engine.InvalidValue;
 
 import java.io.Serializable;
 import java.util.Random;
@@ -12,6 +12,8 @@ public class DecimalProperty extends Property implements Serializable {
     private int m_property;
     private Double m_lowRange, m_highRang;
     private boolean haveRange;
+    //private int lastTickChanged = 0;
+
 
     public DecimalProperty(propertyDifenichan propertyDifenichan) throws InvalidValue{
         super(propertyType.INT);
@@ -21,7 +23,8 @@ public class DecimalProperty extends Property implements Serializable {
             m_lowRange = propertyDifenichan.getLowRange();
             m_highRang = propertyDifenichan.getHighRange();
         }
-        if(propertyDifenichan.getType() != expressionType.INT){
+        init(propertyDifenichan);
+        /*if(propertyDifenichan.getType() != expressionType.INT){
             //exepcen
         }
         if(propertyDifenichan.isRandom()){
@@ -38,8 +41,48 @@ public class DecimalProperty extends Property implements Serializable {
             if(haveRange && (m_property > m_highRang || m_property < m_lowRange)){
                 throw new InvalidValue("In property " + m_name + " value is out of range");
             }
-        }
+        }*/
 
+    }
+
+    public DecimalProperty(propertyDifenichan propertyDifenichan, PropertyInterface secondaryProperty) throws InvalidValue {
+        super(propertyType.INT);
+        m_name = propertyDifenichan.getName();
+        if(secondaryProperty.getType() == propertyType.INT){
+            haveRange = propertyDifenichan.haveRange();
+            if(haveRange) {
+                m_lowRange = propertyDifenichan.getLowRange();
+                m_highRang = propertyDifenichan.getHighRange();
+                if((int)secondaryProperty.getValue() <= m_highRang && (int)secondaryProperty.getValue() >= m_lowRange){
+                    m_property = (int)secondaryProperty.getValue();
+                }
+                else{
+                    init(propertyDifenichan);;
+                }
+            }else{
+                m_property = (int)secondaryProperty.getValue();
+            }
+        }else{
+            init(propertyDifenichan);
+        }
+    }
+
+    private void init(propertyDifenichan propertyDifenichan){
+        if(propertyDifenichan.isRandom()){
+            Random random = new Random();
+            if(haveRange){
+                m_property = random.nextInt((int) (m_highRang - m_lowRange) + 1) + (int)m_lowRange.doubleValue();
+            }
+            else{
+                m_property = random.nextInt();
+            }
+        }
+        else {
+            m_property = propertyDifenichan.getInit().getInt();
+            if(haveRange && (m_property > m_highRang || m_property < m_lowRange)){
+                throw new InvalidValue("In property " + m_name + " value is out of range");
+            }
+        }
     }
 
     public DecimalProperty(EnvironmentDifenichan environmentDifenichan) throws InvalidValue{
@@ -86,9 +129,11 @@ public class DecimalProperty extends Property implements Serializable {
     }
 
     @Override
-    public void addToProperty(int add){
-        if(!haveRange || (m_property + add <= m_highRang && m_property + add >= m_lowRange))
+    public void addToProperty(int add, int currTick){
+        if(!haveRange || (m_property + add <= m_highRang && m_property + add >= m_lowRange)){
+            lastTickChanged = currTick;
             m_property += add;
+        }
     }
     @Override
     public String getName(){
@@ -99,8 +144,9 @@ public class DecimalProperty extends Property implements Serializable {
         return m_property;
     }
     @Override
-    public void setProperty(int value){
+    public void setProperty(int value, int currTick){
         if(!haveRange || (value <= m_highRang && value >= m_lowRange)){
+            lastTickChanged = currTick;
             m_property = value;
         }
     }

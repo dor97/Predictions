@@ -1,18 +1,44 @@
 package Engine.world.expression;
 
+import Engine.InvalidValue;
+import Engine.utilites.Utilites;
+import Engine.world.entity.Entity;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-import static Engine.utilites.Utilites.isEnvironmentExist;
+import static Engine.utilites.Utilites.*;
 
 public class expressionWithFunc extends expression implements Serializable {
 
     private boolean m_isFunc = false;
-    List<expression> params = new ArrayList<>();
+    private List<expressionWithFunc> params = new ArrayList<>();
+    private Utilites m_util;
+    private String entityName, propertyName;
+
+    private List<Entity> EntityPramsToFunc = null;
+
+    public expressionWithFunc(Utilites util){
+        m_util = util;
+    }
 
     public boolean isFunc() {
         return m_isFunc;
+    }
+
+    public void setEntityParams(List<Entity> entityParams){
+        EntityPramsToFunc = entityParams;
+    }
+
+    public void switchLastEntityParam(Entity entity){
+        if(EntityPramsToFunc == null){
+            EntityPramsToFunc = new ArrayList<>();
+        }
+        if(EntityPramsToFunc.size() != 0) {
+            EntityPramsToFunc.remove(EntityPramsToFunc.size() - 1);
+        }
+        EntityPramsToFunc.add(entity);
     }
 
     @Override
@@ -36,9 +62,19 @@ public class expressionWithFunc extends expression implements Serializable {
 
                     params.clear();
                     for (String parameter : parameterParts) {
-                        expression temp = new expression();
+                        expressionWithFunc temp = new expressionWithFunc(m_util);
                         temp.convertValueInString(parameter.trim());
                         params.add(temp);
+                    }
+
+                    if(functionName.equals("evaluate") || functionName.equals("ticks")){
+                        if(params.get(0).getType() != expressionType.STRING){
+                            throw new InvalidValue("func evaluate got wrong type of arg");
+                        }
+                        String pram = params.get(0).getString();
+                        int separatorIndex = pram.indexOf(".");
+                        entityName = pram.substring(0, separatorIndex);
+                        propertyName = pram.substring(separatorIndex + 1);
                     }
 
                     if(!ifFunctionValid(functionName)){
@@ -79,11 +115,24 @@ public class expressionWithFunc extends expression implements Serializable {
 
     private boolean ifFunctionValid(String name){
         if(name.equals("environment")){
-            if(params.size() == 1 && isEnvironmentExist(params.get(0).getString())){
+            if(params.size() == 1 && m_util.isEnvironmentExist(params.get(0).getString())){
                 return true;
             }
+            throw new InvalidValue("bad arg to fun environment");
         } else if (name.equals("random")) {
-            if(params.size() == 1 && params.get(0).getType() == expressionType.INT){
+            if(params.size() == 1 && (params.get(0).getType() == expressionType.INT || params.get(0).getType() == expressionType.STRING)){
+                return true;
+            }
+            throw new InvalidValue("bad arg to fun random");
+        }else if(name.equals("evaluate")){
+            if(params.size() == 1 && m_util.isEntityDifenichanExists(entityName) && m_util.isPropertyExists(entityName, propertyName)){
+                return true;
+            }
+            throw new InvalidValue("bad arg to fun evaluate");
+        } else if (name.equals("percent")) {
+            return true;
+        } else if (name.equals("ticks")) {
+            if(params.size() == 1 && m_util.isEntityDifenichanExists(entityName) && m_util.isPropertyExists(entityName, propertyName)){
                 return true;
             }
         }
@@ -120,7 +169,63 @@ public class expressionWithFunc extends expression implements Serializable {
         m_isFunc = false;
     }
 
-    public expression getParams(int i){
+    public expressionWithFunc getParams(int i){
         return params.get(i);
+    }
+
+    public expressionWithFunc decipherValue(Entity entity, Utilites util, int currTick) {
+        expressionWithFunc res = new expressionWithFunc(m_util);
+        if (this.getType() == expressionType.STRING) {
+            if (this.isFunc()) {
+                if (this.getString().equals("environment")) {
+                    res.setValue(util.environment(this.getParams(0).decipherValue(entity, util, currTick).getString()));
+                } else if (this.getString().equals("random")) {
+                    expressionWithFunc temp = this.getParams(0).decipherValue(entity, util, currTick);
+                    if(temp.getType() != expressionType.INT){
+                        throw new InvalidValue("wrong type of arg in random func");
+                    }
+                    res.setValue(util.random(temp.getInt()));
+                } else if (this.getString().equals("evaluate")) {
+                    Entity param = getEntityAsParam("evaluate");
+                    res.setValue(param.getProperties().get(propertyName).getValue());
+                } else if (this.getString().equals("percent")) {
+                    res.setValue(percent(this.getParams(0).decipherValue(entity, util, currTick), this.getParams(1).decipherValue(entity, util, currTick)));
+                } else if (this.getString().equals("ticks")) {
+                    Entity param = getEntityAsParam("ticks");
+                    res.setValue(currTick - param.getProperties().get(propertyName).getLastTickChanged());
+                }
+            } else {
+                if (entity.isPropertyExists(this.getString())) {
+                    res.setValue(entity.getProperty(this.getString()).getValue());
+                } else {
+                    res = this;
+                }
+            }
+        }else {
+            res = this;
+        }
+        return res;
+    }
+
+    private float percent(expressionWithFunc hole, expressionWithFunc percent){
+        if(hole.getType() == expressionType.INT && percent.getType() == expressionType.INT){
+            return m_util.percent(hole.getInt(), percent.getInt());
+        } else if (hole.getType() == expressionType.FLOAT && percent.getType() == expressionType.INT){
+            return m_util.percent(hole.getFloat(), percent.getInt());
+        } else if (hole.getType() == expressionType.INT && percent.getType() == expressionType.FLOAT){
+            return m_util.percent(hole.getInt(), percent.getFloat());
+        } else if (hole.getType() == expressionType.FLOAT && percent.getType() == expressionType.FLOAT){
+            return m_util.percent(hole.getFloat(), percent.getFloat());
+        }
+        throw new InvalidValue("wrong type of arg in random func");
+    }
+
+    private Entity getEntityAsParam(String funcName){
+        for(Entity entityPrams : EntityPramsToFunc){
+            if(entityPrams.getName().equals(entityName)){
+                return entityPrams;
+            }
+        }
+        throw new InvalidValue("wrong entity in arg to " + funcName + " func");
     }
 }

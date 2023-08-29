@@ -1,40 +1,65 @@
 package Engine.world.rule.action;
 
+import Engine.utilites.Utilites;
 import Engine.world.entity.Entity;
 import Engine.generated.PRDAction;
-import org.omg.CORBA.DynAnyPackage.InvalidValue;
-
+import Engine.world.expression.expression;
+import Engine.world.expression.expressionType;
+import Engine.InvalidValue;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class condition extends action implements Serializable {
     private String m_entity;
     private subCondition m_subCon;
     private List<ActionInterface> m_then = null;
     private List<ActionInterface> m_else = null;
+    //private int m_currTick;
 
-    public condition(PRDAction action) throws InvalidValue {
+//    private boolean isSecondaryAll = false;
+//    private int countForSecondaryEntities = 0;
+//    private String m_secondaryEntity;
+//    private single condition = null;
+
+    public condition(PRDAction action, Utilites util, String ruleName) throws InvalidValue {
+        super(action, util, ruleName);
         m_entity = action.getEntity();
-        actionName = action.getType();
+        //actionName = action.getType();
+//        if(action.getPRDSecondaryEntity() != null){
+//            m_secondaryEntity = action.getPRDSecondaryEntity().getEntity();
+//            expression temp = new expression();
+//            temp.convertValueInString(action.getPRDSecondaryEntity().getPRDSelection().getCount());
+//            if(temp.getType() == expressionType.INT){
+//                countForSecondaryEntities = temp.getInt();
+//            }
+//            else{
+//                isSecondaryAll = true;
+//            }
+//            if(action.getPRDSecondaryEntity().getPRDSelection().getPRDCondition() != null){
+//                condition = new single(action.getPRDSecondaryEntity().getPRDSelection().getPRDCondition(), util);
+//            }
+//        }
         if(action.getPRDCondition().getSingularity().equals("multiple")){
-            m_subCon = new multiple(action.getPRDCondition());
+            m_subCon = new multiple(action.getPRDCondition(), util);
         }
         else if (action.getPRDCondition().getSingularity().equals("single")){
-            m_subCon = new single(action.getPRDCondition());
+            m_subCon = new single(action.getPRDCondition(), util);
         }
         m_then = new ArrayList<>();
         for(PRDAction thanAction : action.getPRDThen().getPRDAction()){
             if (thanAction.getType().equals("increase") || thanAction.getType().equals("decrease")) {
-                m_then.add(new addValue(thanAction));
+                m_then.add(new addValue(thanAction, util, getRuleName()));
             } else if (thanAction.getType().equals("calculation")) {
-                m_then.add(new calculation(thanAction));
+                m_then.add(new calculation(thanAction, util, getRuleName()));
             } else if (thanAction.getType().equals("condition")) {
-                m_then.add(new condition(thanAction));
+                m_then.add(new condition(thanAction, util, getRuleName()));
             } else if (thanAction.getType().equals("set")) {
-                m_then.add(new set(thanAction));
+                m_then.add(new set(thanAction, util, getRuleName()));
             } else if (thanAction.getType().equals("kill")) {
-                m_then.add(new kill(thanAction));
+                m_then.add(new kill(thanAction, util, getRuleName()));
             }
 
         }
@@ -42,42 +67,135 @@ public class condition extends action implements Serializable {
             m_else = new ArrayList<>();
             for(PRDAction elseAction : action.getPRDElse().getPRDAction()){
                 if (elseAction.getType().equals("increase") || elseAction.getType().equals("decrease")) {
-                    m_else.add(new addValue(elseAction));
+                    m_else.add(new addValue(elseAction, util, getRuleName()));
                 } else if (elseAction.getType().equals("calculation")) {
-                    m_else.add(new calculation(elseAction));
+                    m_else.add(new calculation(elseAction, util, getRuleName()));
                 } else if (elseAction.getType().equals("condition")) {
-                    m_else.add(new condition(elseAction));
+                    m_else.add(new condition(elseAction, util, getRuleName()));
                 } else if (elseAction.getType().equals("set")) {
-                    m_else.add(new set(elseAction));
+                    m_else.add(new set(elseAction, util, getRuleName()));
                 } else if (elseAction.getType().equals("kill")) {
-                    m_else.add(new kill(elseAction));
+                    m_else.add(new kill(elseAction, util, getRuleName()));
                 }
             }
         }
     }
-    @Override
-    public boolean activateAction(Entity entity) throws InvalidValue{
-        if (m_subCon.getBoolValue(entity)) {
-            for (ActionInterface action : m_then) {
-                //if(action.getEntityName() == entity.getName() && entity.isPropertyExists(action.getPropertyName())){
-                if(action.activateAction(entity)){
-                    return true;
-                }
-                //}
-            }
-        } else {
-            if (m_else != null) {
-                for (ActionInterface action : m_else) {
-                    //if(action.getEntityName() == entity.getName() && entity.isPropertyExists(action.getPropertyName())){
-                    if(action.activateAction(entity)){
-                        return true;
-                    }
-                    //}
-                }
+    public void doCondition(){
+
+    }
+    private Map<String, List<Entity>> loopThroughEntities(Entity entity, List<Entity> secondaryEntities){
+        List<Entity> passCondition = new ArrayList<>();
+        List<Entity> didntPassCondition = new ArrayList<>();
+
+        for(Entity secondaryEntity : secondaryEntities){
+            if(m_subCon.getBoolValue(entity, secondaryEntity, m_currTick)){
+                passCondition.add(secondaryEntity);
+            }else {
+                didntPassCondition.add(secondaryEntity);
             }
         }
 
-        return false;
+        Map<String, List<Entity>> killAndCreat = new HashMap<>();
+
+        if(passCondition.size() != 0){
+            m_then.stream().forEach(actionInterface -> activateActionWithSecondary(actionInterface, entity, passCondition).forEach((key, value) -> killAndCreat.merge(key, value, (list1, list2) -> {
+                list1.addAll(list2);
+                return list1;
+            })));
+        }
+
+        if(m_else != null && didntPassCondition.size() != 0){
+            m_then.stream().forEach(actionInterface -> activateActionWithSecondary(actionInterface, entity, didntPassCondition).forEach((key, value) -> killAndCreat.merge(key, value, (list1, list2) -> {
+                list1.addAll(list2);
+                return list1;
+            })));
+        }
+
+        return killAndCreat;
+    }
+
+    private Map<String, List<Entity>> activeOnce(Entity entity){
+        Map<String, List<Entity>> killAndCreat = new HashMap<>();
+        if (m_subCon.getBoolValue(entity, m_currTick)) {
+            m_then.stream().forEach(actionInterface -> actionInterface.activateAction(entity, m_currTick).forEach((key, value) -> killAndCreat.merge(key, value, (list1, list2) -> {
+                list1.addAll(list2);
+                return list1;
+            })));
+//            for (ActionInterface action : m_then) {
+                //if(action.getEntityName() == entity.getName() && entity.isPropertyExists(action.getPropertyName())){
+//                if(action.activateAction(entity, temp)){
+//                    return true;
+//                }
+                //}
+            //}
+        } else {
+            if (m_else != null) {
+                m_else.stream().forEach(actionInterface -> actionInterface.activateAction(entity, m_currTick).forEach((key, value) -> killAndCreat.merge(key, value, (list1, list2) -> {
+                    list1.addAll(list2);
+                    return list1;
+                })));
+//                for (ActionInterface action : m_else) {
+//                    //if(action.getEntityName() == entity.getName() && entity.isPropertyExists(action.getPropertyName())){
+//                    if(action.activateAction(entity, temp)){
+//                        return true;
+//                    }
+//                    //}
+//                }
+            }
+        }
+        return killAndCreat;
+    }
+
+    private Map<String, List<Entity>> activateActionWithSecondary(ActionInterface action, Entity entity, List<Entity> secondaries){
+        Map<String, List<Entity>> killAndCreat = new HashMap<>();
+        if(action.getEntityName().equals(entity.getName())) {
+            return action.activateAction(entity, m_currTick);
+
+        }else{
+            secondaries.stream().forEach(secondary -> action.activateAction(secondary, m_currTick).forEach((key, value) -> killAndCreat.merge(key, value, (list1, list2) -> {
+                list1.addAll(list2);
+                return list1;
+            })));
+            return killAndCreat;
+        }
+
+    }
+
+    @Override
+    public Map<String, List<Entity>> activateAction(Entity entity, int currTick) throws InvalidValue{
+        m_currTick = currTick;
+        List<Entity> secondaryEntities = null;
+        if(getCountForSecondaryEntities() != 0 && !getSecondaryName().equals(m_entity)){
+            secondaryEntities = getSecondaryEntities();
+        }
+
+        if(secondaryEntities == null || secondaryEntities.size() == 0){
+            return activeOnce(entity);
+        }else{
+            return loopThroughEntities(entity, secondaryEntities);
+        }
+
+//        if (m_subCon.getBoolValue(entity)) {
+//            for (ActionInterface action : m_then) {
+//                //if(action.getEntityName() == entity.getName() && entity.isPropertyExists(action.getPropertyName())){
+//                if(action.activateAction(entity, secondaryEntities)){
+//                    return true;
+//                }
+//                //}
+//            }
+//        } else {
+//            if (m_else != null) {
+//                for (ActionInterface action : m_else) {
+//                    //if(action.getEntityName() == entity.getName() && entity.isPropertyExists(action.getPropertyName())){
+//                    if(action.activateAction(entity, secondaryEntities)){
+//                        return true;
+//                    }
+//                    //}
+//                }
+//            }
+//        }
+//
+//        return false;
     }
 
     @Override
@@ -85,4 +203,19 @@ public class condition extends action implements Serializable {
         return m_entity;
     }
 
+//    public boolean isSecondaryAll() {
+//        return isSecondaryAll;
+//    }
+//
+//    public int getCountForSecondaryEntities(){
+//        return countForSecondaryEntities;
+//    }
+//
+//    public String getSecondaryName(){
+//        return m_secondaryEntity;
+//    }
+//
+//    public single getCondition(){
+//        return condition;
+//    }
 }

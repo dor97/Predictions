@@ -1,6 +1,7 @@
 package Engine.world;
 
 import DTO.*;
+import Engine.InvalidValue;
 import Engine.UnsupportedFileTypeException;
 import Engine.allReadyExistsException;
 import Engine.world.entity.Entity;
@@ -15,7 +16,6 @@ import Engine.world.rule.action.addValue;
 import Engine.world.rule.action.calculation;
 import Engine.world.expression.expressionType;
 import Engine.utilites.Utilites;
-import org.omg.CORBA.DynAnyPackage.InvalidValue;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -30,6 +30,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class World implements Serializable {
     private List<Rule> m_rules = new ArrayList<>();
@@ -43,34 +44,36 @@ public class World implements Serializable {
     private expression m_secondToWork = null;
     private SimpleDateFormat format = new SimpleDateFormat("dd-MM-yyyy | hh.mm.ss");
     private String simulationTime = null;
+    private Utilites util;
+    private int m_rows, m_cols, currTick;
 
     private final static String JAXB_XML_GAME_PACKAGE_NAME = "Engine.generated";
 
 
-    public void start(){
-        PropertyInterface p = new DecimalProperty("pro", 100, 0, 200);
-        PropertyInterface p2 = new DecimalProperty("p2", 100, 0, 10000);
-        ActionInterface a = new addValue("entity", "pro", "3");
-        ActionInterface a2 = new calculation("entity", "p2", "environment(ep1)",
-               "environment(ep2)");
-        Entity e =new Entity("entity");
-
-        m_rules.add(new Rule("rule", 1, 1));
-        m_rules.add(new Rule("rule", 70, 1));
-        m_entities.add(e);
-        m_entities.get(0).addProperty(p);
-        m_entities.get(0).addProperty(p2);
-        m_rules.get(0).addAction(a);
-        m_rules.get(1).addAction(a2);
-
-        PropertyInterface env = new DecimalProperty("ep1", 50, 0, 200);
-        PropertyInterface env2 = new DecimalProperty("ep2", 4, 0, 200);
-        m_environments.put(env.getName(), env);
-        m_environments.put(env2.getName(), env2);
-        Utilites.Init(m_environments, m_entitiesDifenichan, m_environmentsDifenichen);
-
-
-    }
+//    public void start(){
+//        PropertyInterface p = new DecimalProperty("pro", 100, 0, 200);
+//        PropertyInterface p2 = new DecimalProperty("p2", 100, 0, 10000);
+//        ActionInterface a = new addValue("entity", "pro", "3");
+//        ActionInterface a2 = new calculation("entity", "p2", "environment(ep1)",
+//               "environment(ep2)");
+//        Entity e =new Entity("entity");
+//
+//        m_rules.add(new Rule("rule", 1, 1));
+//        m_rules.add(new Rule("rule", 70, 1));
+//        m_entities.add(e);
+//        m_entities.get(0).addProperty(p);
+//        m_entities.get(0).addProperty(p2);
+//        m_rules.get(0).addAction(a);
+//        m_rules.get(1).addAction(a2);
+//
+//        PropertyInterface env = new DecimalProperty("ep1", 50, 0, 200);
+//        PropertyInterface env2 = new DecimalProperty("ep2", 4, 0, 200);
+//        m_environments.put(env.getName(), env);
+//        m_environments.put(env2.getName(), env2);
+//        //Utilites.Init(m_environments, m_entitiesDifenichan, m_environmentsDifenichen);
+//
+//
+//    }
 
     public void startSimolesan()throws InvalidValue{
         //Utilites.Init(m_environments, m_entitiesDifenichan);
@@ -94,24 +97,92 @@ public class World implements Serializable {
 //        }
 
         simulationTime = format.format(new Date());
-        int currTick = 0, currTime = 0;
+        currTick = 0;
         Instant start = Instant.now();
-        while ((m_ticks.getType() == null || currTick < m_ticks.getInt()) && (m_secondToWork == null || Duration.between(start, Instant.now()).getSeconds() < m_secondToWork.getInt())){
+//        while ((m_ticks.getType() == null || currTick < m_ticks.getInt()) && (m_secondToWork == null || Duration.between(start, Instant.now()).getSeconds() < m_secondToWork.getInt())){
+//            for(Rule r : m_rules) {
+//                if(currTick % r.getTick() == 0 && random.nextDouble() < r.getProbability()) {
+//                    for (Entity entity : m_entities) {
+//                        if (r.activeRule(entity)) {
+//                            toRemove.add(entity);
+//                            break;
+//                        }
+//                    }
+//                }
+//            }
+//            for(Entity entity : toRemove){
+//                m_entities.remove(entity);
+//            }
+//            currTick++;
+//        }
+        map map = new map(m_rows, m_cols);  //TODO change
+        map.setLocations(m_entities);
+        List<ActionInterface> toActive = new ArrayList<>();
+        while ((m_ticks.getType() == null || currTick < m_ticks.getInt()) && (m_secondToWork.getType() == null || Duration.between(start, Instant.now()).getSeconds() < m_secondToWork.getInt()) && (currTick < 1000)) {
+            toActive.clear();
             for(Rule r : m_rules) {
-                if(currTick % r.getTick() == 0 && random.nextDouble() < r.getProbability()) {
-                    for (Entity entity : m_entities) {
-                        if (r.activeRule(entity)) {
-                            toRemove.add(entity);
-                            break;
-                        }
-                    }
-                }
+                toActive.addAll(r.getActionToActive(currTick));
             }
-            for(Entity entity : toRemove){
-                m_entities.remove(entity);
-            }
+
+            //m_rules.stream().forEach(rule -> toActive.addAll(rule.getActionToActive(currTick)));
+            Map<String, List<Entity>> killAndCreat = new HashMap<>();
+            killAndCreat.put("kill", new ArrayList<>());
+            killAndCreat.put("creat", new ArrayList<>());
+            m_entities.stream().forEach(entity -> toActive.stream().forEach(actionInterface -> (activeatActian(entity, actionInterface)).forEach((key, value) -> killAndCreat.merge(key, value, (list1, list2) -> {
+                list1.addAll(list2);
+                return list1;
+            }))));
+
+            map.moveEntities(m_entities);
+            //killAndCreat.forEach((key, value) -> killCreat(key, value));
+            map.deleteEntities(killAndCreat.get("kill"));
+            map.createEntities(killAndCreat.get("creat"));
+            m_entities.removeAll(killAndCreat.get("kill"));
+            m_entities.addAll(killAndCreat.get("creat"));
+
+
             currTick++;
         }
+    }
+
+    public void killCreat(String killCreat,List<Entity> toKillOrCreat){
+        if(killCreat.equals("kill")){
+            m_entities.removeAll(toKillOrCreat);
+        }else{
+            m_entities.addAll(toKillOrCreat);
+        }
+
+        //toKill.stream().forEach(entity -> m_entities.remove(entity));
+    }
+
+    public Map<String, List<Entity>> activeatActian(Entity entity, ActionInterface actionInterface){
+        try {
+            if(actionInterface.getEntityName().equals(entity.getName())){
+                return actionInterface.activateAction(entity, currTick);
+            }
+            return new HashMap<>();
+        }catch (InvalidValue e){
+            throw new InvalidValue(e.getMessage() + ". referred to in rule " + actionInterface.getRuleName());
+        }
+//        List<Entity> secondary;
+//        try {
+//            if (actionInterface.getEntityName().equals(entity.getName())) {
+//                if (actionInterface.isSecondaryAll()) {
+//                    secondary = m_entities.stream().filter(entity1 -> entity1.getName() == actionInterface.getSecondaryName()).collect(Collectors.toList());
+//                    return actionInterface.activateAction(entity, secondary);
+//                } else {
+//                    Random random = new Random();
+//                    random.nextInt();
+//                    List<Entity> EntitiesOfSecondaryType = m_entities.stream().filter(entity1 -> entity1.getName() == actionInterface.getSecondaryName()).filter(entity1 -> (actionInterface.getCondition()).getBoolValue(entity1)).collect(Collectors.toList());
+//                    secondary = IntStream.range(0, actionInterface.getCountForSecondaryEntities()).mapToObj(i -> EntitiesOfSecondaryType.get(random.nextInt(EntitiesOfSecondaryType.size()))).limit(EntitiesOfSecondaryType.size()).collect(Collectors.toList());
+//                    //secondary = temp.stream().mapToObj(i -> temp.get(random.nextInt(temp.size()))).limit(actionInterface.getCountForSecondaryEntities())
+//                    return actionInterface.activateAction(entity, secondary);
+//                }
+//            }
+//            return actionInterface.activateAction(entity, new ArrayList<>());
+//        }catch (InvalidValue e){
+//            throw new InvalidValue(e.getMessage() + ". referred to in rule " + actionInterface.getRuleName());
+//        }
     }
 
     public String getSimulationTime(){
@@ -260,12 +331,15 @@ public class World implements Serializable {
             throw e;
         }
 
+        m_cols = xmlWorld.getPRDGrid().getColumns();
+        m_rows = xmlWorld.getPRDGrid().getRows();
+
         //entitys
         for(PRDEntity e : xmlWorld.getPRDEntities().getPRDEntity()){
             m_entitiesDifenichan.put(e.getName(), new EntityDifenichan(e));
         }
         //environment
-        for(PRDEnvProperty p : xmlWorld.getPRDEvironment().getPRDEnvProperty()){
+        for(PRDEnvProperty p : xmlWorld.getPRDEnvironment().getPRDEnvProperty()){
             if(m_environmentsDifenichen.containsKey(p.getPRDName())){
                 throw new allReadyExistsException("environment variables " + p.getPRDName() + " all ready exists.");
             }
@@ -288,23 +362,55 @@ public class World implements Serializable {
 //            }
 //        }
 
-        Utilites.Init(m_environments, m_entitiesDifenichan, m_environmentsDifenichen);
+        util = new Utilites(m_environments, m_entitiesDifenichan, m_environmentsDifenichen, m_entities);
+        //util.Init(m_environments, m_entitiesDifenichan, m_environmentsDifenichen);
 
         //rules
         for(PRDRule rule : xmlWorld.getPRDRules().getPRDRule()){
-            m_rules.add(new Rule(rule));
+            m_rules.add(new Rule(rule, util));
         }
 
         m_ticks = new expression();
-        Optional<Integer> time = Optional.ofNullable(((PRDByTicks)(xmlWorld.getPRDTermination().getPRDByTicksOrPRDBySecond().get(0))).getCount());
-        time.ifPresent((t) -> m_ticks.setValue(t));
-
         m_secondToWork = new expression();
-        Optional<Integer> second = Optional.ofNullable(((PRDBySecond)xmlWorld.getPRDTermination().getPRDByTicksOrPRDBySecond().get(1)).getCount());
-        second.ifPresent((s) -> m_secondToWork.setValue(s));
+        Optional<List<Object>> secondOrTicks = Optional.ofNullable((List<Object>) xmlWorld.getPRDTermination().getPRDBySecondOrPRDByTicks());
+        secondOrTicks.ifPresent(t -> getTermination(t));
 
-        if(m_ticks.getType() == null && m_secondToWork.getType() == null){
+//        m_ticks = new expression();
+//        Optional<Integer> time = Optional.ofNullable().ifPresent(t -> t.getCount()))));
+//        time.ifPresent((t) -> m_ticks.setValue(t));
+//
+//        m_secondToWork = new expression();
+//        Optional<Integer> second = Optional.ofNullable(((PRDBySecond)xmlWorld.getPRDTermination().getPRDBySecondOrPRDByTicks().get(1)).getCount());
+//        second.ifPresent((s) -> m_secondToWork.setValue(s));
+
+        if(m_ticks.getType() == null && m_secondToWork.getType() == null && xmlWorld.getPRDTermination().getPRDByUser() == null){
             throw new InvalidValue("No termination method was added");
+        }
+    }
+
+    private void getTermination(List<Object> secondOrTicks){
+        if(secondOrTicks.size() == 0){
+            return;
+        }
+        if(secondOrTicks.size() == 1) {
+            if (secondOrTicks.get(0) instanceof PRDByTicks) {
+                m_ticks.setValue(((PRDByTicks) (secondOrTicks.get(0))).getCount());
+            }
+            if (secondOrTicks.get(0) instanceof PRDBySecond) {
+                m_secondToWork.setValue(((PRDBySecond) (secondOrTicks.get(0))).getCount());
+            }
+            return;
+        }
+        if(secondOrTicks.size() == 2) {
+            if (secondOrTicks.get(0) instanceof PRDByTicks) {
+                m_ticks.setValue(((PRDByTicks) (secondOrTicks.get(0))).getCount());
+                m_secondToWork.setValue(((PRDBySecond) (secondOrTicks.get(1))).getCount());
+
+            }
+            if (secondOrTicks.get(0) instanceof PRDBySecond) {
+                m_secondToWork.setValue(((PRDBySecond) (secondOrTicks.get(0))).getCount());
+                m_ticks.setValue(((PRDByTicks) (secondOrTicks.get(1))).getCount());
+            }
         }
     }
 

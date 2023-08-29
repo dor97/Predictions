@@ -1,21 +1,24 @@
 package Engine.world.rule.action;
 
+import Engine.utilites.Utilites;
 import Engine.world.entity.Entity;
 import Engine.generated.PRDAction;
-import org.omg.CORBA.DynAnyPackage.InvalidValue;
+import Engine.InvalidValue;
 import org.omg.CORBA.OBJECT_NOT_EXIST;
-
 import java.io.Serializable;
+import java.util.*;
 
-import static Engine.utilites.Utilites.isEntityDifenichanExists;
 
 public class kill extends action implements Serializable {
 
-    private String m_entity;
+    private String m_entityName;
+    private Utilites m_util;
 
-    public kill(PRDAction action) throws  InvalidValue{
-        m_entity = action.getEntity();
-        actionName = action.getType();
+    public kill(PRDAction action, Utilites util, String ruleName) throws  InvalidValue{
+        super(action, util, ruleName);
+        m_entityName = action.getEntity();
+        //actionName = action.getType();
+        m_util = util;
         cheackUserInput();
     }
 
@@ -24,13 +27,27 @@ public class kill extends action implements Serializable {
     }
 
     private void checkEntityExist(){
-        if(!isEntityDifenichanExists(m_entity)){
-            throw new OBJECT_NOT_EXIST("In action kill the entity " + m_entity + " does not exist.");
+        if(!m_util.isEntityDifenichanExists(m_entityName)){
+            throw new OBJECT_NOT_EXIST("In action kill the entity " + m_entityName + " does not exist.");
         }
     }
 
     @Override
-    public boolean activateAction (Entity i_entity){
-        return true;
+    public Map<String , List<Entity>> activateAction (Entity i_entity, int currTick){
+        List<Entity> secondaryEntities = null;
+        if(getCountForSecondaryEntities() != 0 && !getSecondaryName().equals(m_entityName)){
+            secondaryEntities = getSecondaryEntities();
+        }
+        Map<String , List<Entity>> res = new HashMap<>();
+        if(secondaryEntities == null || secondaryEntities.size() == 0){
+            res.put("kill", new ArrayList<>(Arrays.asList(i_entity)));
+        }else{
+            if(m_entityName.equals(i_entity.getName())){
+                res.put("kill", new ArrayList<>(Arrays.asList(i_entity)));
+            }else {
+                res.put("kill", secondaryEntities);
+            }
+        }
+        return res;
     }
 }

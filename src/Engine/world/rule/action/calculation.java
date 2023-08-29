@@ -1,37 +1,43 @@
 package Engine.world.rule.action;
 
+import Engine.utilites.Utilites;
 import Engine.world.entity.Entity;
 import Engine.generated.PRDAction;
 import Engine.world.entity.property.PropertyInterface;
 import Engine.world.expression.expression;
 import Engine.world.expression.expressionType;
 import Engine.world.expression.expressionWithFunc;
-import org.omg.CORBA.DynAnyPackage.InvalidValue;
+import Engine.InvalidValue;
 import org.omg.CORBA.OBJECT_NOT_EXIST;
 
 import java.io.Serializable;
+import java.util.*;
 
-import static Engine.utilites.Utilites.*;
-import static Engine.utilites.Utilites.getEntityDifenichan;
 
 public class calculation extends action implements Serializable {
-    private String m_entity;
-    private String m_property;
+    private String m_entityName;
+    private String m_propertyName;
     private String m_value1, m_value2;
-    private expressionWithFunc m_v1, m_v2;
+    private expressionWithFunc m_arg1, m_arg2;
+    private List<expression> m_args = new ArrayList<>();
     private boolean isMultiply = true;
-    expression v1Expression = new expression(), v2Expression = new expression();
+    private Entity m_entity = null;
+    private expression v1Expression = new expression(), v2Expression = new expression();
+    private Utilites m_util;
+    //private int m_currTick;
 
     public calculation(String entity, String property, String v1, String v2){
-        m_entity = entity;
-        m_property = property;
+        m_entityName = entity;
+        m_propertyName = property;
         m_value1 = v1;
         m_value2 = v2;
     }
 
-    public calculation(PRDAction action) throws InvalidValue{
-        m_entity = action.getEntity();
-        m_property = action.getResultProp();
+    public calculation(PRDAction action, Utilites util, String ruleName) throws InvalidValue{
+        super(action, util, ruleName);
+        m_entityName = action.getEntity();
+        m_propertyName = action.getResultProp();
+        m_util = util;
         if(action.getPRDMultiply() != null){
             m_value1 = action.getPRDMultiply().getArg1();
             m_value2 = action.getPRDMultiply().getArg2();
@@ -40,25 +46,29 @@ public class calculation extends action implements Serializable {
             m_value2 = action.getPRDDivide().getArg2();
             isMultiply = false;
         }
-        m_v1 = new expressionWithFunc();
-        m_v2 = new expressionWithFunc();
-        m_v1.convertValueInString(m_value1);
-        m_v2.convertValueInString(m_value2);
-        actionName = action.getType();
+        m_arg1 = new expressionWithFunc(util);
+        m_arg2 = new expressionWithFunc(util);
+        try {
+            m_arg1.convertValueInString(m_value1);
+            m_arg2.convertValueInString(m_value2);
+        }catch (InvalidValue e){
+            throw new InvalidValue(e.getMessage() + ". In action " + action.getType());
+        }
+        //actionName = action.getType();
         cheackUserInput();
     }
 
     private void cheackUserInput() throws InvalidValue{
         checkEntityAndPropertyExist();
-        checkTypeValid(m_v1);
-        checkTypeValid(m_v2);
-        checkCompatibilityBetweenPropertyAndExpression(m_v1);
-        checkCompatibilityBetweenPropertyAndExpression(m_v2);
+        checkTypeValid(m_arg1);
+        checkTypeValid(m_arg2);
+        checkCompatibilityBetweenPropertyAndExpression(m_arg1);
+        checkCompatibilityBetweenPropertyAndExpression(m_arg2);
     }
 
     private void checkCompatibilityBetweenPropertyAndExpression(expressionWithFunc arg) throws InvalidValue{
-        if(getEntityDifenichan(m_entity).getPropertys().get(m_property).getType() != arg.getType()){
-            if(getEntityDifenichan(m_entity).getPropertys().get(m_property).getType() == expressionType.INT && arg.getType() == expressionType.FLOAT){
+        if(m_util.getEntityDifenichan(m_entityName).getPropertys().get(m_propertyName).getType() != arg.getType()){
+            if(m_util.getEntityDifenichan(m_entityName).getPropertys().get(m_propertyName).getType() == expressionType.INT && arg.getType() == expressionType.FLOAT){
                 throw new InvalidValue("In action calculation the property and ond of the expression are not compatible");
             }
             if(arg.getType() == expressionType.STRING) {
@@ -73,14 +83,14 @@ public class calculation extends action implements Serializable {
     }
 
     private void checkExpressionIfProperty(expressionWithFunc arg) throws InvalidValue{
-        if (!getEntityDifenichan(m_entity).getPropertys().containsKey(arg.getString())) {
+        if (!m_util.getEntityDifenichan(m_entityName).getPropertys().containsKey(arg.getString())) {
             throw new InvalidValue("In action calculation there is an expression of the wrong type");
         }
-        if(!(getEntityDifenichan(m_entity).getPropertys().get(arg.getString()).getType() == expressionType.INT)){
-            if(!(getEntityDifenichan(m_entity).getPropertys().get(arg.getString()).getType() == expressionType.FLOAT)){
+        if(!(m_util.getEntityDifenichan(m_entityName).getPropertys().get(arg.getString()).getType() == expressionType.INT)){
+            if(!(m_util.getEntityDifenichan(m_entityName).getPropertys().get(arg.getString()).getType() == expressionType.FLOAT)){
                 throw new InvalidValue("In action calculation one of the expression is a property of the wrong type");
             }
-            if(!(getEntityDifenichan(m_entity).getPropertys().get(m_property).getType() == expressionType.FLOAT)){
+            if(!(m_util.getEntityDifenichan(m_entityName).getPropertys().get(m_propertyName).getType() == expressionType.FLOAT)){
                 throw new InvalidValue("In action calculation one of the expression is a property of the wrong type");
             }
         }
@@ -90,11 +100,11 @@ public class calculation extends action implements Serializable {
         if (arg.getString().equals("environment")) {
             //exprecn temp = new exprecn();
             //temp.setValue(environment(arg.getParams(0).getString()));
-            expressionType temp = getEnvironmentType(arg.getParams(0).getString());
+            expressionType temp = m_util.getEnvironmentType(arg.getParams(0).getString());
             if (temp == expressionType.STRING || temp == expressionType.BOOL) {
                 throw new InvalidValue("In action calculation one of the expression is of the wrong type");
             }
-            if (temp == expressionType.FLOAT && getEntityDifenichan(m_entity).getPropertys().get(m_property).getType() == expressionType.INT) {
+            if (temp == expressionType.FLOAT && m_util.getEntityDifenichan(m_entityName).getPropertys().get(m_propertyName).getType() == expressionType.INT) {
                 throw new InvalidValue("In action calculation the property and one of the expression are not compatible");
             }
         }
@@ -104,17 +114,17 @@ public class calculation extends action implements Serializable {
         if(arg.getType() == expressionType.BOOL){
             throw new InvalidValue("In action calculation the value  by is of the wrong type");
         }
-        if(getEntityDifenichan(m_entity).getPropertys().get(m_property).getType() == expressionType.STRING || getEntityDifenichan(m_entity).getPropertys().get(m_property).getType() == expressionType.BOOL){
+        if(m_util.getEntityDifenichan(m_entityName).getPropertys().get(m_propertyName).getType() == expressionType.STRING || m_util.getEntityDifenichan(m_entityName).getPropertys().get(m_propertyName).getType() == expressionType.BOOL){
             throw new InvalidValue("In action calculation got a wrong type property");
         }
     }
 
     private void checkEntityAndPropertyExist(){
-        if(!isEntityDifenichanExists(m_entity)){
-            throw new OBJECT_NOT_EXIST("In action calculation the entity " + m_entity + " does not exist.");
+        if(!m_util.isEntityDifenichanExists(m_entityName)){
+            throw new OBJECT_NOT_EXIST("In action calculation the entity " + m_entityName + " does not exist.");
         }
-        if(!getEntityDifenichan(m_entity).getPropertys().containsKey(m_property)){
-            throw new OBJECT_NOT_EXIST("In action calculation the property " + m_property + " of entity " + m_entity +" does not exist.");
+        if(!m_util.getEntityDifenichan(m_entityName).getPropertys().containsKey(m_propertyName)){
+            throw new OBJECT_NOT_EXIST("In action calculation the property " + m_propertyName + " of entity " + m_entityName +" does not exist.");
         }
     }
 
@@ -122,11 +132,11 @@ public class calculation extends action implements Serializable {
 
     @Override
     public String getEntityName(){
-        return m_entity;
+        return m_entityName;
     }
     @Override
     public String getPropertyName(){
-        return m_property;
+        return m_propertyName;
     }
 
     private void setArgumentValue(expression argument, expressionWithFunc v, Entity entity) throws InvalidValue{
@@ -138,7 +148,7 @@ public class calculation extends action implements Serializable {
             if (v.isFunc()) {
                 if(v.getString().equals("environment")) {
                     expression temp = new expression();
-                    temp.setValue(environment(v.getParams(0).getString()));
+                    temp.setValue(m_util.environment(v.getParams(0).getString()));
                     if (temp.getType() == expressionType.INT) {
                         argument.setValue(temp.getInt());
                     } else if (temp.getType() == expressionType.FLOAT) {
@@ -149,9 +159,9 @@ public class calculation extends action implements Serializable {
                 }
                 else if(v.getString().equals("random")){
                     expression temp = new expression();
-                    temp.setValue(random(v.getParams(0).getInt()));
+                    temp.setValue(m_util.random(v.getParams(0).getInt()));
                     if(temp.getType() == expressionType.INT) {
-                        entity.getProperty(m_property).addToProperty(temp.getInt());
+                        entity.getProperty(m_propertyName).addToProperty(temp.getInt(), m_currTick);
                     }
                     else {
                         throw new InvalidValue("In action calculation can't use value arg");
@@ -180,44 +190,95 @@ public class calculation extends action implements Serializable {
         }
         //do not get here
     }
-    
     @Override
-    public boolean activateAction(Entity entity) throws InvalidValue{
-        expression v1 = new expression(), v2 = new expression();
-        setArgumentValue(v1, m_v1, entity);
-        setArgumentValue(v2, m_v2, entity);
+    protected void wrapper(int value)throws InvalidValue{
+        expression temp = new expression();
+        temp.setValue(value);
+        m_args.add(temp);
+    }
+    @Override
+    protected void wrapper(float value)throws InvalidValue{
+        expression temp = new expression();
+        temp.setValue(value);
+        m_args.add(temp);
+    }
 
-        if(v1.getType() == v2.getType() && v2.getType() == expressionType.INT){
-            setProperty(v1.getInt(), v2.getInt(), entity);
-            return false;
+    public boolean doCalculation(Entity entity) throws InvalidValue{
+        m_entity = entity;
+        activate(m_arg1, entity, m_util);
+        activate(m_arg2, entity, m_util);
+
+        expression v1 = m_args.get(m_args.size() - 1), v2 = m_args.get(m_args.size() - 2);
+        //setArgumentValue(v1, m_arg1, entity);
+        //setArgumentValue(v2, m_arg2, entity);
+        try {
+            if (v1.getType() == v2.getType() && v2.getType() == expressionType.INT) {
+                setProperty(v1.getInt(), v2.getInt(), entity);
+                return false;
+            }
+            if (v1.getType() == v2.getType() && v2.getType() == expressionType.FLOAT) {
+                setProperty(v1.getFloat(), v2.getFloat(), entity);
+                return false;
+            }
+            if (v1.getType() == expressionType.INT && v2.getType() == expressionType.FLOAT) {
+                setProperty(v1.getInt(), v2.getFloat(), entity);
+                return false;
+            }
+            if (v1.getType() == expressionType.FLOAT && v2.getType() == expressionType.INT) {
+                setProperty(v1.getFloat(), v2.getInt(), entity);
+                return false;
+            }
+            throw new InvalidValue("In action calculation can't use value arg");
         }
-        if(v1.getType() == v2.getType() && v2.getType() == expressionType.FLOAT){
-            setProperty(v1.getFloat(), v2.getFloat(), entity);
-            return false;
+        finally{
+            m_args.clear();
         }
-        if(v1.getType() == expressionType.INT && v2.getType() == expressionType.FLOAT){
-            setProperty(v1.getInt() , v2.getFloat() , entity);
-            return false;
-        }
-        if(v1.getType() == expressionType.FLOAT && v2.getType() == expressionType.INT){
-            setProperty(v1.getFloat() , v2.getInt(), entity);
-            return false;
-        }
-        throw new InvalidValue("In action calculation can't use value arg");
         //return false;
         //exepcen
     }
 
+    @Override
+    public Map<String, List<Entity>> activateAction(Entity entity, int currTick) throws InvalidValue{
+        m_currTick = currTick;
+        List<Entity> secondaryEntities = null;
+        if(getCountForSecondaryEntities() != 0 && !getSecondaryName().equals(m_entityName)){
+            secondaryEntities = getSecondaryEntities();
+        }
+        if(secondaryEntities == null || secondaryEntities.size() == 0){
+            m_arg1.setEntityParams(new ArrayList<>(Arrays.asList(entity)));
+            m_arg2.setEntityParams(new ArrayList<>(Arrays.asList(entity)));
+            loopThroughEntities(entity);
+        }else{
+            m_arg1.setEntityParams(new ArrayList<>(Arrays.asList(entity, secondaryEntities.get(0))));
+            m_arg2.setEntityParams(new ArrayList<>(Arrays.asList(entity, secondaryEntities.get(0))));
+            if(m_entityName.equals(entity.getName())){
+                secondaryEntities.stream().forEach(secondaryEntity ->{m_arg1.switchLastEntityParam(secondaryEntity);
+                                                                m_arg2.switchLastEntityParam(secondaryEntity);
+                                                                loopThroughEntities(entity);});
+            }else {
+                secondaryEntities.stream().forEach(secondaryEntity ->{m_arg1.switchLastEntityParam(secondaryEntity);
+                                                    m_arg2.switchLastEntityParam(secondaryEntity);
+                                                    loopThroughEntities(secondaryEntity);});
+            }
+        }
+        return new HashMap<>();
+    }
+
+    private void loopThroughEntities(Entity entity){
+        m_entity = entity;
+        doCalculation(entity);
+    }
+
     public void setProperty(int v1, int v2, Entity entity){
         if(isMultiply){
-            entity.getProperty(m_property).setProperty(v1 * v2);
+            entity.getProperty(m_propertyName).setProperty(v1 * v2, m_currTick);
         }
         else{
             if(v2 == 0){
-                throw new ArithmeticException("In action calculation with entity " + m_entity + "and property" + m_property + " ,divided by zero in");
+                throw new ArithmeticException("In action calculation with entity " + m_entityName + "and property" + m_propertyName + " ,divided by zero in");
             }
             if(v1 % v2 == 0) {
-                entity.getProperty(m_property).setProperty(v1 / v2);
+                entity.getProperty(m_propertyName).setProperty(v1 / v2, m_currTick);
             }
         }
 
@@ -225,13 +286,13 @@ public class calculation extends action implements Serializable {
 
     public void setProperty(float v1, float v2, Entity entity){
         if(isMultiply){
-            entity.getProperty(m_property).setProperty(v1 * v2);
+            entity.getProperty(m_propertyName).setProperty(v1 * v2, m_currTick);
         }
         else{
             if(v2 == 0){
-                throw new ArithmeticException("In action calculation with entity " + m_entity + "and property" + m_property + " ,divided by zero in");
+                throw new ArithmeticException("In action calculation with entity " + m_entityName + "and property" + m_propertyName + " ,divided by zero in");
             }
-            entity.getProperty(m_property).setProperty(v1 / v2);
+            entity.getProperty(m_propertyName).setProperty(v1 / v2, m_currTick);
         }
     }
 

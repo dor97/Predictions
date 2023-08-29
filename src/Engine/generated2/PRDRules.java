@@ -6,7 +6,7 @@
 //
 
 
-package Engine.generated;
+package Engine.generated2;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,7 +27,7 @@ import javax.xml.bind.annotation.XmlType;
  *   &lt;complexContent>
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *       &lt;sequence>
- *         &lt;element ref="{}PRD-entity" maxOccurs="unbounded"/>
+ *         &lt;element ref="{}PRD-rule" maxOccurs="unbounded"/>
  *       &lt;/sequence>
  *     &lt;/restriction>
  *   &lt;/complexContent>
@@ -38,41 +38,41 @@ import javax.xml.bind.annotation.XmlType;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "", propOrder = {
-    "prdEntity"
+    "prdRule"
 })
-@XmlRootElement(name = "PRD-entities")
-public class PRDEntities {
+@XmlRootElement(name = "PRD-rules")
+public class PRDRules {
 
-    @XmlElement(name = "PRD-entity", required = true)
-    protected List<PRDEntity> prdEntity;
+    @XmlElement(name = "PRD-rule", required = true)
+    protected List<PRDRule> prdRule;
 
     /**
-     * Gets the value of the prdEntity property.
+     * Gets the value of the prdRule property.
      * 
      * <p>
      * This accessor method returns a reference to the live list,
      * not a snapshot. Therefore any modification you make to the
      * returned list will be present inside the JAXB object.
-     * This is why there is not a <CODE>set</CODE> method for the prdEntity property.
+     * This is why there is not a <CODE>set</CODE> method for the prdRule property.
      * 
      * <p>
      * For example, to add a new item, do as follows:
      * <pre>
-     *    getPRDEntity().add(newItem);
+     *    getPRDRule().add(newItem);
      * </pre>
      * 
      * 
      * <p>
      * Objects of the following type(s) are allowed in the list
-     * {@link PRDEntity }
+     * {@link PRDRule }
      * 
      * 
      */
-    public List<PRDEntity> getPRDEntity() {
-        if (prdEntity == null) {
-            prdEntity = new ArrayList<PRDEntity>();
+    public List<PRDRule> getPRDRule() {
+        if (prdRule == null) {
+            prdRule = new ArrayList<PRDRule>();
         }
-        return this.prdEntity;
+        return this.prdRule;
     }
 
 }

@@ -2,10 +2,10 @@ package Engine.world.entity.property;
 
 import DTO.DTOPropertyData;
 import DTO.DTOPropertyType;
+import Engine.InvalidValue;
 import Engine.generated.PRDProperty;
 import Engine.world.expression.expression;
 import Engine.world.expression.expressionType;
-import org.omg.CORBA.DynAnyPackage.InvalidValue;
 
 import java.io.Serializable;
 
@@ -34,7 +34,7 @@ public class propertyDifenichan implements Serializable {
         }
         m_init = new expression();
         m_init.convertValueInString(p.getPRDValue().getInit());
-        if(m_type != m_init.getType()){
+        if(m_type != m_init.getType() && (!(m_type == expressionType.FLOAT && m_init.getType() == expressionType.INT))){
             throw new InvalidValue("In property " + m_name + " got a wrong type value");
         }
 

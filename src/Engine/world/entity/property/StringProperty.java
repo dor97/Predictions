@@ -10,6 +10,8 @@ public class StringProperty extends Property implements Serializable {
 
     private String m_name;
     private String m_property;
+    //private int lastTickChanged = 0;
+
 
     public StringProperty(propertyDifenichan propertyDifenichan) {
         super(propertyType.STRING);
@@ -17,6 +19,27 @@ public class StringProperty extends Property implements Serializable {
         if (propertyDifenichan.getType() != expressionType.STRING){
             //exception
         }
+        init(propertyDifenichan);
+/*        if(propertyDifenichan.isRandom()){
+            final int maxTabsInRandomString = 50;
+            m_property = generateRandomString(maxTabsInRandomString);
+        }
+        else{
+            m_property = propertyDifenichan.getInit().getString();
+        }*/
+    }
+
+    public StringProperty(propertyDifenichan propertyDifenichan, PropertyInterface secondaryProperty){
+        super(propertyType.STRING);
+        m_name = propertyDifenichan.getName();
+        if(secondaryProperty.getType() == propertyType.STRING){
+            m_property = (String) secondaryProperty.getValue();
+        }
+        else{
+            init(propertyDifenichan);
+        }
+    }
+    private void init(propertyDifenichan propertyDifenichan){
         if(propertyDifenichan.isRandom()){
             final int maxTabsInRandomString = 50;
             m_property = generateRandomString(maxTabsInRandomString);
@@ -25,7 +48,6 @@ public class StringProperty extends Property implements Serializable {
             m_property = propertyDifenichan.getInit().getString();
         }
     }
-
     public StringProperty(EnvironmentDifenichan environmentDifenichan){
         super(propertyType.STRING);
         m_name = environmentDifenichan.getName();
@@ -69,9 +91,11 @@ public class StringProperty extends Property implements Serializable {
         return m_name;
     }
     @Override
-    public void setProperty(String i_property) {
+    public void setProperty(String i_property, int currTick) {
+        lastTickChanged = currTick;
         m_property = i_property;
     }
+
 //    @Override
 //    public DTOEnvironmentVariablesValues makeDtoEnvironment(){
 //        return new DTOEnvironmentVariablesValues(m_name, m_property);

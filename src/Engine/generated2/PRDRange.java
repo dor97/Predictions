@@ -6,7 +6,7 @@
 //
 
 
-package Engine.generated;
+package Engine.generated2;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -24,8 +24,8 @@ import javax.xml.bind.annotation.XmlType;
  * &lt;complexType>
  *   &lt;complexContent>
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
- *       &lt;attribute name="random-initialize" use="required" type="{http://www.w3.org/2001/XMLSchema}boolean" />
- *       &lt;attribute name="init" type="{http://www.w3.org/2001/XMLSchema}string" />
+ *       &lt;attribute name="to" use="required" type="{http://www.w3.org/2001/XMLSchema}double" />
+ *       &lt;attribute name="from" use="required" type="{http://www.w3.org/2001/XMLSchema}double" />
  *     &lt;/restriction>
  *   &lt;/complexContent>
  * &lt;/complexType>
@@ -35,52 +35,44 @@ import javax.xml.bind.annotation.XmlType;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "")
-@XmlRootElement(name = "PRD-value")
-public class PRDValue {
+@XmlRootElement(name = "PRD-range")
+public class PRDRange {
 
-    @XmlAttribute(name = "random-initialize", required = true)
-    protected boolean randomInitialize;
-    @XmlAttribute(name = "init")
-    protected String init;
+    @XmlAttribute(name = "to", required = true)
+    protected double to;
+    @XmlAttribute(name = "from", required = true)
+    protected double from;
 
     /**
-     * Gets the value of the randomInitialize property.
+     * Gets the value of the to property.
      * 
      */
-    public boolean isRandomInitialize() {
-        return randomInitialize;
+    public double getTo() {
+        return to;
     }
 
     /**
-     * Sets the value of the randomInitialize property.
+     * Sets the value of the to property.
      * 
      */
-    public void setRandomInitialize(boolean value) {
-        this.randomInitialize = value;
+    public void setTo(double value) {
+        this.to = value;
     }
 
     /**
-     * Gets the value of the init property.
+     * Gets the value of the from property.
      * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
      */
-    public String getInit() {
-        return init;
+    public double getFrom() {
+        return from;
     }
 
     /**
-     * Sets the value of the init property.
+     * Sets the value of the from property.
      * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
      */
-    public void setInit(String value) {
-        this.init = value;
+    public void setFrom(double value) {
+        this.from = value;
     }
 
 }

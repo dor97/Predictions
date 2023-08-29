@@ -1,36 +1,49 @@
 package Engine.world.rule.action;
 
+import Engine.utilites.Utilites;
 import Engine.world.entity.Entity;
 import Engine.generated.PRDAction;
-import Engine.world.expression.expression;
 import Engine.world.expression.expressionType;
 import Engine.world.expression.expressionWithFunc;
-import org.omg.CORBA.DynAnyPackage.InvalidValue;
+import Engine.InvalidValue;
 import org.omg.CORBA.OBJECT_NOT_EXIST;
 
 import java.io.Serializable;
-
-import static Engine.utilites.Utilites.*;
+import java.util.*;
 
 public class addValue extends action implements Serializable {  //increase or decrease
-    private String m_entity;
-    private String m_property;
+    private String m_entityName;
+    private String m_propertyName;
     private expressionWithFunc m_by;
-    int sign;
+    private int sign;
+    private Entity m_entity = null;
+    private Utilites m_util;
+    //private int m_currTick;
+//    private boolean isSecondaryAll = false;
+//    private int countForSecondaryEntities = 0;
+//    private String m_secondaryEntity;
+//    private single condition = null;
 
     public addValue(String entity, String property, String by) {
-        m_entity = entity;
-        m_property = property;
+        m_entityName = entity;
+        m_propertyName = property;
         m_by.convertValueInString(by);
     }
 
-    public addValue(PRDAction action) throws InvalidValue {
-        m_by = new expressionWithFunc();
-        m_by.convertValueInString(action.getBy());
-        m_entity = action.getEntity();
-        m_property = action.getProperty();
+    public addValue(PRDAction action, Utilites util, String ruleName) throws InvalidValue {
+        super(action, util, ruleName);
+        m_by = new expressionWithFunc(util);
+        try {
+            m_by.convertValueInString(action.getBy());
+        }
+        catch (InvalidValue e){
+            throw new InvalidValue(e.getMessage() + ". In action " + action.getType());
+        }
+        m_entityName = action.getEntity();
+        m_propertyName = action.getProperty();
         sign = action.getType().equals("increase") ? 1 : -1;
-        actionName = action.getType();
+        //getActionName() = action.getType();
+        m_util = util;
         cheackUserInput();
     }
 
@@ -41,9 +54,9 @@ public class addValue extends action implements Serializable {  //increase or de
     }
 
     private void checkCompatibilityBetweenPropertyAndExpression() throws InvalidValue{
-        if(getEntityDifenichan(m_entity).getPropertys().get(m_property).getType() != m_by.getType()){
-            if(getEntityDifenichan(m_entity).getPropertys().get(m_property).getType() == expressionType.INT && m_by.getType() == expressionType.FLOAT){
-                throw new InvalidValue("In action " + actionName +" the property and the value by are not compatible");
+        if(m_util.getEntityDifenichan(m_entityName).getPropertys().get(m_propertyName).getType() != m_by.getType()){
+            if(m_util.getEntityDifenichan(m_entityName).getPropertys().get(m_propertyName).getType() == expressionType.INT && m_by.getType() == expressionType.FLOAT){
+                throw new InvalidValue("In action " + getActionName() +" the property and the value by are not compatible");
             }
             if(m_by.getType() == expressionType.STRING) {
                 if (!m_by.isFunc()) {
@@ -57,15 +70,15 @@ public class addValue extends action implements Serializable {  //increase or de
     }
 
     private void checkExpressionIfProperty() throws InvalidValue{
-        if (!getEntityDifenichan(m_entity).getPropertys().containsKey(m_by.getString())) {
-            throw new InvalidValue("In action " + actionName + " the value by is of the wrong type");
+        if (!m_util.getEntityDifenichan(m_entityName).getPropertys().containsKey(m_by.getString())) {
+            throw new InvalidValue("In action " + getActionName() + " the value by is of the wrong type");
         }
-        if(!(getEntityDifenichan(m_entity).getPropertys().get(m_by.getString()).getType() == expressionType.INT)){
-            if(!(getEntityDifenichan(m_entity).getPropertys().get(m_by.getString()).getType() == expressionType.FLOAT)){
-                throw new InvalidValue("In action " + actionName + " the value by is a property of the wrong type");
+        if(!(m_util.getEntityDifenichan(m_entityName).getPropertys().get(m_by.getString()).getType() == expressionType.INT)){
+            if(!(m_util.getEntityDifenichan(m_entityName).getPropertys().get(m_by.getString()).getType() == expressionType.FLOAT)){
+                throw new InvalidValue("In action " + getActionName() + " the value by is a property of the wrong type");
             }
-            if(!(getEntityDifenichan(m_entity).getPropertys().get(m_property).getType() == expressionType.FLOAT)){
-                throw new InvalidValue("In action " + actionName + " the value by is a property of the wrong type");
+            if(!(m_util.getEntityDifenichan(m_entityName).getPropertys().get(m_propertyName).getType() == expressionType.FLOAT)){
+                throw new InvalidValue("In action " + getActionName() + " the value by is a property of the wrong type");
             }
         }
     }
@@ -74,97 +87,116 @@ public class addValue extends action implements Serializable {  //increase or de
         if (m_by.getString().equals("environment")) {
             //exprecn temp = new exprecn();
             //temp.setValue(environment(m_by.getParams(0).getString()));
-            expressionType temp = getEnvironmentType(m_by.getParams(0).getString());
+            expressionType temp = m_util.getEnvironmentType(m_by.getParams(0).getString());
             if (temp == expressionType.STRING || temp == expressionType.BOOL) {
-                throw new InvalidValue("In action " + actionName + " the value by is of the wrong type");
+                throw new InvalidValue("In action " + getActionName() + " the value by is of the wrong type");
             }
-            if (temp == expressionType.FLOAT && getEntityDifenichan(m_entity).getPropertys().get(m_property).getType() == expressionType.INT) {
-                throw new InvalidValue("In action " + actionName + " the property and the value by are not compatible");
+            if (temp == expressionType.FLOAT && m_util.getEntityDifenichan(m_entityName).getPropertys().get(m_propertyName).getType() == expressionType.INT) {
+                throw new InvalidValue("In action " + getActionName() + " the property and the value by are not compatible");
             }
         }
     }
 
     private void checkTypeValid() throws InvalidValue{
         if(m_by.getType() == expressionType.BOOL){
-            throw new InvalidValue("In action " + actionName + " the value  by is of the wrong type");
+            throw new InvalidValue("In action " + getActionName() + " the value  by is of the wrong type");
         }
-        if(getEntityDifenichan(m_entity).getPropertys().get(m_property).getType() == expressionType.STRING || getEntityDifenichan(m_entity).getPropertys().get(m_property).getType() == expressionType.BOOL){
-            throw new InvalidValue("In action " + actionName + " got a wrong type property");
+        if(m_util.getEntityDifenichan(m_entityName).getPropertys().get(m_propertyName).getType() == expressionType.STRING || m_util.getEntityDifenichan(m_entityName).getPropertys().get(m_propertyName).getType() == expressionType.BOOL){
+            throw new InvalidValue("In action " + getActionName() + " got a wrong type property");
         }
     }
 
     private void checkEntityAndPropertyExist(){
-        if(!isEntityDifenichanExists(m_entity)){
-            throw new OBJECT_NOT_EXIST("In action " + actionName + " the entity " + m_entity + " does not exist.");
+        if(!m_util.isEntityDifenichanExists(m_entityName)){
+            throw new OBJECT_NOT_EXIST("In action " + getActionName() + " the entity " + m_entity + " does not exist.");
         }
-        if(!getEntityDifenichan(m_entity).getPropertys().containsKey(m_property)){
-            throw new OBJECT_NOT_EXIST("In action " + actionName + " the property " + m_property + " of entity " + m_entity +" does not exist.");
+        if(!m_util.getEntityDifenichan(m_entityName).getPropertys().containsKey(m_propertyName)){
+            throw new OBJECT_NOT_EXIST("In action " + getActionName() + " the property " + m_propertyName + " of entity " + m_entity +" does not exist.");
         }
     }
 
     @Override
     public String getEntityName(){
-        return m_entity;
+        return m_entityName;
     }
     @Override
     public String getPropertyName(){
-        return m_property;
+        return m_propertyName;
     }
     @Override
-    public boolean activateAction(Entity entity)throws InvalidValue{
-        if(m_by.getType() == expressionType.INT) {
-            entity.getProperty(m_property).addToProperty(sign * m_by.getInt());
+    public Map<String, List<Entity>> activateAction(Entity entity, int currTick)throws InvalidValue{
+        m_currTick = currTick;
+        List<Entity> secondaryEntities = null;
+        if(getCountForSecondaryEntities() != 0 && !getSecondaryName().equals(m_entityName)){
+            secondaryEntities = getSecondaryEntities();
         }
-        else if (m_by.getType() == expressionType.FLOAT) {
-            entity.getProperty(m_property).addToProperty(sign * m_by.getFloat());
-        }
-        else if(m_by.getType() == expressionType.STRING){
-            if(m_by.isFunc()){
-                if(m_by.getString().equals("environment")){
-                    expression temp = new expression();
-                    temp.setValue(environment(m_by.getParams(0).getString()));
-                    if(temp.getType() == expressionType.INT) {
-                        entity.getProperty(m_property).addToProperty(sign * temp.getInt());
-                    }
-                    else if (temp.getType() == expressionType.FLOAT) {
-                        entity.getProperty(m_property).addToProperty(sign * temp.getFloat());
-                    }
-                    else{
-                        throw new InvalidValue("In action " + actionName + "can't use value by");
-                    }
-                } else if(m_by.getString().equals("random")){
-                    expression temp = new expression();
-                    temp.setValue(random(m_by.getParams(0).getInt()));
-                    if(temp.getType() == expressionType.INT) {
-                        entity.getProperty(m_property).addToProperty(sign * temp.getInt());
-                    }
-                    else{
-                        throw new InvalidValue("In action " + actionName + "can't use value by");
-                    }
-                }
-            }
-            else {
-                if(entity.isPropertyExists(m_by.getString())){
-                    expression temp = new expression();
-                    temp.setValue(entity.getProperty(m_by.getString()).getValue());
-                    if(m_by.getType() == expressionType.INT) {
-                        entity.getProperty(m_property).addToProperty(sign * m_by.getInt());
-                    }
-                    else if (m_by.getType() == expressionType.FLOAT) {
-                        entity.getProperty(m_property).addToProperty(sign * m_by.getFloat());
-                    }
-                    else{
-                        throw new InvalidValue("In action " + actionName + "can't use value by");
-                    }
-                }
-                else {
-                    throw new InvalidValue("In action " + actionName + "can't use value by");
-                }
+        if(secondaryEntities == null || secondaryEntities.size() == 0){
+            m_by.setEntityParams(new ArrayList<>(Arrays.asList(entity)));
+            loopThroughEntities(entity);
+        }else{
+            m_by.setEntityParams(new ArrayList<>(Arrays.asList(entity, secondaryEntities.get(0))));
+            if(m_entityName.equals(entity.getName())){
+                secondaryEntities.stream().forEach(secondaryEntity ->{m_by.switchLastEntityParam(secondaryEntity);loopThroughEntities(entity);});
+            }else {
+                secondaryEntities.stream().forEach(secondaryEntity -> {m_by.switchLastEntityParam(secondaryEntity);
+                    loopThroughEntities(secondaryEntity);});
             }
         }
-        else if (m_by.getType() == expressionType.BOOL){
-            throw new InvalidValue("In action " + actionName + "can't use value by");
-        }
-        return false;
+        return new HashMap<>();
     }
+
+    private void loopThroughEntities(Entity entity){
+        m_entity = entity;
+        activate(m_by, entity, m_util);
+    }
+
+//    @Override
+//    public boolean isSecondaryAll() {
+//        return false;
+//    }
+//
+//    @Override
+//    public int getCountForSecondaryEntities() {
+//        return 0;
+//    }
+//
+//    @Override
+//    public String getSecondaryName() {
+//        return null;
+//    }
+//
+//    @Override
+//    public single getCondition() {
+//        return null;
+//    }
+
+    @Override
+    protected void wrapper(int value)throws InvalidValue{
+        m_entity.getProperty(m_propertyName).addToProperty(sign * value, m_currTick);
+    }
+    @Override
+    protected void wrapper(float value)throws InvalidValue{
+        m_entity.getProperty(m_propertyName).addToProperty(sign * value, m_currTick);
+    }
+
+
+//    private void activate(expressionWithFunc value, Entity entity)throws InvalidValue{
+//        if(value.getType() == expressionType.INT) {
+//            entity.getProperty(m_propertyName).addToProperty(sign * value.getInt());
+//        }
+//        else if (value.getType() == expressionType.FLOAT) {
+//            entity.getProperty(m_propertyName).addToProperty(sign * value.getFloat());
+//        }
+//        else if (value.getType() == expressionType.BOOL){
+//            throw new InvalidValue("In action " + getActionName() + "can't use value by");
+//        }
+//        else if(value.getType() == expressionType.STRING){
+//            expressionWithFunc temp = value.decipherValue(entity);
+//            if(temp == value){
+//                throw new InvalidValue("In action " + getActionName() + "can't use value by");
+//            }else{
+//                activate(temp, entity);
+//            }
+//        }
+//    }
 }

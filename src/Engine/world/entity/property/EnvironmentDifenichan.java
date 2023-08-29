@@ -2,10 +2,10 @@ package Engine.world.entity.property;
 
 import DTO.DTOEnvironmentVariables;
 import DTO.DTOPropertyType;
+import Engine.InvalidValue;
 import Engine.generated.PRDEnvProperty;
 import Engine.world.expression.expression;
 import Engine.world.expression.expressionType;
-import org.omg.CORBA.DynAnyPackage.InvalidValue;
 
 import java.io.Serializable;
 
