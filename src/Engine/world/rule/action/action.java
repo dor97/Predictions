@@ -26,7 +26,7 @@ public class action implements ActionInterface, Serializable {
     private String entityName;
     private Utilites m_util;
     private String targetEntity;
-    protected int m_currTick;
+    protected int m_currTick = 0;
 
     public action(){}
     public action(PRDAction action, Utilites util, String ruleName){
@@ -159,7 +159,8 @@ public class action implements ActionInterface, Serializable {
     }
 
     protected List<Entity> getSecondaryEntities(){
-        List<Entity> secondaries = m_util.getEntitiesByName(m_secondaryEntity);
+        List<Entity> secondaries = condition == null ? m_util.getEntitiesByName(m_secondaryEntity) :
+                                        m_util.getEntitiesByName(m_secondaryEntity).stream().filter(secondary -> condition.getBoolValue(secondary, m_currTick)).collect(Collectors.toList());
 
         if (isSecondaryAll()) {
             return secondaries;

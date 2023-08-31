@@ -116,6 +116,9 @@ public class condition extends action implements Serializable {
 
     private Map<String, List<Entity>> activeOnce(Entity entity){
         Map<String, List<Entity>> killAndCreat = new HashMap<>();
+        if(m_subCon.shouldIgnore(entity)){
+            return killAndCreat;
+        }
         if (m_subCon.getBoolValue(entity, m_currTick)) {
             m_then.stream().forEach(actionInterface -> actionInterface.activateAction(entity, m_currTick).forEach((key, value) -> killAndCreat.merge(key, value, (list1, list2) -> {
                 list1.addAll(list2);

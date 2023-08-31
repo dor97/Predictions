@@ -135,6 +135,13 @@ public class single implements subCondition, Serializable {
         return active(propertyValue, m_exprecn, temp);
 
     }
+    @Override
+    public boolean shouldIgnore(Entity entity){
+        if(!m_entityName.equals(entity.getName())){
+            return true;
+        }
+        return false;
+    }
 
     @Override
     public boolean getBoolValue(Entity entity, int currTick) throws InvalidValue{

@@ -9,4 +9,6 @@ public interface subCondition {
     public boolean getBoolValue(Entity entity, int currTick) throws InvalidValue;
     public boolean getBoolValue(Entity entity, Entity secondaryEntity, int currTick) throws InvalidValue;
 
+    public boolean shouldIgnore(Entity entity);
+
 }

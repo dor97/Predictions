@@ -51,19 +51,28 @@ public class multiple implements subCondition, Serializable {
             return false;
         }
     }
+    @Override
+    public boolean shouldIgnore(Entity entity){
+        for(subCondition condition : m_conditions){
+            if(!condition.shouldIgnore(entity)){
+                return false;
+            }
+        }
+        return true;
+    }
 
     @Override
     public boolean getBoolValue(Entity entity, Entity secondaryEntity, int currTick){
         if(m_logical == logicalOp.AND){
             for(subCondition condition : m_conditions){
-                if(condition.getBoolValue(entity, secondaryEntity, currTick) == false){
+                if(!condition.shouldIgnore(entity) && condition.getBoolValue(entity, secondaryEntity, currTick) == false){
                     return false;
                 }
             }
             return true;
         } else if (m_logical == logicalOp.OR) {
             for(subCondition condition : m_conditions){
-                if(condition.getBoolValue(entity, secondaryEntity, currTick) == false){
+                if(!condition.shouldIgnore(entity) && condition.getBoolValue(entity, secondaryEntity, currTick) == false){
                     return true;
                 }
             }
