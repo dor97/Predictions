@@ -1,5 +1,6 @@
 package Engine.world.rule.action;
 
+import DTO.DTOActionData;
 import Engine.generated.PRDAction;
 import Engine.utilites.Utilites;
 import Engine.world.entity.Entity;
@@ -172,5 +173,10 @@ public class action implements ActionInterface, Serializable {
             //secondary = temp.stream().mapToObj(i -> temp.get(random.nextInt(temp.size()))).limit(actionInterface.getCountForSecondaryEntities())
         }
     }
+    @Override
+    public DTOActionData makeActionDto(){
+        DTOActionData actionData = new DTOActionData(getActionName());
 
+        return actionData;
+    }
 }

@@ -123,4 +123,8 @@ public class expression implements Serializable {
     public expressionType getType(){
         return m_type;
     }
+    @Override
+    public String toString(){
+        return getValue().toString();
+    }
 }

@@ -241,16 +241,16 @@ public class calculation extends action implements Serializable {
     public Map<String, List<Entity>> activateAction(Entity entity, int currTick) throws InvalidValue{
         m_currTick = currTick;
         List<Entity> secondaryEntities = null;
-        if(getCountForSecondaryEntities() != 0 && !getSecondaryName().equals(m_entityName)){
+        if(getCountForSecondaryEntities() != 0){
             secondaryEntities = getSecondaryEntities();
         }
-        if(secondaryEntities == null || secondaryEntities.size() == 0){
+        if(secondaryEntities == null){
             m_arg1.setEntityParams(new ArrayList<>(Arrays.asList(entity)));
             m_arg2.setEntityParams(new ArrayList<>(Arrays.asList(entity)));
             loopThroughEntities(entity);
         }else{
-            m_arg1.setEntityParams(new ArrayList<>(Arrays.asList(entity, secondaryEntities.get(0))));
-            m_arg2.setEntityParams(new ArrayList<>(Arrays.asList(entity, secondaryEntities.get(0))));
+            m_arg1.setEntityParams(new ArrayList<>(Arrays.asList(entity, entity)));
+            m_arg2.setEntityParams(new ArrayList<>(Arrays.asList(entity, entity)));
             if(m_entityName.equals(entity.getName())){
                 secondaryEntities.stream().forEach(secondaryEntity ->{m_arg1.switchLastEntityParam(secondaryEntity);
                                                                 m_arg2.switchLastEntityParam(secondaryEntity);

@@ -48,35 +48,15 @@ public class condition extends action implements Serializable {
         else if (action.getPRDCondition().getSingularity().equals("single")){
             m_subCon = new single(action.getPRDCondition(), util);
         }
+        actionFactory factory = new actionFactory();
         m_then = new ArrayList<>();
         for(PRDAction thanAction : action.getPRDThen().getPRDAction()){
-            if (thanAction.getType().equals("increase") || thanAction.getType().equals("decrease")) {
-                m_then.add(new addValue(thanAction, util, getRuleName()));
-            } else if (thanAction.getType().equals("calculation")) {
-                m_then.add(new calculation(thanAction, util, getRuleName()));
-            } else if (thanAction.getType().equals("condition")) {
-                m_then.add(new condition(thanAction, util, getRuleName()));
-            } else if (thanAction.getType().equals("set")) {
-                m_then.add(new set(thanAction, util, getRuleName()));
-            } else if (thanAction.getType().equals("kill")) {
-                m_then.add(new kill(thanAction, util, getRuleName()));
-            }
-
+            m_then.add(factory.makeAction(thanAction, util, getRuleName()));
         }
         if(action.getPRDElse() != null){
             m_else = new ArrayList<>();
             for(PRDAction elseAction : action.getPRDElse().getPRDAction()){
-                if (elseAction.getType().equals("increase") || elseAction.getType().equals("decrease")) {
-                    m_else.add(new addValue(elseAction, util, getRuleName()));
-                } else if (elseAction.getType().equals("calculation")) {
-                    m_else.add(new calculation(elseAction, util, getRuleName()));
-                } else if (elseAction.getType().equals("condition")) {
-                    m_else.add(new condition(elseAction, util, getRuleName()));
-                } else if (elseAction.getType().equals("set")) {
-                    m_else.add(new set(elseAction, util, getRuleName()));
-                } else if (elseAction.getType().equals("kill")) {
-                    m_else.add(new kill(elseAction, util, getRuleName()));
-                }
+                m_else.add(factory.makeAction(elseAction, util, getRuleName()));
             }
         }
     }
@@ -120,7 +100,7 @@ public class condition extends action implements Serializable {
             return killAndCreat;
         }
         if (m_subCon.getBoolValue(entity, m_currTick)) {
-            m_then.stream().forEach(actionInterface -> actionInterface.activateAction(entity, m_currTick).forEach((key, value) -> killAndCreat.merge(key, value, (list1, list2) -> {
+            m_then.stream().forEach(actionInterface -> activateActionWithSecondary(actionInterface,entity, new ArrayList<>()).forEach((key, value) -> killAndCreat.merge(key, value, (list1, list2) -> {
                 list1.addAll(list2);
                 return list1;
             })));
@@ -133,7 +113,7 @@ public class condition extends action implements Serializable {
             //}
         } else {
             if (m_else != null) {
-                m_else.stream().forEach(actionInterface -> actionInterface.activateAction(entity, m_currTick).forEach((key, value) -> killAndCreat.merge(key, value, (list1, list2) -> {
+                m_else.stream().forEach(actionInterface -> activateActionWithSecondary(actionInterface, entity, new ArrayList<>()).forEach((key, value) -> killAndCreat.merge(key, value, (list1, list2) -> {
                     list1.addAll(list2);
                     return list1;
                 })));
@@ -168,11 +148,11 @@ public class condition extends action implements Serializable {
     public Map<String, List<Entity>> activateAction(Entity entity, int currTick) throws InvalidValue{
         m_currTick = currTick;
         List<Entity> secondaryEntities = null;
-        if(getCountForSecondaryEntities() != 0 && !getSecondaryName().equals(m_entity)){
+        if(getCountForSecondaryEntities() != 0){
             secondaryEntities = getSecondaryEntities();
         }
 
-        if(secondaryEntities == null || secondaryEntities.size() == 0){
+        if(secondaryEntities == null){  //TODO add && secondaryEntities.size() == 0 if want to activate condition even if no secondaries
             return activeOnce(entity);
         }else{
             return loopThroughEntities(entity, secondaryEntities);

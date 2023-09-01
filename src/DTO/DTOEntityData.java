@@ -3,7 +3,7 @@ package DTO;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DTOEntityData {
+public class DTOEntityData extends DTOSimulationDetailsItem{
     private String EntityName;
     private int m_amount;
     private List<DTOPropertyData> PropertList = new ArrayList<>();
@@ -27,5 +27,10 @@ public class DTOEntityData {
 
     public List<DTOPropertyData> getPropertList(){
         return PropertList;
+    }
+
+    @Override
+    public String toString(){
+        return EntityName;
     }
 }

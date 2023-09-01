@@ -39,7 +39,7 @@ public class kill extends action implements Serializable {
             secondaryEntities = getSecondaryEntities();
         }
         Map<String , List<Entity>> res = new HashMap<>();
-        if(secondaryEntities == null || secondaryEntities.size() == 0){
+        if(secondaryEntities == null){
             res.put("kill", new ArrayList<>(Arrays.asList(i_entity)));
         }else{
             if(m_entityName.equals(i_entity.getName())){

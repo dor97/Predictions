@@ -41,12 +41,12 @@ public class replace extends action{
             secondaryEntities = getSecondaryEntities();
         }
         Map<String, List<Entity>> killAndCreat = new HashMap<>();
-        if(secondaryEntities == null || secondaryEntities.size() == 0){
+        if(secondaryEntities == null){
             killAndCreat.put("kill", new ArrayList<>(Arrays.asList(entity)));
             killAndCreat.put("creat", new ArrayList<>(Arrays.asList(creatEntity(entity))));
             //loopThroughEntities(entity);
         }else{
-            if(m_entityName.equals(entity.getName())){
+            if(m_entityName.equals(entity.getName()) || secondaryEntities.size() != 0){
                 killAndCreat.put("kill", new ArrayList<>(Arrays.asList(entity)));
                 killAndCreat.put("creat", new ArrayList<>(Arrays.asList(creatEntity(entity))));
             }else {

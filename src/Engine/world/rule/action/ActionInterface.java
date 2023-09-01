@@ -1,5 +1,6 @@
 package Engine.world.rule.action;
 
+import DTO.DTOActionData;
 import Engine.InvalidValue;
 import Engine.world.entity.Entity;
 import Engine.world.entity.property.PropertyInterface;
@@ -21,4 +22,5 @@ public interface ActionInterface {
     public int getCountForSecondaryEntities();
     public String getSecondaryName();
     public single getCondition();
+    public DTOActionData makeActionDto();
 }

@@ -1,5 +1,7 @@
 package Engine.world.rule.action;
 
+import DTO.DTOActionData;
+import DTO.DTORuleData;
 import Engine.utilites.Utilites;
 import Engine.world.entity.Entity;
 import Engine.generated.PRDAction;
@@ -127,14 +129,14 @@ public class addValue extends action implements Serializable {  //increase or de
     public Map<String, List<Entity>> activateAction(Entity entity, int currTick)throws InvalidValue{
         m_currTick = currTick;
         List<Entity> secondaryEntities = null;
-        if(getCountForSecondaryEntities() != 0 && !getSecondaryName().equals(m_entityName)){
+        if(getCountForSecondaryEntities() != 0){
             secondaryEntities = getSecondaryEntities();
         }
-        if(secondaryEntities == null || secondaryEntities.size() == 0){
+        if(secondaryEntities == null){
             m_by.setEntityParams(new ArrayList<>(Arrays.asList(entity)));
             loopThroughEntities(entity);
         }else{
-            m_by.setEntityParams(new ArrayList<>(Arrays.asList(entity, secondaryEntities.get(0))));
+            m_by.setEntityParams(new ArrayList<>(Arrays.asList(entity, entity)));
             if(m_entityName.equals(entity.getName())){
                 secondaryEntities.stream().forEach(secondaryEntity ->{m_by.switchLastEntityParam(secondaryEntity);loopThroughEntities(entity);});
             }else {
@@ -199,4 +201,14 @@ public class addValue extends action implements Serializable {  //increase or de
 //            }
 //        }
 //    }
+
+    @Override
+    public DTOActionData makeActionDto(){
+        DTOActionData actionData = new DTOActionData(getActionName());
+        actionData.putData("entity", m_entityName);
+        actionData.putData("property", m_propertyName);
+        actionData.putData("by", m_by.toString());
+
+        return actionData;
+    }
 }

@@ -3,7 +3,7 @@ package DTO;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DTOSimulationDetails {
+public class DTOSimulationDetails extends DTOSimulationDetailsItem{
 
     private List<DTOEntityData> entitysList = new ArrayList<>();
 
@@ -34,5 +34,10 @@ public class DTOSimulationDetails {
 
     public List<DTOTerminationData> getTerminationList(){
         return terminationList;
+    }
+
+    @Override
+    public String toString(){
+        return "world";
     }
 }

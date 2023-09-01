@@ -132,11 +132,11 @@ public class set extends action implements Serializable {
         if(getCountForSecondaryEntities() != 0 && !getSecondaryName().equals(m_entityName)){
             secondaryEntities = getSecondaryEntities();
         }
-        if(secondaryEntities == null || secondaryEntities.size() == 0){
+        if(secondaryEntities == null){
             m_value.setEntityParams(new ArrayList<>(Arrays.asList(i_entity)));
             loopThroughEntities(i_entity);
         }else{
-            m_value.setEntityParams(new ArrayList<>(Arrays.asList(i_entity, secondaryEntities.get(0))));
+            m_value.setEntityParams(new ArrayList<>(Arrays.asList(i_entity, i_entity)));
             if(m_entityName.equals(i_entity.getName())){
                 secondaryEntities.stream().forEach(secondaryEntity ->{m_value.switchLastEntityParam(secondaryEntity);
                                                         loopThroughEntities(i_entity);});

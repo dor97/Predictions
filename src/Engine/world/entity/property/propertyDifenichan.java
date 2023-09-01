@@ -12,10 +12,10 @@ import java.io.Serializable;
 public class propertyDifenichan implements Serializable {
     private String m_name;
     private expressionType m_type;
-    private double m_lowRange, m_highRang;
-    private boolean m_randomlyIneceat;
+    private Double m_lowRange, m_highRang;
+    private Boolean m_randomlyIneceat;
     private expression m_init;
-    private boolean haveRange = false;
+    private Boolean haveRange = false;
 
     public propertyDifenichan(PRDProperty p) throws InvalidValue{
         m_name = p.getPRDName();
@@ -102,6 +102,15 @@ public class propertyDifenichan implements Serializable {
         else{
             DTO = new DTOPropertyData(m_name, type, haveRange, m_randomlyIneceat);
         }
+
+        DTO.putData("Name", m_name);
+        DTO.putData("Type", type.toString());
+        DTO.putData("HaveRange", haveRange.toString());
+        if(haveRange){
+            DTO.putData("lowRange", m_lowRange.toString());
+            DTO.putData("lowRange", m_highRang.toString());
+        }
+        DTO.putData("Random", m_randomlyIneceat.toString());
         return DTO;
     }
 

@@ -12,6 +12,7 @@ public class DecimalProperty extends Property implements Serializable {
     private int m_property;
     private Double m_lowRange, m_highRang;
     private boolean haveRange;
+    private boolean isRandom = false;
     //private int lastTickChanged = 0;
 
 
@@ -69,6 +70,7 @@ public class DecimalProperty extends Property implements Serializable {
 
     private void init(propertyDifenichan propertyDifenichan){
         if(propertyDifenichan.isRandom()){
+            isRandom = true;
             Random random = new Random();
             if(haveRange){
                 m_property = random.nextInt((int) (m_highRang - m_lowRange) + 1) + (int)m_lowRange.doubleValue();

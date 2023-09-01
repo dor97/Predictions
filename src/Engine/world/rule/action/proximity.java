@@ -31,19 +31,9 @@ public class proximity extends action {
         action.getPRDActions().getPRDAction();
 
         actions = new ArrayList<>();
+        actionFactory factory = new actionFactory();
         for (PRDAction thanAction : action.getPRDActions().getPRDAction()) {
-            if (thanAction.getType().equals("increase") || thanAction.getType().equals("decrease")) {
-                actions.add(new addValue(thanAction, util, getRuleName()));
-            } else if (thanAction.getType().equals("calculation")) {
-                actions.add(new calculation(thanAction, util, getRuleName()));
-            } else if (thanAction.getType().equals("condition")) {
-                actions.add(new condition(thanAction, util, getRuleName()));
-            } else if (thanAction.getType().equals("set")) {
-                actions.add(new set(thanAction, util, getRuleName()));
-            } else if (thanAction.getType().equals("kill")) {
-                actions.add(new kill(thanAction, util, getRuleName()));
-            }
-
+            actions.add(factory.makeAction(thanAction, util, getRuleName()));
         }
     }
 

@@ -56,7 +56,7 @@
                       <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                     </rowConstraints>
                      <children>
-                        <TreeView fx:id="detailsTreeView" prefHeight="296.0" prefWidth="215.0" />
+                        <TreeView fx:id="detailsTreeView" onContextMenuRequested="#selectItem" onMouseClicked="#selectItem" prefHeight="296.0" prefWidth="215.0" />
                         <TextArea fx:id="detailsTextArea" disable="true" prefHeight="300.0" prefWidth="375.0" GridPane.columnIndex="1" />
                      </children>
                   </GridPane>

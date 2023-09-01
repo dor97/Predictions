@@ -48,7 +48,7 @@ public class expressionWithFunc extends expression implements Serializable {
         if (getType() == expressionType.STRING) {
             if (value.contains("(") && value.contains(")")) {
                 int openParenIndex = value.indexOf('(');
-                int closeParenIndex = value.indexOf(')');
+                int closeParenIndex = value.lastIndexOf(')');
 
                 if (openParenIndex != -1 && closeParenIndex != -1) {
                     // Extract the function name
@@ -59,6 +59,8 @@ public class expressionWithFunc extends expression implements Serializable {
 
                     // Split the parameter if needed
                     String[] parameterParts = parameters.split(",");
+
+
 
                     params.clear();
                     for (String parameter : parameterParts) {
@@ -136,7 +138,8 @@ public class expressionWithFunc extends expression implements Serializable {
                 return true;
             }
         }
-        return false;
+        throw new InvalidValue("Not an existing function");
+        //return false;
     }
 
     @Override
@@ -178,8 +181,10 @@ public class expressionWithFunc extends expression implements Serializable {
         if (this.getType() == expressionType.STRING) {
             if (this.isFunc()) {
                 if (this.getString().equals("environment")) {
+                    this.getParams(0).setEntityParams(this.EntityPramsToFunc);
                     res.setValue(util.environment(this.getParams(0).decipherValue(entity, util, currTick).getString()));
                 } else if (this.getString().equals("random")) {
+                    this.getParams(0).setEntityParams(this.EntityPramsToFunc);
                     expressionWithFunc temp = this.getParams(0).decipherValue(entity, util, currTick);
                     if(temp.getType() != expressionType.INT){
                         throw new InvalidValue("wrong type of arg in random func");
@@ -189,6 +194,8 @@ public class expressionWithFunc extends expression implements Serializable {
                     Entity param = getEntityAsParam("evaluate");
                     res.setValue(param.getProperties().get(propertyName).getValue());
                 } else if (this.getString().equals("percent")) {
+                    this.getParams(0).setEntityParams(this.EntityPramsToFunc);
+                    this.getParams(1).setEntityParams(this.EntityPramsToFunc);
                     res.setValue(percent(this.getParams(0).decipherValue(entity, util, currTick), this.getParams(1).decipherValue(entity, util, currTick)));
                 } else if (this.getString().equals("ticks")) {
                     Entity param = getEntityAsParam("ticks");
@@ -221,6 +228,9 @@ public class expressionWithFunc extends expression implements Serializable {
     }
 
     private Entity getEntityAsParam(String funcName){
+        if(EntityPramsToFunc == null){
+            int x = 2;
+        }
         for(Entity entityPrams : EntityPramsToFunc){
             if(entityPrams.getName().equals(entityName)){
                 return entityPrams;
@@ -228,4 +238,9 @@ public class expressionWithFunc extends expression implements Serializable {
         }
         throw new InvalidValue("wrong entity in arg to " + funcName + " func");
     }
+
+//    @Override
+//    public String toString(){
+//        return getValue().toString();
+//    }
 }

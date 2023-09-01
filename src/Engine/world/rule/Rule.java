@@ -44,19 +44,10 @@ public class Rule implements Serializable {
         }
         random = new Random();
         m_actions = new ArrayList<>();
+        actionFactory factory = new actionFactory();
         for(PRDAction action : rule.getPRDActions().getPRDAction()){
             try {
-                if (action.getType().equals("increase") || action.getType().equals("decrease")) {
-                    m_actions.add(new addValue(action, util, m_name));
-                } else if (action.getType().equals("calculation")) {
-                    m_actions.add(new calculation(action, util, m_name));
-                } else if (action.getType().equals("condition")) {
-                    m_actions.add(new condition(action, util, m_name));
-                } else if (action.getType().equals("set")) {
-                    m_actions.add(new set(action, util, m_name));
-                } else if (action.getType().equals("kill")) {
-                    m_actions.add(new kill(action, util, m_name));
-                }
+                m_actions.add(factory.makeAction(action, util, m_name));
             }
             catch (OBJECT_NOT_EXIST e){
                 throw new OBJECT_NOT_EXIST(e.getMessage() + " referred to in rule " + m_name);
@@ -111,6 +102,7 @@ public class Rule implements Serializable {
         DTORuleData DTO = new DTORuleData(m_name, m_ticks, m_probability);
 
         for(ActionInterface action : m_actions){
+            DTO.addAction(action.makeActionDto());
             DTO.addActionName(action.getName());
             DTO.increaseNumberOfActionByOne();
         }
