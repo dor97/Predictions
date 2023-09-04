@@ -1,51 +1,25 @@
-package Controller;
+package TreeView;
+
+import App.AppController;
 import DTO.*;
 import Engine.Engine;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
-import javafx.scene.Node;
-import javafx.scene.control.*;
-import javafx.stage.FileChooser;
-import javafx.stage.Stage;
+import javafx.scene.control.TreeItem;
+import javafx.scene.control.TreeView;
+import javafx.scene.layout.BorderPane;
 
-import java.io.File;
-import java.net.URL;
 import java.util.Map;
-import java.util.Objects;
-import java.util.ResourceBundle;
 
-public class Controller implements Initializable {
-
-    @FXML private TextArea detailsTextArea;
+public class TreeViewController {
+    private AppController mainController;
     @FXML private TreeView<DTOSimulationDetailsItem> detailsTreeView;
-    @FXML private Button loadFileButton;
-    @FXML private TextField loadedFilePathTextBox;
-    @FXML private TableColumn<?, ?> queueManagementTable;
-    private Stage primaryStage;
-    private Engine engine;
+    @FXML private BorderPane borderPaneTreeView;
 
-    @Override
-    public void initialize(URL location, ResourceBundle resources) {
-        engine = new Engine();
+    public void setMainController(AppController mainController) {
+        this.mainController = mainController;
     }
-    @FXML
-    void loadFile(ActionEvent event) {
-        FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("Open File");
-        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("xml files", "*.xml"));
-        File selectedFile = fileChooser.showOpenDialog(primaryStage);
 
-        if (selectedFile == null) {
-            return;
-        }
-
-        String absolutePath = selectedFile.getAbsolutePath();
-        loadedFilePathTextBox.setText(absolutePath);
-        loadedFilePathTextBox.setDisable(true);
-;
-        System.out.println("gat world ");
-
+    public void displayFileDetails(Engine engine, String absolutePath) {
 
         try {
             engine.loadSimulation(absolutePath);
@@ -69,17 +43,20 @@ public class Controller implements Initializable {
             }
 
             detailsTreeView.setRoot(rootItem);
+            mainController.getTreeViewComponent().setLeft(detailsTreeView);
+
+            detailsTreeView.getSelectionModel().selectedItemProperty().addListener(((observable, oldValue, newValue) -> {
+                if (newValue !=null && newValue.getChildren().isEmpty()){
+                    TreeItem<DTOSimulationDetailsItem> selectedTreeItem = newValue;
+                    DTOSimulationDetailsItem selectedValue = selectedTreeItem.getValue();
+                    mainController.displayTreeItemsDetails(selectedValue);
+                }
+            }));
         }catch (Exception e){
             System.out.println(e.getMessage());
 
         }
-
-
-
-
-
     }
-
     public void selectItem(){
         TreeItem<DTOSimulationDetailsItem> item = detailsTreeView.getSelectionModel().getSelectedItem();
 
@@ -93,10 +70,4 @@ public class Controller implements Initializable {
             System.out.println(d);
         }
     }
-
-    public void setStage (Stage i_primaryStage){
-        this.primaryStage = i_primaryStage;
-    }
-
-
 }
