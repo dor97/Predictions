@@ -44,7 +44,7 @@ public class proximity extends action {
         if(!m_util.isEntityDifenichanExists(targetName)){
             throw new OBJECT_NOT_EXIST("In action set the entity " + targetName + " does not exist.");
         }
-        if(!m_util.isEntityDifenichanExists(getSecondaryName())){
+        if(getCountForSecondaryEntities() != 0 && !m_util.isEntityDifenichanExists(getSecondaryName())){
             throw new OBJECT_NOT_EXIST("In action " + getActionName() + " the entity " + getSecondaryName() + " does not exist.");
         }
     }

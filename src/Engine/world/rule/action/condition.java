@@ -65,7 +65,7 @@ public class condition extends action implements Serializable {
         if(!util.isEntityDifenichanExists(m_entity)){
             throw new OBJECT_NOT_EXIST("In action " + getActionName() + " the entity " + m_entity + " does not exist.");
         }
-        if(!util.isEntityDifenichanExists(getSecondaryName())){
+        if(getCountForSecondaryEntities() != 0 && !util.isEntityDifenichanExists(getSecondaryName())){
             throw new OBJECT_NOT_EXIST("In action " + getActionName() + " the entity " + getSecondaryName() + " does not exist.");
         }
     }
