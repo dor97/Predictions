@@ -573,26 +573,26 @@ public class World implements Serializable {
         Map<String, Pair<Float, Integer>> avPropertyValue = new HashMap<>();
         m_entities.stream().forEach(entity -> entity.getProperties().values().stream().filter(propertyInterface -> propertyInterface.getType() == propertyType.FLOAT || propertyInterface.getType() == propertyType.INT).forEach(propertyInterface -> avPropertyValue.put(entity.getName() + "_" + propertyInterface.getName(), makeNewAv(avPropertyValue.get(entity.getName() + "_" + propertyInterface.getName()), (Float)propertyInterface.getValue()))));
 
-        numOfEntitiesPerTick;
-
-        //m_entitiesDifenichan.values().stream().collect(Collectors.toMap(entityDifenichan -> entityDifenichan.getName(), entityDifenichan -> entityDifenichan.getPopulation()));
-        //m_environmentsDifenichen.values().stream().filter(environmentDifenichan -> !environmentDifenichan.isRandom()).collect(Collectors.toMap(environmentDifenichan -> environmentDifenichan.getName(), environmentDifenichan -> environmentDifenichan.getInit().getValue()));
-
-
-        for(EntityDifenichan entityDifenichan : m_entitiesDifenichan){
-            for(Entity entity : m_entities){
-                if(entity.equals(entityDifenichan)){
-                    entity.getProperties().values().stream()
-                }
-            }
-        }
-        Map<String, List<DTOEntityHistogram>>entitiesHistogram = m_entitiesDifenichan.values().stream().forEach(ent -> m.put(ent.getPropertys().keySet().stream().map(proper -> ent + "_" + proper).toString(),
-                proper -> m_entities.stream().filter(entity -> entity.getName().equals(ent))
-                        .map(e -> e.getProperties().values().stream()
-                        .filter(pro -> pro.getName().equals(proper))
-                        .map(valueDelta -> valueDelta.getDeltaTicksChangedValueAve()))
-                        .collect(Collectors.toList()))))
-        );
+//        numOfEntitiesPerTick;
+//
+//        //m_entitiesDifenichan.values().stream().collect(Collectors.toMap(entityDifenichan -> entityDifenichan.getName(), entityDifenichan -> entityDifenichan.getPopulation()));
+//        //m_environmentsDifenichen.values().stream().filter(environmentDifenichan -> !environmentDifenichan.isRandom()).collect(Collectors.toMap(environmentDifenichan -> environmentDifenichan.getName(), environmentDifenichan -> environmentDifenichan.getInit().getValue()));
+//
+//
+//        for(EntityDifenichan entityDifenichan : m_entitiesDifenichan){
+//            for(Entity entity : m_entities){
+//                if(entity.equals(entityDifenichan)){
+//                    entity.getProperties().values().stream()
+//                }
+//            }
+//        }
+//        Map<String, List<DTOEntityHistogram>>entitiesHistogram = m_entitiesDifenichan.values().stream().forEach(ent -> m.put(ent.getPropertys().keySet().stream().map(proper -> ent + "_" + proper).toString(),
+//                proper -> m_entities.stream().filter(entity -> entity.getName().equals(ent))
+//                        .map(e -> e.getProperties().values().stream()
+//                        .filter(pro -> pro.getName().equals(proper))
+//                        .map(valueDelta -> valueDelta.getDeltaTicksChangedValueAve()))
+//                        .collect(Collectors.toList()))))
+//        );
     }
 
     public List<DTOEnvironmentVariablesValues> setSimulation()throws InvalidValue{
