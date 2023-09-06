@@ -108,7 +108,7 @@ public class propertyDifenichan implements Serializable {
         DTO.putData("HaveRange", haveRange.toString());
         if(haveRange){
             DTO.putData("lowRange", m_lowRange.toString());
-            DTO.putData("lowRange", m_highRang.toString());
+            DTO.putData("highRange", m_highRang.toString());
         }
         DTO.putData("Random", m_randomlyIneceat.toString());
         return DTO;

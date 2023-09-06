@@ -11,7 +11,7 @@ public class DTOTerminationData extends DTOSimulationDetailsItem{
     private Map<String, String> data = new HashMap<>();
 
     public DTOTerminationData(terminationType type, int count){
-        data.put("SimulationDetailsItem", "Action");
+        data.put("SimulationDetailsItem", "Termination");
         m_type = type;
         m_count = count;
     }

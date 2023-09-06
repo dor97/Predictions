@@ -16,7 +16,7 @@ public class DTOPropertyData extends DTOSimulationDetailsItem{
         propertyType = type;
         m_haveRange = haveRange;
         m_RandomlyInatiated = RandomlyInatiated;
-        data.put("SimulationDetailsItem", "Action");
+        data.put("SimulationDetailsItem", "Property");
     }
 
     public DTOPropertyData(String name, DTOPropertyType type, boolean haveRange, boolean RandomlyInatiated, double highRange, double lowRange){
@@ -26,7 +26,7 @@ public class DTOPropertyData extends DTOSimulationDetailsItem{
         m_RandomlyInatiated = RandomlyInatiated;
         m_highRange = highRange;
         m_lowRange = lowRange;
-        data.put("SimulationDetailsItem", "Action");
+        data.put("SimulationDetailsItem", "Property");
     }
 
     public String getName(){

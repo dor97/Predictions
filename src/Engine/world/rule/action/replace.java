@@ -20,7 +20,7 @@ public class replace extends action{
 
     public replace(PRDAction action, Utilites util, String ruleName){
         super(action, util, ruleName);
-        m_entityName = action.getEntity();
+        m_entityName = action.getKill();
         toCreate = action.getCreate();
         m_util = util;
         //actionName = action.getType();
@@ -30,7 +30,7 @@ public class replace extends action{
 
     private void checkEntityAndPropertyExist(){
         if(!m_util.isEntityDifenichanExists(m_entityName)){
-            throw new OBJECT_NOT_EXIST("In action set the entity " + m_entityName + " does not exist.");
+            throw new OBJECT_NOT_EXIST("In action replace the entity " + m_entityName + " does not exist.");
         }
         if(getCountForSecondaryEntities() != 0 && !m_util.isEntityDifenichanExists(getSecondaryName())){
             throw new OBJECT_NOT_EXIST("In action " + getActionName() + " the entity " + getSecondaryName() + " does not exist.");

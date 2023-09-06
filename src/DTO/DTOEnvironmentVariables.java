@@ -19,6 +19,7 @@ public class DTOEnvironmentVariables extends DTOSimulationDetailsItem{
         m_variableName = name;
         m_variableType = type;
         m_haveRange = haveRange;
+        data.put("SimulationDetailsItem", "Environment");
     }
 
     public DTOEnvironmentVariables(String name, DTOPropertyType type, boolean haveRange, double highRange, double lowRange){
@@ -27,6 +28,7 @@ public class DTOEnvironmentVariables extends DTOSimulationDetailsItem{
         m_haveRange = haveRange;
         m_highRange = highRange;
         m_lowRange = lowRange;
+        data.put("SimulationDetailsItem", "Environment");
     }
 
     public String getVariableName(){
