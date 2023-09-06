@@ -4,10 +4,13 @@ import DTO.DTOEnvironmentVariablesValues;
 import org.omg.CORBA.INVALID_ACTIVITY;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Property implements PropertyInterface, Serializable {
     private propertyType m_type;
     protected int lastTickChanged = 0;
+    private List<Integer> deltaTicksChangedValue = new ArrayList<>();
 
     public Property(propertyType type){
         m_type = type;
@@ -56,6 +59,23 @@ public class Property implements PropertyInterface, Serializable {
     @Override
     public int getLastTickChanged(){
         return lastTickChanged;
+    }
+
+    public void addDeltaTicksChanged(Integer delta){
+        deltaTicksChangedValue.add(delta);
+    }
+    @Override
+    public List<Integer> getDeltaTicksChangedValue(){
+        return deltaTicksChangedValue;
+    }
+
+    @Override
+    public Float getDeltaTicksChangedValueAve(){
+        Float sum = 0f;
+        for(Integer num : deltaTicksChangedValue){
+            sum += num;
+        }
+        return sum / deltaTicksChangedValue.size();
     }
 
 }

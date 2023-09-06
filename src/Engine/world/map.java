@@ -25,6 +25,17 @@ public class map {
         }
     }
 
+    public space[][] getMap(){
+        return m_map;
+    }
+
+    public Integer getRows(){
+        return m_rows;
+    }
+
+    public Integer getCols(){
+        return m_cols;
+    }
     public void setLocations(final List<Entity> entities){
         ArrayList<space> freeSpaces = new ArrayList<>();
         for (int i = 0; i < m_rows; i++) {
@@ -41,6 +52,9 @@ public class map {
         int index = random.nextInt(spaces.size());
         //int x = index / m_cols, y = index % m_cols;
         spaces.get(index).setToOccupied();
+        if(entity.getPosition() != null){
+            entity.getPosition().setToFree();
+        }
         entity.setPosition(spaces.get(index));
         spaces.remove(index);
     }
@@ -56,15 +70,19 @@ public class map {
         ArrayList<space> freeSpacesNearEntity = new ArrayList<>();
         for (int i = 0; i <= 1; i++) {
             for (int j = 0; j <= 1; j++) {
-                freeSpacesNearEntity.add(m_map[(x - 1 + 2*i) % m_rows][(y - 1 + 2*j) % m_cols]);
+                if(!m_map[(x - 1 + 2*i) % m_rows][(y - 1 + 2*j) % m_cols].isOccupied()) {
+                    freeSpacesNearEntity.add(m_map[(x - 1 + 2 * i) % m_rows][(y - 1 + 2 * j) % m_cols]);
+                }
             }
         }
 
         if(freeSpacesNearEntity.size() == 0){
             return;
         }
-
-        entity.setPosition(freeSpacesNearEntity.get(random.nextInt(freeSpacesNearEntity.size())));
+        entity.getPosition().setToFree();
+        Integer index = random.nextInt(freeSpacesNearEntity.size());
+        freeSpacesNearEntity.get(index).setToOccupied();
+        entity.setPosition(freeSpacesNearEntity.get(index));
 
     }
 

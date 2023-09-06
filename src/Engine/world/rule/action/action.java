@@ -36,6 +36,8 @@ public class action implements ActionInterface, Serializable {
         if(actionName.equals("proximity")){
             entityName = action.getPRDBetween().getSourceEntity();
             targetEntity = action.getPRDBetween().getTargetEntity();
+        } else if (actionName.equals("replace")) {
+            entityName = action.getKill();
         }
         m_ruleName = ruleName;
         m_util = util;
@@ -80,7 +82,7 @@ public class action implements ActionInterface, Serializable {
     }
 
     @Override
-    public Map<String, List<Entity>> activateAction(Entity entity, int currTick)throws InvalidValue {
+    public Map<String, List<Entity>> activateAction(Entity entity, int currTick, List<Entity> paramsForFuncs)throws InvalidValue {
         return null;
     }
 

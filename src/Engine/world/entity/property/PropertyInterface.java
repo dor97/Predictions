@@ -2,6 +2,8 @@ package Engine.world.entity.property;
 
 import DTO.DTOEnvironmentVariablesValues;
 
+import java.util.List;
+
 public interface PropertyInterface {
 
     public propertyType getType();
@@ -15,5 +17,7 @@ public interface PropertyInterface {
     public void setProperty(String v, int currTick);
     public DTOEnvironmentVariablesValues makeDtoEnvironment();
     public int getLastTickChanged();
+    public List<Integer> getDeltaTicksChangedValue();
+    public Float getDeltaTicksChangedValueAve();
 
 }

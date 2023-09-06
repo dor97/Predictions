@@ -1,5 +1,6 @@
 package Engine.world.rule.action;
 
+import DTO.DTOActionData;
 import Engine.utilites.Utilites;
 import Engine.world.entity.Entity;
 import Engine.generated.PRDAction;
@@ -30,10 +31,13 @@ public class kill extends action implements Serializable {
         if(!m_util.isEntityDifenichanExists(m_entityName)){
             throw new OBJECT_NOT_EXIST("In action kill the entity " + m_entityName + " does not exist.");
         }
+        if(!m_util.isEntityDifenichanExists(getSecondaryName())){
+            throw new OBJECT_NOT_EXIST("In action " + getActionName() + " the entity " + getSecondaryName() + " does not exist.");
+        }
     }
 
     @Override
-    public Map<String , List<Entity>> activateAction (Entity i_entity, int currTick){
+    public Map<String , List<Entity>> activateAction (Entity i_entity, int currTick, List<Entity> paramsForFuncs){
         List<Entity> secondaryEntities = null;
         if(getCountForSecondaryEntities() != 0 && !getSecondaryName().equals(m_entityName)){
             secondaryEntities = getSecondaryEntities();
@@ -49,5 +53,14 @@ public class kill extends action implements Serializable {
             }
         }
         return res;
+    }
+
+    @Override
+    public DTOActionData makeActionDto(){
+        DTOActionData actionData = new DTOActionData(getActionName());
+        actionData.putData("entity", m_entityName);
+        actionData.putData("secondary", getSecondaryName());
+
+        return actionData;
     }
 }

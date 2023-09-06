@@ -1,12 +1,18 @@
 package DTO;
 
-public class DTOEnvironmentVariables {
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+
+public class DTOEnvironmentVariables extends DTOSimulationDetailsItem{
 
     private String m_variableName;
     private DTOPropertyType m_variableType;
     private double m_highRange, m_lowRange;
     private boolean m_haveRange, m_RandomlyInatiated;
     private String m_value;
+
+    private Map<String, String> data = new HashMap<>();
 
 
     public DTOEnvironmentVariables(String name, DTOPropertyType type, boolean haveRange){
@@ -53,5 +59,17 @@ public class DTOEnvironmentVariables {
 
     public String getValue(){
         return m_value;
+    }
+
+    public void putData(String key, String value){
+        data.put(key, value);
+    }
+    @Override
+    public Optional<Map<String, String>> getData() {
+        return Optional.of(data);
+    }
+    @Override
+    public String toString(){
+        return m_variableName;
     }
 }

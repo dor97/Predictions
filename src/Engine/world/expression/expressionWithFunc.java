@@ -31,6 +31,13 @@ public class expressionWithFunc extends expression implements Serializable {
         EntityPramsToFunc = entityParams;
     }
 
+    public void addToEntityParams(Entity entity){
+        if(EntityPramsToFunc == null){
+            throw new RuntimeException("try to add to EntityPramsToFunc while it is null");
+        }
+        EntityPramsToFunc.add(entity);
+    }
+
     public void switchLastEntityParam(Entity entity){
         if(EntityPramsToFunc == null){
             EntityPramsToFunc = new ArrayList<>();
@@ -228,15 +235,15 @@ public class expressionWithFunc extends expression implements Serializable {
     }
 
     private Entity getEntityAsParam(String funcName){
-        if(EntityPramsToFunc == null){
-            int x = 2;
-        }
         for(Entity entityPrams : EntityPramsToFunc){
             if(entityPrams.getName().equals(entityName)){
                 return entityPrams;
             }
         }
-        throw new InvalidValue("wrong entity in arg to " + funcName + " func");
+        InvalidValue e = new InvalidValue("wrong entity in arg to " + funcName + " func");
+        e.setEntityName(entityName);
+        throw e;
+        //throw new InvalidValue("wrong entity in arg to " + funcName + " func");
     }
 
 //    @Override

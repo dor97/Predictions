@@ -1,17 +1,18 @@
 package Engine.world.rule.action;
 
+import DTO.DTOActionData;
 import Engine.generated.PRDAction;
 import Engine.utilites.Utilites;
 import Engine.world.entity.Entity;
 import Engine.world.entity.EntityDifenichan;
 import Engine.world.expression.expressionWithFunc;
+import org.omg.CORBA.OBJECT_NOT_EXIST;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
 public class replace extends action{
     private String m_entityName;
-    private String m_propertyName;
     private String toCreate;
     private Entity m_entity = null;
     private String mode;
@@ -21,8 +22,19 @@ public class replace extends action{
         super(action, util, ruleName);
         m_entityName = action.getEntity();
         toCreate = action.getCreate();
+        m_util = util;
         //actionName = action.getType();
         mode = action.getMode();
+        checkEntityAndPropertyExist();
+    }
+
+    private void checkEntityAndPropertyExist(){
+        if(!m_util.isEntityDifenichanExists(m_entityName)){
+            throw new OBJECT_NOT_EXIST("In action set the entity " + m_entityName + " does not exist.");
+        }
+        if(!m_util.isEntityDifenichanExists(getSecondaryName())){
+            throw new OBJECT_NOT_EXIST("In action " + getActionName() + " the entity " + getSecondaryName() + " does not exist.");
+        }
     }
 
     private Entity creatEntity(Entity entity){
@@ -35,7 +47,7 @@ public class replace extends action{
     }
 
     @Override
-    public Map<String, List<Entity>> activateAction(Entity entity, int m_currTick){
+    public Map<String, List<Entity>> activateAction(Entity entity, int m_currTick, List<Entity> paramsForFuncs){
         List<Entity> secondaryEntities = null;
         if(getCountForSecondaryEntities() != 0 && !getSecondaryName().equals(m_entityName)){
             secondaryEntities = getSecondaryEntities();
@@ -56,5 +68,16 @@ public class replace extends action{
             }
         }
         return killAndCreat;
+    }
+
+    @Override
+    public DTOActionData makeActionDto(){
+        DTOActionData actionData = new DTOActionData(getActionName());
+        actionData.putData("entity", m_entityName);
+        actionData.putData("create", toCreate);
+        actionData.putData("mode", mode);
+        actionData.putData("secondary", getSecondaryName());
+
+        return actionData;
     }
 }

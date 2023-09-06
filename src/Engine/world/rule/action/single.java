@@ -1,5 +1,6 @@
 package Engine.world.rule.action;
 
+import DTO.DTOActionData;
 import Engine.utilites.Utilites;
 import Engine.world.entity.Entity;
 import Engine.generated.PRDCondition;
@@ -263,4 +264,11 @@ public class single implements subCondition, Serializable {
 //    private boolean bigger(Float v1, Float v2){
 //        return v1 > v2;
 //    }
+    @Override
+    public void makeActionDto(DTOActionData actionData){
+        actionData.putData("condition", "single");
+        actionData.putData("property", m_propertyName);
+        actionData.putData("operator", m_op.toString());
+        actionData.putData("value", m_exprecn.toString());
+    }
 }

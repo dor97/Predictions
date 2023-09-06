@@ -3,6 +3,7 @@ package UI.ConsoleUI;
 import DTO.*;
 import com.sun.org.apache.xml.internal.security.signature.ReferenceNotInitializedException;
 import Engine.Engine;
+import javafx.beans.property.*;
 import org.omg.CORBA.DynAnyPackage.InvalidValue;
 
 import java.io.FileNotFoundException;
@@ -11,7 +12,22 @@ import java.util.*;
 
 public class ConsoleUI {
     private Engine m_Engine;
+    private myTask m_task;
+
+    private BooleanProperty pause = new SimpleBooleanProperty();
+    private IntegerProperty tick = new SimpleIntegerProperty();
+
+    public ConsoleUI(myTask task){
+        m_task = task;
+
+
+    }
     public void start() {
+
+        pause.bindBidirectional(m_task.pauseProperty());
+        pause.set(false);
+        tick.bindBidirectional(m_task.tickProperty());
+        tick.set(0);
 
         boolean validAction = true;
         m_Engine = new Engine();
@@ -69,6 +85,20 @@ public class ConsoleUI {
             }catch (NoSuchElementException e){
                 System.out.println(e.getMessage());
             }
+        } else if (userChoice == 8) {
+            pause.set(true);
+            System.out.println(tick.get());
+//            int t = tick.get();
+//            if(t % 1000 == 0){
+//                System.out.println(t);
+//            }
+        } else if (userChoice == 9) {
+            synchronized(m_task) {
+                pause.set(false);
+                m_task.notifyAll();
+            }
+        } else if (userChoice == 10) {
+
         }
     }
 
@@ -334,9 +364,11 @@ public class ConsoleUI {
             printEnvironmentVariablesValues(environmentVariablesValues);
         }catch (InvalidValue e){
             System.out.println(e.getMessage());
+        }catch (Exception e){
+            System.out.println(e.getMessage());
         }
         try {
-            simuladtion_id= m_Engine.activeSimulation();
+            simuladtion_id= m_Engine.activeSimulation(m_task);
             System.out.println("Simulation ID : " + simuladtion_id);
             System.out.println();
         }catch (InvalidValue | ReferenceNotInitializedException e){
@@ -388,6 +420,8 @@ public class ConsoleUI {
                         else {
                             validAction = true;
                         }
+                    }catch (Exception e){
+                        System.out.println(e.getMessage());
                     }
                 }
             }
@@ -498,7 +532,7 @@ public class ConsoleUI {
             try {
                 choice = scanner.nextInt();
 
-                if (choice < 1 || choice > 7) {
+                if (choice < 1 || choice > 9) {
                     throw new IllegalArgumentException("Invalid input. you must choose number between 1 and 7.");
                 }
 

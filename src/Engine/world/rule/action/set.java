@@ -1,5 +1,6 @@
 package Engine.world.rule.action;
 
+import DTO.DTOActionData;
 import Engine.utilites.Utilites;
 import Engine.world.entity.Entity;
 import Engine.generated.PRDAction;
@@ -88,6 +89,9 @@ public class set extends action implements Serializable {
         if(!m_util.isEntityDifenichanExists(m_entityName)){
             throw new OBJECT_NOT_EXIST("In action set the entity " + m_entityName + " does not exist.");
         }
+        if(!m_util.isEntityDifenichanExists(getSecondaryName())){
+            throw new OBJECT_NOT_EXIST("In action " + getActionName() + " the entity " + getSecondaryName() + " does not exist.");
+        }
         if(!m_util.getEntityDifenichan(m_entityName).getPropertys().containsKey(m_propertyName)){
             throw new OBJECT_NOT_EXIST("In action set the property " + m_propertyName + "of entity " + m_entityName +" does not exist.");
         }
@@ -126,17 +130,17 @@ public class set extends action implements Serializable {
     }
 
     @Override
-    public Map<String, List<Entity>> activateAction(Entity i_entity, int currTick)throws InvalidValue {
+    public Map<String, List<Entity>> activateAction(Entity i_entity, int currTick, List<Entity> paramsForFuncs)throws InvalidValue {
         m_currTick = currTick;
         List<Entity> secondaryEntities = null;
         if(getCountForSecondaryEntities() != 0 && !getSecondaryName().equals(m_entityName)){
             secondaryEntities = getSecondaryEntities();
         }
+        m_value.setEntityParams(paramsForFuncs);
         if(secondaryEntities == null){
-            m_value.setEntityParams(new ArrayList<>(Arrays.asList(i_entity)));
             loopThroughEntities(i_entity);
         }else{
-            m_value.setEntityParams(new ArrayList<>(Arrays.asList(i_entity, i_entity)));
+            m_value.addToEntityParams(i_entity);
             if(m_entityName.equals(i_entity.getName())){
                 secondaryEntities.stream().forEach(secondaryEntity ->{m_value.switchLastEntityParam(secondaryEntity);
                                                         loopThroughEntities(i_entity);});
@@ -202,5 +206,16 @@ public class set extends action implements Serializable {
 //        }
 //
 //        return false;
+    }
+
+    @Override
+    public DTOActionData makeActionDto(){
+        DTOActionData actionData = new DTOActionData(getActionName());
+        actionData.putData("entity", m_entityName);
+        actionData.putData("property", m_propertyName);
+        actionData.putData("value", m_value.toString());
+        actionData.putData("secondary", getSecondaryName());
+
+        return actionData;
     }
 }

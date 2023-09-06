@@ -112,6 +112,9 @@ public class addValue extends action implements Serializable {  //increase or de
         if(!m_util.isEntityDifenichanExists(m_entityName)){
             throw new OBJECT_NOT_EXIST("In action " + getActionName() + " the entity " + m_entity + " does not exist.");
         }
+        if(!m_util.isEntityDifenichanExists(getSecondaryName())){
+            throw new OBJECT_NOT_EXIST("In action " + getActionName() + " the entity " + getSecondaryName() + " does not exist.");
+        }
         if(!m_util.getEntityDifenichan(m_entityName).getPropertys().containsKey(m_propertyName)){
             throw new OBJECT_NOT_EXIST("In action " + getActionName() + " the property " + m_propertyName + " of entity " + m_entity +" does not exist.");
         }
@@ -126,17 +129,17 @@ public class addValue extends action implements Serializable {  //increase or de
         return m_propertyName;
     }
     @Override
-    public Map<String, List<Entity>> activateAction(Entity entity, int currTick)throws InvalidValue{
+    public Map<String, List<Entity>> activateAction(Entity entity, int currTick, List<Entity> paramsForFuncs)throws InvalidValue{
         m_currTick = currTick;
         List<Entity> secondaryEntities = null;
         if(getCountForSecondaryEntities() != 0){
             secondaryEntities = getSecondaryEntities();
         }
+        m_by.setEntityParams(paramsForFuncs);
         if(secondaryEntities == null){
-            m_by.setEntityParams(new ArrayList<>(Arrays.asList(entity)));
             loopThroughEntities(entity);
         }else{
-            m_by.setEntityParams(new ArrayList<>(Arrays.asList(entity, entity)));
+            m_by.addToEntityParams(entity);
             if(m_entityName.equals(entity.getName())){
                 secondaryEntities.stream().forEach(secondaryEntity ->{m_by.switchLastEntityParam(secondaryEntity);loopThroughEntities(entity);});
             }else {
@@ -208,6 +211,7 @@ public class addValue extends action implements Serializable {  //increase or de
         actionData.putData("entity", m_entityName);
         actionData.putData("property", m_propertyName);
         actionData.putData("by", m_by.toString());
+        actionData.putData("secondary", getSecondaryName());
 
         return actionData;
     }

@@ -15,7 +15,7 @@ public interface ActionInterface {
     public String getPropertyName();
     public String getRuleName();
     public String getActionName();
-    public Map<String, List<Entity>> activateAction(Entity entity, int currTick)throws InvalidValue;
+    public Map<String, List<Entity>> activateAction(Entity entity, int currTick, List<Entity> paramsForFuncs)throws InvalidValue;
     public boolean setValues(PropertyInterface v1, PropertyInterface v2);
     public String getName();
     public boolean isSecondaryAll();

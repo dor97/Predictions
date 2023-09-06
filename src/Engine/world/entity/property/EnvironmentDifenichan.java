@@ -12,10 +12,10 @@ import java.io.Serializable;
 public class EnvironmentDifenichan implements Serializable {
     private String m_name;
     private expressionType m_type;
-    private double m_lowRange, m_highRang;
-    private boolean m_randomlyIneceat = true;
+    private Double m_lowRange, m_highRang;
+    private Boolean m_randomlyIneceat = true;
     private expression m_init;
-    private boolean m_haveRange = false;
+    private Boolean m_haveRange = false;
 
     public EnvironmentDifenichan(PRDEnvProperty p){
         m_name = p.getPRDName();
@@ -98,6 +98,17 @@ public class EnvironmentDifenichan implements Serializable {
         else{
             DTO = new DTOEnvironmentVariables(m_name, type, m_haveRange);
         }
+
+        DTO.putData("Name", m_name);
+        DTO.putData("Type", type.toString());
+        DTO.putData("HaveRange", m_haveRange.toString());
+        if(m_haveRange){
+            DTO.putData("lowRange", m_lowRange.toString());
+            DTO.putData("lowRange", m_highRang.toString());
+        }
+        DTO.putData("Random", m_randomlyIneceat.toString());
+
+
         return DTO;
     }
 

@@ -133,6 +133,7 @@ public class DecimalProperty extends Property implements Serializable {
     @Override
     public void addToProperty(int add, int currTick){
         if(!haveRange || (m_property + add <= m_highRang && m_property + add >= m_lowRange)){
+            addDeltaTicksChanged(currTick - lastTickChanged);
             lastTickChanged = currTick;
             m_property += add;
         }
@@ -148,6 +149,7 @@ public class DecimalProperty extends Property implements Serializable {
     @Override
     public void setProperty(int value, int currTick){
         if(!haveRange || (value <= m_highRang && value >= m_lowRange)){
+            addDeltaTicksChanged(currTick - lastTickChanged);
             lastTickChanged = currTick;
             m_property = value;
         }

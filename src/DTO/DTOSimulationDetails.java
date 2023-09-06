@@ -1,5 +1,7 @@
 package DTO;
 
+import javafx.util.Pair;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,6 +13,25 @@ public class DTOSimulationDetails extends DTOSimulationDetailsItem{
 
     private List<DTOTerminationData> terminationList = new ArrayList<>();
 
+    private List<DTOEnvironmentVariables> environmentVariables = new ArrayList<>();
+    private Pair<Integer, Integer> gridSize = null;
+
+
+    public Pair<Integer, Integer> getGridSize(){
+        return gridSize;
+    }
+
+    public void setGridSize(Integer x, Integer y){
+        new Pair<>(x, y);
+    }
+    public void addEnvironment(DTOEnvironmentVariables environment){
+        environmentVariables.add(environment);
+    }
+    public void setEnvironments(List<DTOEnvironmentVariables> environments){
+        environmentVariables = environments;
+    }
+
+    public List<DTOEnvironmentVariables> getEnvironmentVariables(){return environmentVariables;}
 
     public void addEntity(DTOEntityData entity){
         entitysList.add(entity);

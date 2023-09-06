@@ -1,5 +1,6 @@
 package Engine.world.rule.action;
 
+import DTO.DTOActionData;
 import Engine.utilites.Utilites;
 import Engine.world.entity.Entity;
 import Engine.generated.PRDCondition;
@@ -82,6 +83,12 @@ public class multiple implements subCondition, Serializable {
             return false;
         }
     }
+    @Override
+    public void makeActionDto(DTOActionData actionData) {
+        actionData.putData("condition", "multiple");
+        actionData.putData("logic", m_logical.toString());
+        actionData.putData("logicSize", ((Integer)(m_conditions.size())).toString());
+    }
 
 
-}
+    }

@@ -1,16 +1,16 @@
 package Engine.world.rule.action;
 
+import DTO.DTOActionData;
 import Engine.utilites.Utilites;
 import Engine.world.entity.Entity;
 import Engine.generated.PRDAction;
 import Engine.world.expression.expression;
 import Engine.world.expression.expressionType;
 import Engine.InvalidValue;
+import org.omg.CORBA.OBJECT_NOT_EXIST;
+
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class condition extends action implements Serializable {
     private String m_entity;
@@ -58,6 +58,15 @@ public class condition extends action implements Serializable {
             for(PRDAction elseAction : action.getPRDElse().getPRDAction()){
                 m_else.add(factory.makeAction(elseAction, util, getRuleName()));
             }
+        }
+        checkEntityAndPropertyExist(util);
+    }
+    private void checkEntityAndPropertyExist(Utilites util){
+        if(!util.isEntityDifenichanExists(m_entity)){
+            throw new OBJECT_NOT_EXIST("In action " + getActionName() + " the entity " + m_entity + " does not exist.");
+        }
+        if(!util.isEntityDifenichanExists(getSecondaryName())){
+            throw new OBJECT_NOT_EXIST("In action " + getActionName() + " the entity " + getSecondaryName() + " does not exist.");
         }
     }
     public void doCondition(){
@@ -131,27 +140,42 @@ public class condition extends action implements Serializable {
 
     private Map<String, List<Entity>> activateActionWithSecondary(ActionInterface action, Entity entity, List<Entity> secondaries){
         Map<String, List<Entity>> killAndCreat = new HashMap<>();
-        if(action.getEntityName().equals(entity.getName())) {
-            return action.activateAction(entity, m_currTick);
+        try {
+            if (action.getEntityName().equals(entity.getName())) {
+                if (secondaries == null || secondaries.size() == 0) {
+                    return action.activateAction(entity, m_currTick, new ArrayList<>(Arrays.asList(entity)));
+                } else {
+                    secondaries.stream().forEach(secondary -> action.activateAction(entity, m_currTick, new ArrayList<>(Arrays.asList(entity, secondary))).forEach((key, value) -> killAndCreat.merge(key, value, (list1, list2) -> {
+                        list1.addAll(list2);
+                        return list1;
+                    })));
+                    return killAndCreat;
+                }
 
-        }else{
-            secondaries.stream().forEach(secondary -> action.activateAction(secondary, m_currTick).forEach((key, value) -> killAndCreat.merge(key, value, (list1, list2) -> {
-                list1.addAll(list2);
-                return list1;
-            })));
-            return killAndCreat;
+            } else {
+                secondaries.stream().forEach(secondary -> action.activateAction(secondary, m_currTick, new ArrayList<>(Arrays.asList(secondary, entity))).forEach((key, value) -> killAndCreat.merge(key, value, (list1, list2) -> {
+                    list1.addAll(list2);
+                    return list1;
+                })));
+                return killAndCreat;
+            }
+        } catch (InvalidValue e){
+        if(e.getEntityName() != null){
+            if(!e.getEntityName().equals(m_entity) && !e.getEntityName().equals(getSecondaryName())) {
+                throw e;
+            }
         }
-
+    }
+        return killAndCreat;
     }
 
     @Override
-    public Map<String, List<Entity>> activateAction(Entity entity, int currTick) throws InvalidValue{
+    public Map<String, List<Entity>> activateAction(Entity entity, int currTick, List<Entity> paramsForFuncs) throws InvalidValue{
         m_currTick = currTick;
         List<Entity> secondaryEntities = null;
         if(getCountForSecondaryEntities() != 0){
             secondaryEntities = getSecondaryEntities();
         }
-
         if(secondaryEntities == null){  //TODO add && secondaryEntities.size() == 0 if want to activate condition even if no secondaries
             return activeOnce(entity);
         }else{
@@ -201,4 +225,16 @@ public class condition extends action implements Serializable {
 //    public single getCondition(){
 //        return condition;
 //    }
+
+    @Override
+    public DTOActionData makeActionDto(){
+        DTOActionData actionData = new DTOActionData(getActionName());
+        actionData.putData("entity", m_entity);
+        actionData.putData("then", ((Integer)(m_then.size())).toString());
+        actionData.putData("else", ((Integer)(m_else.size())).toString());
+        actionData.putData("secondary", getSecondaryName());
+        m_subCon.makeActionDto(actionData);
+
+        return actionData;
+    }
 }

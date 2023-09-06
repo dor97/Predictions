@@ -23,7 +23,7 @@ public class EntityDifenichan implements Serializable {
     public EntityDifenichan(PRDEntity e) throws allReadyExistsException, InvalidValue{
         m_name = e.getName();
         //m_amount = e.getPRDPopulation();
-        m_amount = 100;
+        m_amount = 100; //TODO change to zero
         m_propertys = new HashMap<>();
         for(PRDProperty p : e.getPRDProperties().getPRDProperty()){
             if(m_propertys.containsKey(p.getPRDName())){
@@ -39,6 +39,10 @@ public class EntityDifenichan implements Serializable {
 
     public void addProperty(propertyDifenichan propertyToAdd){
         m_propertys.put(propertyToAdd.getName(), propertyToAdd);
+    }
+
+    public void setPopulation(Integer population){
+        m_amount = population;
     }
 
     public int getAmount(){
@@ -65,6 +69,10 @@ public class EntityDifenichan implements Serializable {
     public DTOEntitysProperties makeDtoEntitysProperties(){
         List<DTOProperty> properties = m_propertys.values().stream().map(propertyDifenichan -> new DTOProperty(propertyDifenichan.getName())).collect(Collectors.toList());
         return new DTOEntitysProperties(m_name, properties);
+    }
+
+    public Integer getPopulation(){
+        return m_amount;
     }
 
 }

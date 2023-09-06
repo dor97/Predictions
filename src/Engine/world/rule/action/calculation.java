@@ -1,5 +1,6 @@
 package Engine.world.rule.action;
 
+import DTO.DTOActionData;
 import Engine.utilites.Utilites;
 import Engine.world.entity.Entity;
 import Engine.generated.PRDAction;
@@ -123,6 +124,9 @@ public class calculation extends action implements Serializable {
         if(!m_util.isEntityDifenichanExists(m_entityName)){
             throw new OBJECT_NOT_EXIST("In action calculation the entity " + m_entityName + " does not exist.");
         }
+        if(!m_util.isEntityDifenichanExists(getSecondaryName())){
+            throw new OBJECT_NOT_EXIST("In action " + getActionName() + " the entity " + getSecondaryName() + " does not exist.");
+        }
         if(!m_util.getEntityDifenichan(m_entityName).getPropertys().containsKey(m_propertyName)){
             throw new OBJECT_NOT_EXIST("In action calculation the property " + m_propertyName + " of entity " + m_entityName +" does not exist.");
         }
@@ -238,19 +242,19 @@ public class calculation extends action implements Serializable {
     }
 
     @Override
-    public Map<String, List<Entity>> activateAction(Entity entity, int currTick) throws InvalidValue{
+    public Map<String, List<Entity>> activateAction(Entity entity, int currTick, List<Entity> paramsForFuncs) throws InvalidValue{
         m_currTick = currTick;
         List<Entity> secondaryEntities = null;
         if(getCountForSecondaryEntities() != 0){
             secondaryEntities = getSecondaryEntities();
         }
+        m_arg1.setEntityParams(paramsForFuncs);
+        m_arg2.setEntityParams(paramsForFuncs);
         if(secondaryEntities == null){
-            m_arg1.setEntityParams(new ArrayList<>(Arrays.asList(entity)));
-            m_arg2.setEntityParams(new ArrayList<>(Arrays.asList(entity)));
             loopThroughEntities(entity);
         }else{
-            m_arg1.setEntityParams(new ArrayList<>(Arrays.asList(entity, entity)));
-            m_arg2.setEntityParams(new ArrayList<>(Arrays.asList(entity, entity)));
+            m_arg1.addToEntityParams(entity);
+            m_arg2.addToEntityParams(entity);
             if(m_entityName.equals(entity.getName())){
                 secondaryEntities.stream().forEach(secondaryEntity ->{m_arg1.switchLastEntityParam(secondaryEntity);
                                                                 m_arg2.switchLastEntityParam(secondaryEntity);
@@ -300,5 +304,18 @@ public class calculation extends action implements Serializable {
     public boolean setValues(PropertyInterface v1, PropertyInterface v2) {
 
         return false;
+    }
+
+    @Override
+    public DTOActionData makeActionDto(){
+        DTOActionData actionData = new DTOActionData(getActionName());
+        actionData.putData("entity", m_entityName);
+        actionData.putData("property", m_propertyName);
+        actionData.putData("calculationType", isMultiply == true ? "multiply" : "divide");
+        actionData.putData("arg1", m_value1);
+        actionData.putData("arg2", m_value2);
+        actionData.putData("secondary", getSecondaryName());
+
+        return actionData;
     }
 }

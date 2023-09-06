@@ -4,6 +4,7 @@ import DTO.*;
 import Engine.InvalidValue;
 import Engine.UnsupportedFileTypeException;
 import Engine.allReadyExistsException;
+import Engine.stopException;
 import Engine.world.entity.Entity;
 import Engine.world.entity.EntityDifenichan;
 import Engine.generated.*;
@@ -16,6 +17,10 @@ import Engine.world.rule.action.addValue;
 import Engine.world.rule.action.calculation;
 import Engine.world.expression.expressionType;
 import Engine.utilites.Utilites;
+import UI.ConsoleUI.myTask;
+import javafx.beans.property.SimpleMapProperty;
+import javafx.collections.ObservableMap;
+import javafx.util.Pair;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -45,7 +50,14 @@ public class World implements Serializable {
     private SimpleDateFormat format = new SimpleDateFormat("dd-MM-yyyy | hh.mm.ss");
     private String simulationTime = null;
     private Utilites util;
-    private int m_rows, m_cols, currTick;
+    private int m_rows, m_cols, currTick = 0;
+    private Instant start;
+    private Integer numSimulation = 0;
+    private Boolean isSimulationEnded = false;
+    private map map;
+    private String exception = "";
+
+    private List<Pair<Integer, Integer>> numOfEntitiesPerTick = new ArrayList<>();
 
     private final static String JAXB_XML_GAME_PACKAGE_NAME = "Engine.generated";
 
@@ -75,7 +87,35 @@ public class World implements Serializable {
 //
 //    }
 
-    public void startSimolesan()throws InvalidValue{
+    public void setNumSimulation(Integer num){
+        numSimulation = num;
+    }
+    public Integer getNumSimulation(){
+        return numSimulation;
+    }
+
+    public void setSimulationEnded(){
+        isSimulationEnded = true;
+    }
+
+    public DTORunningSimulationDetails getRunningSimulationDTO(){
+        if(isSimulationEnded){
+            return null;
+        }
+        DTORunningSimulationDetails runningSimulationDetails = new DTORunningSimulationDetails();
+
+        //m_entities.stream().collect(Collectors.groupingBy(Entity::getName, Collectors.summingInt(e -> 1)));
+        Map<String, Integer> entitiesMap = m_entities.stream().collect(Collectors.groupingBy(Entity::getName, Collectors.summingInt(e -> 1)));
+        ObservableMap<String, Integer> entitiesObservableMap = new SimpleMapProperty<>();
+        entitiesMap.entrySet().stream().forEach(entityEntrySet -> entitiesObservableMap.put(entityEntrySet.getKey(), entityEntrySet.getValue()));
+        runningSimulationDetails.setEntities(entitiesObservableMap);
+
+        runningSimulationDetails.setTick(currTick);
+        runningSimulationDetails.setTime(Duration.between(start, Instant.now()).getSeconds());
+
+        return runningSimulationDetails;
+    }
+    public void startSimolesan(Boolean isPause)throws InvalidValue{
         //Utilites.Init(m_environments, m_entitiesDifenichan);
         List<Entity> toRemove = new ArrayList<>();
         Random random = new Random();
@@ -98,7 +138,7 @@ public class World implements Serializable {
 
         simulationTime = format.format(new Date());
         currTick = 0;
-        Instant start = Instant.now();
+        start = Instant.now();
 //        while ((m_ticks.getType() == null || currTick < m_ticks.getInt()) && (m_secondToWork == null || Duration.between(start, Instant.now()).getSeconds() < m_secondToWork.getInt())){
 //            for(Rule r : m_rules) {
 //                if(currTick % r.getTick() == 0 && random.nextDouble() < r.getProbability()) {
@@ -115,10 +155,11 @@ public class World implements Serializable {
 //            }
 //            currTick++;
 //        }
-        map map = new map(m_rows, m_cols);  //TODO change
+        map = new map(m_rows, m_cols);  //TODO change
         map.setLocations(m_entities);
         List<ActionInterface> toActive = new ArrayList<>();
-        while ((m_ticks.getType() == null || currTick < m_ticks.getInt()) && (m_secondToWork.getType() == null || Duration.between(start, Instant.now()).getSeconds() < m_secondToWork.getInt())) {
+        while ((m_ticks.getType() == null || currTick < m_ticks.getInt()) && (m_secondToWork.getType() == null || Duration.between(start, Instant.now()).getSeconds() < m_secondToWork.getInt())) {  //&& currTick < 1000
+            numOfEntitiesPerTick.add(new Pair<>(currTick, m_entities.size()));
             toActive.clear();
             for(Rule r : m_rules) {
                 toActive.addAll(r.getActionToActive(currTick));
@@ -142,7 +183,40 @@ public class World implements Serializable {
 
 
             currTick++;
+//            aTask.func(m_entities.stream().collect(Collectors.groupingBy(Entity::getName, Collectors.summingInt(e -> 1))));
+//            aTask.setTick(currTick);
+//            aTask.setSce(Duration.between(start, Instant.now()).getSeconds());
+            if(isPause){
+                synchronized (isPause) {
+                    System.out.println("pause");
+                    try {
+                        isPause.wait();
+                        System.out.println("resume");
+                    } catch (InterruptedException e) {
+                        System.out.println("leave");
+                        isSimulationEnded = true;
+                        return;
+                        // Handle interruption if needed
+                    }
+                }
+            }
+            if(Thread.currentThread().isInterrupted()){
+                System.out.println("leave");
+                isSimulationEnded = true;
+                return;
+            }
+            //aTask.run();
+            //Thread.currentThread().isInterrupted();
         }
+        isSimulationEnded = true;
+    }
+
+    public void setException(String exception){
+        this.exception = exception;
+    }
+
+    public String getException(){
+        return this.exception;
     }
 
     public void killCreat(String killCreat,List<Entity> toKillOrCreat){
@@ -158,7 +232,7 @@ public class World implements Serializable {
     public Map<String, List<Entity>> activeatActian(Entity entity, ActionInterface actionInterface){
         try {
             if(actionInterface.getEntityName().equals(entity.getName())){
-                return actionInterface.activateAction(entity, currTick);
+                return actionInterface.activateAction(entity, currTick, new ArrayList<>(Arrays.asList(entity)));
             }
             return new HashMap<>();
         }catch (InvalidValue e){
@@ -219,6 +293,8 @@ public class World implements Serializable {
 
         Map<String, DTOEntitysProperties> entitysPropertiesMap = m_entitiesDifenichan.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, entity -> entity.getValue().makeDtoEntitysProperties()));
         simulationDetailsPostRun.setEntitysProperties(entitysPropertiesMap);
+
+
 
         return simulationDetailsPostRun;
     }
@@ -288,6 +364,10 @@ public class World implements Serializable {
             DTO.addRule(rule.makeDtoRule());
         }
 
+        DTO.setEnvironments(getEnvironmentDetails());
+
+        DTO.setGridSize(m_rows, m_cols);
+
         if(m_ticks.getType() != null){
             DTO.addTermination(new DTOTerminationData(terminationType.TICKS, m_ticks.getInt()));
         }
@@ -309,7 +389,7 @@ public class World implements Serializable {
         return DTOList;
     }
 
-    public void loadFile(String xmlFile)throws NoSuchFileException , UnsupportedFileTypeException, allReadyExistsException, InvalidValue, JAXBException, FileNotFoundException {
+    public int loadFile(String xmlFile)throws NoSuchFileException , UnsupportedFileTypeException, allReadyExistsException, InvalidValue, JAXBException, FileNotFoundException {
         PRDWorld xmlWorld = new PRDWorld();
 
         //load file
@@ -333,6 +413,9 @@ public class World implements Serializable {
 
         m_cols = xmlWorld.getPRDGrid().getColumns();
         m_rows = xmlWorld.getPRDGrid().getRows();
+        if(m_rows > 100 || m_rows < 10 || m_cols > 100 || m_cols < 100){
+            throw new InvalidValue("Size of grid is not valid");
+        }
 
         //entitys
         for(PRDEntity e : xmlWorld.getPRDEntities().getPRDEntity()){
@@ -386,6 +469,8 @@ public class World implements Serializable {
         if(m_ticks.getType() == null && m_secondToWork.getType() == null && xmlWorld.getPRDTermination().getPRDByUser() == null){
             throw new InvalidValue("No termination method was added");
         }
+
+        return xmlWorld.getPRDThreadCount();
     }
 
     private void getTermination(List<Object> secondOrTicks){
@@ -421,6 +506,93 @@ public class World implements Serializable {
         else{
             throw new InvalidValue("Got a non exising environment variables name");
         }
+    }
+
+    public void addPopulationToEntity(String entityName, int population){
+        if(m_entitiesDifenichan.containsKey(entityName)){
+            Integer sumPopulation = 0;
+            for(EntityDifenichan entityDifenichan : m_entitiesDifenichan.values()){
+                sumPopulation += entityDifenichan.getPopulation();
+            }
+            if(sumPopulation + population > m_rows * m_cols){
+                throw new InvalidValue("Sum of entities population is to big for the size of the grid");
+            }
+            m_entitiesDifenichan.get(entityName).setPopulation(population);
+        }else{
+            throw new InvalidValue("Got a non exising entity variables name");
+        }
+    }
+
+    public DTOMap getMap(Boolean isPause){
+        synchronized (isPause){
+            if(isPause){
+                DTOMap map = new DTOMap();
+                map.setMapSize(this.map.getRows(), this.map.getCols());
+                map.setMap(this.map.getMap(), this.map.getRows(), this.map.getCols());
+                return map;
+            }
+            throw new InvalidValue("not pause, can't get map");
+        }
+    }
+
+    public List<Float> addPropertyChangedAv(List<Float> listPropertyChange, Float propertyChange){
+        if(listPropertyChange != null){
+            listPropertyChange.add(propertyChange);
+        }else{
+            listPropertyChange = new ArrayList<>(Arrays.asList(propertyChange));
+        }
+        return listPropertyChange;
+    }
+
+    public Pair<Float, Integer> makeNewAv(Pair<Float, Integer> p, Float n){
+        if(p != null){
+            Float av = p.getKey();
+            Integer size = p.getValue();
+            return new Pair<>((av * size + n) / size + 1, size + 1);
+        }else{
+            return new Pair<>(n, 1);
+        }
+    }
+
+    public DTODataForReRun getDataForRerun(){
+        DTODataForReRun dataForReRun = new DTODataForReRun();
+
+        dataForReRun.setEntitiesPopulation(m_entitiesDifenichan.values().stream().collect(Collectors.toMap(entityDifenichan -> entityDifenichan.getName(), entityDifenichan -> entityDifenichan.getPopulation())));
+        dataForReRun.setEnvironmentsValues(m_environmentsDifenichen.values().stream().filter(environmentDifenichan -> !environmentDifenichan.isRandom()).collect(Collectors.toMap(environmentDifenichan -> environmentDifenichan.getName(), environmentDifenichan -> environmentDifenichan.getInit().getValue())));
+
+        return dataForReRun;
+    }
+
+    public void get(){
+        m_entities.stream();
+        Map<String, List<Float>> propertyChangeByTick = new HashMap<>();
+        for(Entity entity : m_entities){
+            entity.getProperties().values().stream().forEach(propertyInterface -> propertyChangeByTick.put(entity.getName() + "_" + propertyInterface.getName(), addPropertyChangedAv(propertyChangeByTick.get(entity.getName() + "_" + propertyInterface.getName()), propertyInterface.getDeltaTicksChangedValueAve())));
+        }
+
+        Map<String, Pair<Float, Integer>> avPropertyValue = new HashMap<>();
+        m_entities.stream().forEach(entity -> entity.getProperties().values().stream().filter(propertyInterface -> propertyInterface.getType() == propertyType.FLOAT || propertyInterface.getType() == propertyType.INT).forEach(propertyInterface -> avPropertyValue.put(entity.getName() + "_" + propertyInterface.getName(), makeNewAv(avPropertyValue.get(entity.getName() + "_" + propertyInterface.getName()), (Float)propertyInterface.getValue()))));
+
+        numOfEntitiesPerTick;
+
+        //m_entitiesDifenichan.values().stream().collect(Collectors.toMap(entityDifenichan -> entityDifenichan.getName(), entityDifenichan -> entityDifenichan.getPopulation()));
+        //m_environmentsDifenichen.values().stream().filter(environmentDifenichan -> !environmentDifenichan.isRandom()).collect(Collectors.toMap(environmentDifenichan -> environmentDifenichan.getName(), environmentDifenichan -> environmentDifenichan.getInit().getValue()));
+
+
+        for(EntityDifenichan entityDifenichan : m_entitiesDifenichan){
+            for(Entity entity : m_entities){
+                if(entity.equals(entityDifenichan)){
+                    entity.getProperties().values().stream()
+                }
+            }
+        }
+        Map<String, List<DTOEntityHistogram>>entitiesHistogram = m_entitiesDifenichan.values().stream().forEach(ent -> m.put(ent.getPropertys().keySet().stream().map(proper -> ent + "_" + proper).toString(),
+                proper -> m_entities.stream().filter(entity -> entity.getName().equals(ent))
+                        .map(e -> e.getProperties().values().stream()
+                        .filter(pro -> pro.getName().equals(proper))
+                        .map(valueDelta -> valueDelta.getDeltaTicksChangedValueAve()))
+                        .collect(Collectors.toList()))))
+        );
     }
 
     public List<DTOEnvironmentVariablesValues> setSimulation()throws InvalidValue{

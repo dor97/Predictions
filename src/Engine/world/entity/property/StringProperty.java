@@ -92,6 +92,7 @@ public class StringProperty extends Property implements Serializable {
     }
     @Override
     public void setProperty(String i_property, int currTick) {
+        addDeltaTicksChanged(currTick - lastTickChanged);
         lastTickChanged = currTick;
         m_property = i_property;
     }

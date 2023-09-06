@@ -79,6 +79,7 @@ public class BooleanProperty extends Property implements Serializable {
     }
     @Override
     public void setProperty(boolean i_property, int currTick) {
+        addDeltaTicksChanged(currTick - lastTickChanged);
         lastTickChanged = currTick;
         m_property = i_property;
     }
