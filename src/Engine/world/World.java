@@ -413,7 +413,7 @@ public class World implements Serializable {
 
         m_cols = xmlWorld.getPRDGrid().getColumns();
         m_rows = xmlWorld.getPRDGrid().getRows();
-        if(m_rows > 100 || m_rows < 10 || m_cols > 100 || m_cols < 100){
+        if(m_rows > 100 || m_rows < 10 || m_cols > 100 || m_cols < 10){
             throw new InvalidValue("Size of grid is not valid");
         }
 

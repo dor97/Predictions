@@ -231,7 +231,7 @@ public class condition extends action implements Serializable {
         DTOActionData actionData = new DTOActionData(getActionName());
         actionData.putData("entity", m_entity);
         actionData.putData("then", ((Integer)(m_then.size())).toString());
-        actionData.putData("else", ((Integer)(m_else.size())).toString());
+        actionData.putData("else", ((Integer)(m_else!=null? m_else.size() : 0)).toString());
         actionData.putData("secondary", getSecondaryName());
         m_subCon.makeActionDto(actionData);
 
