@@ -5,6 +5,9 @@ import Engine.world.worldDifenichan;
 import UI.ConsoleUI.myTask;
 import com.sun.org.apache.xml.internal.security.signature.ReferenceNotInitializedException;
 import Engine.world.World;
+import javafx.application.Platform;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.IntegerProperty;
 import javafx.concurrent.Task;
 import org.omg.CORBA.DynAnyPackage.InvalidValue;
 
@@ -25,7 +28,8 @@ public class Engine {
     private World cuurentSimuletion;
     private Integer simulationNum = 0;
     private int numOfThreads = 1;
-    private ExecutorService threadPool;
+    private ExecutorService threadPool = null;
+    private Integer poolSize = 0;
     private String m_fileName = null;
     private Boolean isFileLoadedInSimulation = false;
     private Map<Integer, simulationsStatus> simStatus = new HashMap<>();
@@ -48,7 +52,11 @@ public class Engine {
     }
 
     private void loadNewFile(String fileName)throws NoSuchFileException, UnsupportedFileTypeException, InvalidValue, allReadyExistsException , JAXBException, FileNotFoundException{
+        threadPool.shutdown();
         m_fileName = fileName;
+        synchronized (simStatus) {
+            simStatus.clear();
+        }
         threadPool = Executors.newFixedThreadPool(numOfThreads);
     }
 
@@ -57,6 +65,53 @@ public class Engine {
             loadSimulation(m_fileName);
         }
         return cuurentSimuletion.setSimulation();
+    }
+
+    public void bindAndGetThreadPoolDetails(IntegerProperty wit, IntegerProperty run, IntegerProperty fin){
+        new Thread(() -> {  while(true)
+                                {threadPoolDetails(wit, run, fin);}
+                            });
+    }
+    public void threadPoolDetails(IntegerProperty wit, IntegerProperty run, IntegerProperty fin){
+        if(threadPool != null && !threadPool.isTerminated()){
+            Integer poolSize = 0;
+            Integer finedSimulation = 0;
+            Integer witting = 0;
+//            synchronized (this.poolSize){
+//                poolSize = this.poolSize;
+//            }
+//            synchronized (this) {
+//                finedSimulation = worldsList.size();
+//            }
+            synchronized(simStatus) {
+                for (simulationsStatus simulationsStatus : simStatus.values()) {
+                    if (simulationsStatus.getStatus() == Status.WAITINGTORUN) {
+                        witting++;
+                    } else if (simulationsStatus.getStatus() == Status.RUNNING) {
+                        poolSize++;
+                    } else if (simulationsStatus.getStatus() == Status.FINISHED) {
+                        finedSimulation++;
+                    }
+                }
+            }
+            setThreadPoolProperties(wit, witting);
+            setThreadPoolProperties(run, poolSize);
+            setThreadPoolProperties(fin, finedSimulation);
+        }
+    }
+
+    private void setThreadPoolProperties(IntegerProperty prop, Integer value){
+        Platform.runLater(() -> prop.set(value));
+    }
+
+    public void disposeOfThreadPool(){
+        if(threadPool != null && !threadPool.isTerminated()){
+            threadPool.shutdown();
+        }
+    }
+
+    public void bindToWhenFines(BooleanProperty isFines){
+        cuurentSimuletion.bindToWhenFines(isFines);
     }
 
     public int activeSimulation(myTask aTask)throws InvalidValue, ReferenceNotInitializedException{
@@ -74,6 +129,9 @@ public class Engine {
             simStatus.put(simulationNum, temp);
         }
         isFileLoadedInSimulation = false;
+        synchronized (poolSize){
+            poolSize++;
+        }
         threadPool.execute(() -> activeSimulationUsingThread(aTask, simulationNum));
         cuurentSimuletion = null;
         //cuurentSimuletion.startSimolesan();
@@ -84,6 +142,9 @@ public class Engine {
     private void activeSimulationUsingThread(myTask aTask, Integer simulationNum){
         Boolean pause;
         World world;
+        synchronized (poolSize){
+            poolSize--;
+        }
         synchronized (simStatus) {
             world = simStatus.get(simulationNum).getWorld();
             simStatus.get(world.getNumSimulation()).setStatus(Status.RUNNING);

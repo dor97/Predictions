@@ -18,6 +18,8 @@ import Engine.world.rule.action.calculation;
 import Engine.world.expression.expressionType;
 import Engine.utilites.Utilites;
 import UI.ConsoleUI.myTask;
+import javafx.application.Platform;
+import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.MapProperty;
 import javafx.beans.property.SimpleMapProperty;
 import javafx.collections.ObservableMap;
@@ -55,6 +57,7 @@ public class World implements Serializable {
     private Instant start;
     private Integer numSimulation = 0;
     private Boolean isSimulationEnded = false;
+    private javafx.beans.property.BooleanProperty isFines;
     private map map;
     private String exception = "";
 
@@ -62,6 +65,9 @@ public class World implements Serializable {
 
     private final static String JAXB_XML_GAME_PACKAGE_NAME = "Engine.generated";
 
+    public World(){
+        isFines.set(false);
+    }
 
     public void setNumSimulation(Integer num){
         numSimulation = num;
@@ -71,6 +77,7 @@ public class World implements Serializable {
     }
 
     public void setSimulationEnded(){
+        Platform.runLater(() -> isFines.set(true));
         isSimulationEnded = true;
     }
 
@@ -174,6 +181,7 @@ public class World implements Serializable {
                     } catch (InterruptedException e) {
                         System.out.println("leave");
                         isSimulationEnded = true;
+                        Platform.runLater(() -> isFines.set(true));
                         isPause = false;
                         return;
                         // Handle interruption if needed
@@ -183,11 +191,13 @@ public class World implements Serializable {
             if(Thread.currentThread().isInterrupted()){
                 System.out.println("leave");
                 isSimulationEnded = true;
+                Platform.runLater(() -> isFines.set(true));
                 return;
             }
             //aTask.run();
             //Thread.currentThread().isInterrupted();
         }
+        Platform.runLater(() -> isFines.set(true));
         isSimulationEnded = true;
     }
 
@@ -492,6 +502,10 @@ public class World implements Serializable {
                 m_ticks.setValue(((PRDByTicks) (secondOrTicks.get(1))).getCount());
             }
         }
+    }
+
+    public void bindToWhenFines(javafx.beans.property.BooleanProperty isFines){
+        isFines.bind(this.isFines);
     }
 
     public void addEnvironmentDto(DTOEnvironmentVariables dtoEnvironmentVariables) throws InvalidValue{
