@@ -148,7 +148,7 @@ public class proximity extends action {
         actionData.putData("entity", sourceName);
         actionData.putData("target", targetName);
         actionData.putData("envDepth", ((Integer)(envDepth)).toString());
-        actionData.putData("actions", ((Integer)(actions.size())).toString());
+        actionData.putData("actions", ((Integer)(actions != null ? actions.size() : 0)).toString());
         actionData.putData("secondary", getSecondaryName());
 
         return actionData;
