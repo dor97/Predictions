@@ -11,6 +11,7 @@ import org.omg.CORBA.DynAnyPackage.InvalidValue;
 import javax.xml.bind.JAXBException;
 import java.io.*;
 import java.nio.file.NoSuchFileException;
+import java.util.EventListener;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -107,24 +108,26 @@ public class Engine {
     }
 
     public void pauseSimulation(Integer numSimulation){
-        synchronized (simStatus) {
+        synchronized (simStatus.get(numSimulation).getIsPause()) {
             simStatus.get(numSimulation).setIsPause(true);
         }
     }
 
     public void resumeSimulation(Integer numSimulation){
-        synchronized (simStatus) {
+        synchronized (simStatus.get(numSimulation).getIsPause()) {
             simStatus.get(numSimulation).setIsPause(false);
-            synchronized (simStatus.get(numSimulation).getIsPause()) {
-                simStatus.get(numSimulation).getIsPause().notify();
-            }
+            simStatus.get(numSimulation).getIsPause().notify();
         }
     }
 
     public void stopSimulation(Integer numSimulation){
-        synchronized (simStatus) {
+        synchronized (simStatus.get(numSimulation).getRunningThread()) {
             simStatus.get(numSimulation).getRunningThread().interrupt();
         }
+    }
+
+    public DTOMap getMap(Integer simulationNum) {
+        return simStatus.get(simulationNum).getWorld().getMap(simStatus.get(simStatus).getIsPause());
     }
 
     public DTODataForReRun getDataForRerun(Integer simulationNum){

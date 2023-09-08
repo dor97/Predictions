@@ -1,5 +1,7 @@
 package DTO;
 
+import javafx.util.Pair;
+
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -8,6 +10,34 @@ public class DTOSimulationDetailsPostRun {
     private Map<String, List<DTOEntityHistogram>> m_entitiesHistogram = new HashMap<>();
 
     private Map<String, DTOEntitysProperties> m_entitysProperties = new HashMap<>();
+
+    private Map<String, List<Float>> propertyChangeByTick = new HashMap<>();
+    private Map<String, Pair<Float, Integer>> avPropertyValue = new HashMap<>();
+    private List<Pair<Integer, Integer>> numOfEntitiesPerTick = new ArrayList<>();
+
+    public void setPropertyChangeByTick(Map<String, List<Float>> propertyChangeByTick){
+        this.propertyChangeByTick = propertyChangeByTick;
+    }
+
+    public void setAvPropertyValue(Map<String, Pair<Float, Integer>> avPropertyValue){
+        this.avPropertyValue = avPropertyValue;
+    }
+
+    public void setNumOfEntitiesPerTick(List<Pair<Integer, Integer>> numOfEntitiesPerTick){
+        this.numOfEntitiesPerTick = numOfEntitiesPerTick;
+    }
+
+    public Map<String, List<Float>> getPropertyChangeByTick(){
+        return propertyChangeByTick;
+    }
+
+    public Map<String, Pair<Float, Integer>> getAvPropertyValue(){
+        return avPropertyValue;
+    }
+
+    public List<Pair<Integer, Integer>> getNumOfEntitiesPerTick(){
+        return numOfEntitiesPerTick;
+    }
 
     public void addEntityPostRun(DTOEntityPostRun entityPostRun){
         m_entitiesPostRuns.add(entityPostRun);

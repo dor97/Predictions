@@ -62,31 +62,6 @@ public class World implements Serializable {
     private final static String JAXB_XML_GAME_PACKAGE_NAME = "Engine.generated";
 
 
-//    public void start(){
-//        PropertyInterface p = new DecimalProperty("pro", 100, 0, 200);
-//        PropertyInterface p2 = new DecimalProperty("p2", 100, 0, 10000);
-//        ActionInterface a = new addValue("entity", "pro", "3");
-//        ActionInterface a2 = new calculation("entity", "p2", "environment(ep1)",
-//               "environment(ep2)");
-//        Entity e =new Entity("entity");
-//
-//        m_rules.add(new Rule("rule", 1, 1));
-//        m_rules.add(new Rule("rule", 70, 1));
-//        m_entities.add(e);
-//        m_entities.get(0).addProperty(p);
-//        m_entities.get(0).addProperty(p2);
-//        m_rules.get(0).addAction(a);
-//        m_rules.get(1).addAction(a2);
-//
-//        PropertyInterface env = new DecimalProperty("ep1", 50, 0, 200);
-//        PropertyInterface env2 = new DecimalProperty("ep2", 4, 0, 200);
-//        m_environments.put(env.getName(), env);
-//        m_environments.put(env2.getName(), env2);
-//        //Utilites.Init(m_environments, m_entitiesDifenichan, m_environmentsDifenichen);
-//
-//
-//    }
-
     public void setNumSimulation(Integer num){
         numSimulation = num;
     }
@@ -190,11 +165,15 @@ public class World implements Serializable {
                 synchronized (isPause) {
                     System.out.println("pause");
                     try {
-                        isPause.wait();
+                        synchronized (this) {
+                            this.notifyAll();
+                            isPause.wait();
+                        }
                         System.out.println("resume");
                     } catch (InterruptedException e) {
                         System.out.println("leave");
                         isSimulationEnded = true;
+                        isPause = false;
                         return;
                         // Handle interruption if needed
                     }
@@ -294,6 +273,17 @@ public class World implements Serializable {
         Map<String, DTOEntitysProperties> entitysPropertiesMap = m_entitiesDifenichan.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, entity -> entity.getValue().makeDtoEntitysProperties()));
         simulationDetailsPostRun.setEntitysProperties(entitysPropertiesMap);
 
+        Map<String, List<Float>> propertyChangeByTick = new HashMap<>();
+        for(Entity entity : m_entities){
+            entity.getProperties().values().stream().forEach(propertyInterface -> propertyChangeByTick.put(entity.getName() + "_" + propertyInterface.getName(), addPropertyChangedAv(propertyChangeByTick.get(entity.getName() + "_" + propertyInterface.getName()), propertyInterface.getDeltaTicksChangedValueAve())));
+        }
+        simulationDetailsPostRun.setPropertyChangeByTick(propertyChangeByTick);
+
+        Map<String, Pair<Float, Integer>> avPropertyValue = new HashMap<>();
+        m_entities.stream().forEach(entity -> entity.getProperties().values().stream().filter(propertyInterface -> propertyInterface.getType() == propertyType.FLOAT || propertyInterface.getType() == propertyType.INT).forEach(propertyInterface -> avPropertyValue.put(entity.getName() + "_" + propertyInterface.getName(), makeNewAv(avPropertyValue.get(entity.getName() + "_" + propertyInterface.getName()), (Float)propertyInterface.getValue()))));
+        simulationDetailsPostRun.setAvPropertyValue(avPropertyValue);
+
+        simulationDetailsPostRun.setNumOfEntitiesPerTick(numOfEntitiesPerTick);
 
 
         return simulationDetailsPostRun;
@@ -413,7 +403,7 @@ public class World implements Serializable {
 
         m_cols = xmlWorld.getPRDGrid().getColumns();
         m_rows = xmlWorld.getPRDGrid().getRows();
-        if(m_rows > 100 || m_rows < 10 || m_cols > 100 || m_cols < 100){
+        if(m_rows > 100 || m_rows < 10 || m_cols > 100 || m_cols < 10){
             throw new InvalidValue("Size of grid is not valid");
         }
 
@@ -526,6 +516,14 @@ public class World implements Serializable {
     public DTOMap getMap(Boolean isPause){
         synchronized (isPause){
             if(isPause){
+                synchronized (this){
+                    isPause.notifyAll();
+                    try {
+                        this.wait(2000);
+                    }catch (InterruptedException e){
+
+                    }
+                }
                 DTOMap map = new DTOMap();
                 map.setMapSize(this.map.getRows(), this.map.getCols());
                 map.setMap(this.map.getMap(), this.map.getRows(), this.map.getCols());
@@ -563,16 +561,16 @@ public class World implements Serializable {
         return dataForReRun;
     }
 
-    public void get(){
-        m_entities.stream();
-        Map<String, List<Float>> propertyChangeByTick = new HashMap<>();
-        for(Entity entity : m_entities){
-            entity.getProperties().values().stream().forEach(propertyInterface -> propertyChangeByTick.put(entity.getName() + "_" + propertyInterface.getName(), addPropertyChangedAv(propertyChangeByTick.get(entity.getName() + "_" + propertyInterface.getName()), propertyInterface.getDeltaTicksChangedValueAve())));
-        }
-
-        Map<String, Pair<Float, Integer>> avPropertyValue = new HashMap<>();
-        m_entities.stream().forEach(entity -> entity.getProperties().values().stream().filter(propertyInterface -> propertyInterface.getType() == propertyType.FLOAT || propertyInterface.getType() == propertyType.INT).forEach(propertyInterface -> avPropertyValue.put(entity.getName() + "_" + propertyInterface.getName(), makeNewAv(avPropertyValue.get(entity.getName() + "_" + propertyInterface.getName()), (Float)propertyInterface.getValue()))));
-
+//    public void get(){
+//        m_entities.stream();
+//        Map<String, List<Float>> propertyChangeByTick = new HashMap<>();
+//        for(Entity entity : m_entities){
+//            entity.getProperties().values().stream().forEach(propertyInterface -> propertyChangeByTick.put(entity.getName() + "_" + propertyInterface.getName(), addPropertyChangedAv(propertyChangeByTick.get(entity.getName() + "_" + propertyInterface.getName()), propertyInterface.getDeltaTicksChangedValueAve())));
+//        }
+//
+//        Map<String, Pair<Float, Integer>> avPropertyValue = new HashMap<>();
+//        m_entities.stream().forEach(entity -> entity.getProperties().values().stream().filter(propertyInterface -> propertyInterface.getType() == propertyType.FLOAT || propertyInterface.getType() == propertyType.INT).forEach(propertyInterface -> avPropertyValue.put(entity.getName() + "_" + propertyInterface.getName(), makeNewAv(avPropertyValue.get(entity.getName() + "_" + propertyInterface.getName()), (Float)propertyInterface.getValue()))));
+//
 //        numOfEntitiesPerTick;
 //
 //        //m_entitiesDifenichan.values().stream().collect(Collectors.toMap(entityDifenichan -> entityDifenichan.getName(), entityDifenichan -> entityDifenichan.getPopulation()));
@@ -593,7 +591,7 @@ public class World implements Serializable {
 //                        .map(valueDelta -> valueDelta.getDeltaTicksChangedValueAve()))
 //                        .collect(Collectors.toList()))))
 //        );
-    }
+//    }
 
     public List<DTOEnvironmentVariablesValues> setSimulation()throws InvalidValue{
         for(EnvironmentDifenichan entityDifenichan : m_environmentsDifenichen.values()){
