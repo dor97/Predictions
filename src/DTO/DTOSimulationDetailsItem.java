@@ -4,7 +4,7 @@ import java.util.Map;
 import java.util.Optional;
 
 public class DTOSimulationDetailsItem implements DTOSimulationDetailsItemInterface{
-    private String toPrint = "";
+    private String toPrint = "?";
 
     public DTOSimulationDetailsItem(){
 

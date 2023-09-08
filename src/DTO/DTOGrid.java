@@ -3,7 +3,7 @@ package DTO;
 import java.util.Map;
 import java.util.Optional;
 
-public class DTOGrid extends DTOSimulationDetails{
+public class DTOGrid extends DTOSimulationDetailsItem{
     private Map<String, String> data;
 
     public void putData(String key, String value){
