@@ -18,6 +18,7 @@ import Engine.world.rule.action.calculation;
 import Engine.world.expression.expressionType;
 import Engine.utilites.Utilites;
 import UI.ConsoleUI.myTask;
+import javafx.beans.property.MapProperty;
 import javafx.beans.property.SimpleMapProperty;
 import javafx.collections.ObservableMap;
 import javafx.util.Pair;
@@ -81,7 +82,7 @@ public class World implements Serializable {
 
         //m_entities.stream().collect(Collectors.groupingBy(Entity::getName, Collectors.summingInt(e -> 1)));
         Map<String, Integer> entitiesMap = m_entities.stream().collect(Collectors.groupingBy(Entity::getName, Collectors.summingInt(e -> 1)));
-        ObservableMap<String, Integer> entitiesObservableMap = new SimpleMapProperty<>();
+        MapProperty<String, Integer> entitiesObservableMap = new SimpleMapProperty<>();
         entitiesMap.entrySet().stream().forEach(entityEntrySet -> entitiesObservableMap.put(entityEntrySet.getKey(), entityEntrySet.getValue()));
         runningSimulationDetails.setEntities(entitiesObservableMap);
 
@@ -358,13 +359,17 @@ public class World implements Serializable {
 
         DTO.setGridSize(m_rows, m_cols);
 
+        DTOTerminationData terminationData = new DTOTerminationData();
         if(m_ticks.getType() != null){
-            DTO.addTermination(new DTOTerminationData(terminationType.TICKS, m_ticks.getInt()));
+            terminationData.putData(terminationType.TICKS.toString(), ((Integer)m_ticks.getInt()).toString());
+            //DTO.(terminationType.TICKS, m_ticks.getInt()));
         }
 
         if(m_secondToWork.getType() != null){
-            DTO.addTermination(new DTOTerminationData(terminationType.SECOND, m_secondToWork.getInt()));
+            terminationData.putData(terminationType.SECOND.toString(), ((Integer)m_secondToWork.getInt()).toString());
+            //DTO.addTermination(new DTOTerminationData(terminationType.SECOND, m_secondToWork.getInt()));
         }
+        DTO.setTermination(terminationData);
 
         return DTO;
     }

@@ -435,11 +435,11 @@ public class ConsoleUI {
         DTOSimulationDetails dtoSimulationDetails = m_Engine.getSimulationDetails();
         List <DTOEntityData> dtoEntityData = dtoSimulationDetails.getEntitysList();
         List < DTORuleData> dtoRuleData = dtoSimulationDetails.getRulesList();
-        List < DTOTerminationData> dtoTerminationData = dtoSimulationDetails.getTerminationList();
+        //List < DTOTerminationData> dtoTerminationData = dtoSimulationDetails.getTerminationList();
 
         printEntitiesDetails(dtoEntityData);
         printRulesDetails(dtoRuleData);
-        printTerminationDetails(dtoTerminationData);
+        //printTerminationDetails(dtoTerminationData);
     }
     private void printTerminationDetails(List<DTOTerminationData> dtoTerminationData) {
         System.out.println();
@@ -447,7 +447,7 @@ public class ConsoleUI {
         System.out.println("----------------------------");
 
         for (DTOTerminationData t_condition : dtoTerminationData) {
-            System.out.println("Number Of " + t_condition.getType() + ": " + t_condition.getCount());
+            //System.out.println("Number Of " + t_condition.getType() + ": " + t_condition.getCount());
         }
         System.out.println();
     }

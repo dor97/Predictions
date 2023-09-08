@@ -11,18 +11,18 @@ public class DTOSimulationDetails extends DTOSimulationDetailsItem{
 
     private List<DTORuleData> RulesList = new ArrayList<>();
 
-    private List<DTOTerminationData> terminationList = new ArrayList<>();
+    private DTOTerminationData termination = new DTOTerminationData();
 
     private List<DTOEnvironmentVariables> environmentVariables = new ArrayList<>();
-    private Pair<Integer, Integer> gridSize = null;
+    private DTOGrid gridSize = new DTOGrid();
 
 
-    public Pair<Integer, Integer> getGridSize(){
+    public DTOGrid getGridSize(){
         return gridSize;
     }
 
     public void setGridSize(Integer x, Integer y){
-        new Pair<>(x, y);
+        gridSize.putData("Size", x.toString() + "X" + y.toString());
     }
     public void addEnvironment(DTOEnvironmentVariables environment){
         environmentVariables.add(environment);
@@ -49,12 +49,12 @@ public class DTOSimulationDetails extends DTOSimulationDetailsItem{
         return RulesList;
     }
 
-    public void addTermination(DTOTerminationData termination){
-        terminationList.add(termination);
+    public void setTermination(DTOTerminationData termination){
+        this.termination = termination;
     }
 
-    public List<DTOTerminationData> getTerminationList(){
-        return terminationList;
+    public DTOTerminationData getTerminationList(){
+        return termination;
     }
 
     @Override

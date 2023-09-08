@@ -1,15 +1,16 @@
 package DTO;
 
+import javafx.beans.property.MapProperty;
 import javafx.collections.ObservableMap;
 
 import java.util.Map;
 
 public class DTORunningSimulationDetails {
-    private ObservableMap<String, Integer> entities;
+    private MapProperty<String, Integer> entities;
     private Integer tick;
     private Long time;
 
-    public void setEntities(ObservableMap<String, Integer> entities){
+    public void setEntities(MapProperty<String, Integer> entities){
         this.entities = entities;
     }
 
@@ -21,7 +22,7 @@ public class DTORunningSimulationDetails {
         this.time = time;
     }
 
-    public ObservableMap<String, Integer> getEntities(){
+    public MapProperty<String, Integer> getEntities(){
         return entities;
     }
 

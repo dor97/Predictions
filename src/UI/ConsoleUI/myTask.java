@@ -37,11 +37,16 @@ public class myTask extends Task<ObservableMap<String, Integer>> {
     private BooleanProperty pause = new SimpleBooleanProperty();
     private IntegerProperty m_tick = new SimpleIntegerProperty();
     private LongProperty m_sec = new SimpleLongProperty();
-    private ObservableMap<String, Integer> map = new SimpleMapProperty<>();
-    private Map<String, Integer> m = new SimpleMapProperty<>();
+    private MapProperty<String, Integer> map = new SimpleMapProperty<>();
 
 
     private World world;
+
+    public void bindProperties(MapProperty<String, Integer> map, IntegerProperty tick, LongProperty sec){
+        map.bind(this.map);
+        tick.bind(m_tick);
+        sec.bind(m_sec);
+    }
 
     public void func(Map<String, Integer> name){
         //name.bind(valueProperty());
