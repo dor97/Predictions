@@ -9,6 +9,7 @@ public class DTOTerminationData extends DTOSimulationDetailsItem{
 
     public DTOTerminationData(){
         data.put("SimulationDetailsItem", "Termination");
+        this.setToPrint("Termination");
     }
 
 //    public terminationType getType(){
