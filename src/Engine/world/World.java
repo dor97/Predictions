@@ -503,6 +503,14 @@ public class World implements Serializable {
         }
     }
 
+    public void addEnvironmentValue(String name, Object value){
+        if(m_environmentsDifenichen.containsKey(name)){
+            m_environmentsDifenichen.get(name).setWithString(value.toString());
+        }else{
+            throw new InvalidValue("Got a non exising environment variables name");
+        }
+    }
+
     public void addPopulationToEntity(String entityName, int population){
         if(m_entitiesDifenichan.containsKey(entityName)){
             Integer sumPopulation = 0;
