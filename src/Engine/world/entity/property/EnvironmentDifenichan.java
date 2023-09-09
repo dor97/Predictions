@@ -104,7 +104,7 @@ public class EnvironmentDifenichan implements Serializable {
         DTO.putData("HaveRange", m_haveRange.toString());
         if(m_haveRange){
             DTO.putData("lowRange", m_lowRange.toString());
-            DTO.putData("lowRange", m_highRang.toString());
+            DTO.putData("highRange", m_highRang.toString());
         }
         DTO.putData("Random", m_randomlyIneceat.toString());
 
@@ -112,10 +112,10 @@ public class EnvironmentDifenichan implements Serializable {
         return DTO;
     }
 
-    public void setWithDto(DTOEnvironmentVariables environmentVariables) throws InvalidValue{
-        m_init.convertValueInString(environmentVariables.getValue());
+    public void setWithString(String value){
+        m_init.convertValueInString(value);
 
-        if(m_init.getType() != getDtoType(environmentVariables.getVariableType())){
+        if(m_init.getType() != m_type){
             throw new InvalidValue("In environment variabale " + m_name + " got wrong value type");
         }
 
@@ -133,6 +133,30 @@ public class EnvironmentDifenichan implements Serializable {
             }
         }
         m_randomlyIneceat = false;
+    }
+
+    public void setWithDto(DTOEnvironmentVariables environmentVariables) throws InvalidValue{
+        setWithString(environmentVariables.getValue());
+//        m_init.convertValueInString(environmentVariables.getValue());
+//
+//        if(m_init.getType() != getDtoType(environmentVariables.getVariableType())){
+//            throw new InvalidValue("In environment variabale " + m_name + " got wrong value type");
+//        }
+//
+//        if(m_haveRange){
+//            if(m_init.getType() == expressionType.INT){
+//                if(m_init.getInt() > m_highRang || m_init.getInt() < m_lowRange){
+//                    throw new InvalidValue("In environment variabale " + m_name + " got value out of range");
+//                }
+//            } else if (m_init.getType() == expressionType.FLOAT) {
+//                if(m_init.getFloat() > m_highRang || m_init.getFloat() < m_lowRange){
+//                    throw new InvalidValue("In environment variabale " + m_name + " got value out of range");
+//                }
+//            }else {
+//                throw new InvalidValue("In environment variabale " + m_name + " of type " + m_type + " got range");
+//            }
+//        }
+//        m_randomlyIneceat = false;
     }
 
     public expressionType getDtoType(DTOPropertyType propertyType){

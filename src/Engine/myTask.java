@@ -1,4 +1,4 @@
-package UI.ConsoleUI;
+package Engine;
 
 import DTO.DTORunningSimulationDetails;
 import Engine.stopException;
