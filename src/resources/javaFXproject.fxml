@@ -51,7 +51,18 @@
                   </BorderPane>
                </content>
             </Tab>
-          <Tab text="New Execution" />
+          <Tab text="New Execution">
+               <content>
+                  <BorderPane prefHeight="200.0" prefWidth="200.0">
+                     <center>
+                         <fx:include source="../SimulationDetailsTable/SimulationDetailsTable.fxml" />
+                     </center>
+                     <top>
+                        <Button fx:id="runSimulationButton" mnemonicParsing="false" onAction="#runSimulationListener" prefHeight="25.0" prefWidth="605.0" text="Run Simulation" BorderPane.alignment="CENTER" />
+                     </top>
+                  </BorderPane>
+               </content>
+          </Tab>
             <Tab text="Results" />
         </tabs>
       </TabPane>

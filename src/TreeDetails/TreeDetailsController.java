@@ -21,8 +21,6 @@ public class TreeDetailsController {
 
     public void displayTreeItemsDetails(DTOSimulationDetailsItem selectedValue) {
 
-        //mainController.getTreeDetailsComponent().getChildren().clear();
-
         TreeItem<String> rootItem = new TreeItem<>("Data");
 
         for (Map.Entry<String, String> entry : selectedValue.getData().get().entrySet()) {

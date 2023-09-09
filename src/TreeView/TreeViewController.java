@@ -25,22 +25,17 @@ public class TreeViewController {
             engine.loadSimulation(absolutePath);
             DTOSimulationDetails details = engine.getSimulationDetails();
             TreeItem<DTOSimulationDetailsItem> rootItem = new TreeItem<>(details);
-            System.out.println("adding item: ");
-            for(DTOEntityData entityData : details.getEntitysList()){
-                TreeItem<DTOSimulationDetailsItem> entityItem = new TreeItem<>(entityData);
-                rootItem.getChildren().add(entityItem);
-                for(DTOPropertyData propertyData : entityData.getPropertList()){
-                    entityItem.getChildren().add(new TreeItem<>(propertyData));
-                }
-                System.out.println("Item: ");
-            }
-            for(DTORuleData ruleData : details.getRulesList()){
-                TreeItem<DTOSimulationDetailsItem> ruleItem = new TreeItem<>(ruleData);
-                rootItem.getChildren().add(ruleItem);
-                for(DTOActionData actionData : ruleData.getActions()){
-                    ruleItem.getChildren().add(new TreeItem<>(actionData));
-                }
-            }
+            TreeItem<DTOSimulationDetailsItem> entityItem = new TreeItem<>(new DTOSimulationDetailsItem("Entities"));
+            TreeItem<DTOSimulationDetailsItem> ruleItem = new TreeItem<>(new DTOSimulationDetailsItem("Rules"));
+            TreeItem<DTOSimulationDetailsItem> envItem = new TreeItem<>(new DTOSimulationDetailsItem("Environment Variables"));
+            TreeItem<DTOSimulationDetailsItem> gridItem = new TreeItem<>(new DTOSimulationDetailsItem("Grid"));
+            TreeItem<DTOSimulationDetailsItem> terminationItem = new TreeItem<>(new DTOSimulationDetailsItem("Termination"));
+
+            rootItem.getChildren().add(getEntities(details, entityItem));
+            rootItem.getChildren().add(getRules(details, ruleItem));
+            rootItem.getChildren().add(getEnvVar(details, envItem));
+            rootItem.getChildren().add(getGrid(details,gridItem));
+            rootItem.getChildren().add(getTermination(details,terminationItem));
 
             detailsTreeView.setRoot(rootItem);
             mainController.getTreeViewComponent().setLeft(detailsTreeView);
@@ -57,6 +52,52 @@ public class TreeViewController {
 
         }
     }
+
+    private TreeItem<DTOSimulationDetailsItem> getTermination(DTOSimulationDetails details, TreeItem<DTOSimulationDetailsItem> terminationItem) {
+
+        TreeItem termination = new TreeItem<>(details.getTerminationList());
+        return termination;
+    }
+
+    private TreeItem<DTOSimulationDetailsItem> getGrid(DTOSimulationDetails details, TreeItem<DTOSimulationDetailsItem> gridItem) {
+
+        TreeItem grid = new TreeItem<>(details.getGridSize());
+        return grid;
+    }
+
+    private TreeItem<DTOSimulationDetailsItem> getEnvVar(DTOSimulationDetails details, TreeItem<DTOSimulationDetailsItem> envItem) {
+
+        for(DTOEnvironmentVariables environmentVariable : details.getEnvironmentVariables()){
+            TreeItem<DTOSimulationDetailsItem> env = new TreeItem<>(environmentVariable);
+            envItem.getChildren().add(env);
+        }
+        return envItem;
+    }
+
+    private TreeItem<DTOSimulationDetailsItem> getRules(DTOSimulationDetails details, TreeItem<DTOSimulationDetailsItem> ruleItem) {
+
+        for(DTORuleData ruleData : details.getRulesList()){
+            TreeItem<DTOSimulationDetailsItem> rule = new TreeItem<>(ruleData);
+            for(DTOActionData actionData : ruleData.getActions()){
+                rule.getChildren().add(new TreeItem<>(actionData));
+            }
+            ruleItem.getChildren().add(rule);
+        }
+        return ruleItem;
+    }
+
+    private TreeItem<DTOSimulationDetailsItem> getEntities(DTOSimulationDetails details, TreeItem<DTOSimulationDetailsItem> entityItem) {
+
+        for(DTOEntityData entityData : details.getEntitysList()){
+            TreeItem<DTOSimulationDetailsItem> entity = new TreeItem<>(entityData);
+            for(DTOPropertyData propertyData : entityData.getPropertList()){
+                entity.getChildren().add(new TreeItem<>(propertyData));
+            }
+            entityItem.getChildren().add(entity);
+        }
+        return entityItem;
+    }
+
     public void selectItem(){
         TreeItem<DTOSimulationDetailsItem> item = detailsTreeView.getSelectionModel().getSelectedItem();
 
