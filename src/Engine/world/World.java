@@ -16,6 +16,7 @@ import Engine.world.expression.expressionType;
 import Engine.utilites.Utilites;
 import javafx.application.Platform;
 import javafx.beans.property.MapProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleMapProperty;
 import javafx.util.Pair;
 
@@ -50,7 +51,7 @@ public class World implements Serializable {
     private Instant start;
     private Integer numSimulation = 0;
     private Boolean isSimulationEnded = false;
-    private javafx.beans.property.BooleanProperty isFines;
+    private javafx.beans.property.BooleanProperty isFines = new SimpleBooleanProperty();
     private map map;
     private String exception = "";
 

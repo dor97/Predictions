@@ -48,7 +48,9 @@ public class Engine {
     }
 
     private void loadNewFile(String fileName)throws NoSuchFileException, UnsupportedFileTypeException, InvalidValue, allReadyExistsException , JAXBException, FileNotFoundException{
-        threadPool.shutdown();
+        if(threadPool != null && !threadPool.isShutdown()){
+            threadPool.shutdown();
+        }
         m_fileName = fileName;
         synchronized (simStatus) {
             simStatus.clear();
