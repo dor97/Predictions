@@ -1,8 +1,6 @@
 package Engine;
 
 import Engine.world.World;
-import UI.ConsoleUI.myTask;
-import Engine.Status;
 
 public class simulationsStatus {
     private Integer m_simulationId;

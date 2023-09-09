@@ -2,23 +2,18 @@ package Engine;
 
 import DTO.*;
 import Engine.world.worldDifenichan;
-import UI.ConsoleUI.myTask;
 import com.sun.org.apache.xml.internal.security.signature.ReferenceNotInitializedException;
 import Engine.world.World;
 import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.IntegerProperty;
-import javafx.concurrent.Task;
+import javafx.collections.ObservableList;
 import org.omg.CORBA.DynAnyPackage.InvalidValue;
 
 import javax.xml.bind.JAXBException;
 import java.io.*;
 import java.nio.file.NoSuchFileException;
-import java.util.EventListener;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.Executor;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
@@ -35,6 +30,7 @@ public class Engine {
     private Map<Integer, simulationsStatus> simStatus = new HashMap<>();
     private worldDifenichan worldDif = null;
     private Map<Integer, String> simulationsExceptions;
+    private List<Integer> newlyFinishedSimulationIds = new ArrayList<>();
 
     public void loadSimulation(String fileName) throws NoSuchFileException, UnsupportedFileTypeException, InvalidValue, allReadyExistsException , JAXBException, FileNotFoundException {
         try {
@@ -57,6 +53,9 @@ public class Engine {
         synchronized (simStatus) {
             simStatus.clear();
         }
+        synchronized (newlyFinishedSimulationIds){
+            newlyFinishedSimulationIds.clear(); //TODO maybe not (i.e delete this line)
+        }
         threadPool = Executors.newFixedThreadPool(numOfThreads);
     }
 
@@ -67,9 +66,32 @@ public class Engine {
         return cuurentSimuletion.setSimulation();
     }
 
+    public void updateNewlyFinishedSimulationInLoop(ObservableList<Object> simulations){
+        new Thread(() -> {  while(true)
+        {updateNewlyFinishedSimulation(simulations);
+            try{Thread.sleep(200);}catch (InterruptedException e){}}
+        });
+    }
+
+    public void updateNewlyFinishedSimulation(ObservableList<Object> simulations){
+        synchronized (newlyFinishedSimulationIds){
+            for(Integer id : newlyFinishedSimulationIds){
+                Platform.runLater(() -> simulations.get(id));   //TODO make logic when simulation ended
+            }
+            newlyFinishedSimulationIds.clear();
+        }
+    }
+
+    public Status getSimulationStatus(Integer simulationNum){
+        synchronized (simStatus){
+            return simStatus.get(simulationNum).getStatus();
+        }
+    }
+
     public void bindAndGetThreadPoolDetails(IntegerProperty wit, IntegerProperty run, IntegerProperty fin){
         new Thread(() -> {  while(true)
-                                {threadPoolDetails(wit, run, fin);}
+                                {threadPoolDetails(wit, run, fin);
+                                try{Thread.sleep(200);}catch (InterruptedException e){}}
                             });
     }
     public void threadPoolDetails(IntegerProperty wit, IntegerProperty run, IntegerProperty fin){
@@ -115,7 +137,10 @@ public class Engine {
     }
 
     public int activeSimulation(myTask aTask)throws InvalidValue, ReferenceNotInitializedException{
-        int old_simulationNumber = ++simulationNum;
+        int simulationNum;
+        synchronized (this.simulationNum) {
+            simulationNum = ++this.simulationNum;
+        }
         if(cuurentSimuletion == null){
             throw new ReferenceNotInitializedException("Simulation wasn't load");
         }
@@ -136,7 +161,7 @@ public class Engine {
         cuurentSimuletion = null;
         //cuurentSimuletion.startSimolesan();
         //worldsList.put(simulationNum, cuurentSimuletion);
-        return old_simulationNumber;
+        return simulationNum;
     }
 
     private void activeSimulationUsingThread(myTask aTask, Integer simulationNum){
@@ -166,6 +191,9 @@ public class Engine {
         synchronized (this) {
             worldsList.put(simulationNum, world);
         }
+        synchronized (newlyFinishedSimulationIds){
+            newlyFinishedSimulationIds.add(world.getNumSimulation());
+        }
     }
 
     public void pauseSimulation(Integer numSimulation){
@@ -185,6 +213,10 @@ public class Engine {
         synchronized (simStatus.get(numSimulation).getRunningThread()) {
             simStatus.get(numSimulation).getRunningThread().interrupt();
         }
+    }
+
+    public void moveOneStep(Integer simulationNum){
+        simStatus.get(simulationNum).getWorld().moveOneStep(simStatus.get(simStatus).getIsPause());
     }
 
     public DTOMap getMap(Integer simulationNum) {
@@ -241,7 +273,9 @@ public class Engine {
 
         synchronized (this) {
             worldsList = (Map<Integer, World>) in.readObject();
-            simulationNum = worldsList.keySet().size();
+            synchronized (simulationName) {
+                simulationNum = worldsList.keySet().size();
+            }
         }
 //        }catch (FileNotFoundException e){
 //

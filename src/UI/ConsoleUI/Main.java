@@ -2,15 +2,11 @@ package UI.ConsoleUI;
 
 
 
+import Engine.myTask;
 import javafx.application.Application;
 import javafx.beans.property.MapProperty;
 import javafx.beans.property.SimpleMapProperty;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
-import javafx.collections.FXCollections;
 import javafx.stage.Stage;
-
-import java.util.HashMap;
 
 public class Main extends Application {
 

@@ -4,7 +4,6 @@ import DTO.*;
 import Engine.InvalidValue;
 import Engine.UnsupportedFileTypeException;
 import Engine.allReadyExistsException;
-import Engine.stopException;
 import Engine.world.entity.Entity;
 import Engine.world.entity.EntityDifenichan;
 import Engine.generated.*;
@@ -13,16 +12,11 @@ import Engine.world.entity.property.PropertyInterface;
 import Engine.world.expression.expression;
 import Engine.world.rule.Rule;
 import Engine.world.rule.action.ActionInterface;
-import Engine.world.rule.action.addValue;
-import Engine.world.rule.action.calculation;
 import Engine.world.expression.expressionType;
 import Engine.utilites.Utilites;
-import UI.ConsoleUI.myTask;
 import javafx.application.Platform;
-import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.MapProperty;
 import javafx.beans.property.SimpleMapProperty;
-import javafx.collections.ObservableMap;
 import javafx.util.Pair;
 
 import javax.xml.bind.JAXBContext;
@@ -38,7 +32,6 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 public class World implements Serializable {
     private List<Rule> m_rules = new ArrayList<>();
@@ -540,7 +533,7 @@ public class World implements Serializable {
         }
     }
 
-    public DTOMap getMap(Boolean isPause){
+    public void moveOneStep(Boolean isPause){
         synchronized (isPause){
             if(isPause){
                 synchronized (this){
@@ -551,13 +544,34 @@ public class World implements Serializable {
 
                     }
                 }
-                DTOMap map = new DTOMap();
-                map.setMapSize(this.map.getRows(), this.map.getCols());
-                map.setMap(this.map.getMap(), this.map.getRows(), this.map.getCols());
-                return map;
             }
-            throw new InvalidValue("not pause, can't get map");
+            throw new InvalidValue("not pause, can't run manually");
         }
+    }
+
+    public DTOMap getMap(Boolean isPause){
+        moveOneStep(isPause);
+        DTOMap map = new DTOMap();
+        map.setMapSize(this.map.getRows(), this.map.getCols());
+        map.setMap(this.map.getMap(), this.map.getRows(), this.map.getCols());
+        return map;
+//        synchronized (isPause){
+//            if(isPause){
+//                synchronized (this){
+//                    isPause.notifyAll();
+//                    try {
+//                        this.wait(2000);
+//                    }catch (InterruptedException e){
+//
+//                    }
+//                }
+//                DTOMap map = new DTOMap();
+//                map.setMapSize(this.map.getRows(), this.map.getCols());
+//                map.setMap(this.map.getMap(), this.map.getRows(), this.map.getCols());
+//                return map;
+//            }
+//            throw new InvalidValue("not pause, can't get map");
+//        }
     }
 
     public List<Float> addPropertyChangedAv(List<Float> listPropertyChange, Float propertyChange){
