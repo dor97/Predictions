@@ -23,7 +23,7 @@ public class EntityDifenichan implements Serializable {
     public EntityDifenichan(PRDEntity e) throws allReadyExistsException, InvalidValue{
         m_name = e.getName();
         //m_amount = e.getPRDPopulation();
-        m_amount = 100; //TODO change to zero
+        m_amount = 0; //TODO change to zero
         m_propertys = new HashMap<>();
         for(PRDProperty p : e.getPRDProperties().getPRDProperty()){
             if(m_propertys.containsKey(p.getPRDName())){
