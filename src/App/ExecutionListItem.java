@@ -23,7 +23,7 @@ public class ExecutionListItem {
     @Override
     public String toString(){
         if(isFinished){
-            return "Simulation Number: "+ id.toString() + "(finished)";
+            return "Id: "+ id.toString() + "(finished)";
         }
         return "Id: "+ id.toString();
     }
