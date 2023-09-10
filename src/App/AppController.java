@@ -1,6 +1,7 @@
 package App;
 import DTO.*;
 import Engine.Engine;
+import Engine.Status;
 import TreeDetails.TreeDetailsController;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -80,8 +81,16 @@ public class AppController implements Initializable {
                 myTask newTask = new myTask();
                 newTask.bindProperties(ticksValueLabel.textProperty(), secondsValueLabel.textProperty(), entitiesRunTablesData);
                 engine.getDataUsingTask(newTask, selectedValue);
+                if (engine.getSimulationStatus(selectedValue) == Status.FINISHED){
+                    displaySimulationResults(engine);
+                }
+
             }
         }));
+    }
+
+    private void displaySimulationResults(Engine engine) {
+        
     }
 
     public void setTreeViewComponentController(TreeViewController treeViewController) {
