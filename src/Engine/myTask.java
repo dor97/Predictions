@@ -1,11 +1,13 @@
 package Engine;
 
+import App.EntitiesRunTable;
 import DTO.DTORunningSimulationDetails;
 import Engine.stopException;
 import Engine.world.World;
 import javafx.application.Platform;
 import javafx.beans.property.*;
 import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.collections.ObservableMap;
 import javafx.concurrent.Task;
 
@@ -35,17 +37,19 @@ public class myTask extends Task<ObservableMap<String, Integer>> {
     private boolean paused = false;
 
     private BooleanProperty pause = new SimpleBooleanProperty();
-    private IntegerProperty m_tick = new SimpleIntegerProperty();
-    private LongProperty m_sec = new SimpleLongProperty();
+    private StringProperty m_tick = new SimpleStringProperty();
+    private StringProperty m_sec = new SimpleStringProperty();
     private MapProperty<String, Integer> map = new SimpleMapProperty<>();
+    private ObservableList<EntitiesRunTable> table;
 
 
     private World world;
 
-    public void bindProperties(MapProperty<String, Integer> map, IntegerProperty tick, LongProperty sec){
-        map.bind(this.map);
+    public void bindProperties(StringProperty tick, StringProperty sec, ObservableList<EntitiesRunTable> table){//MapProperty<String, Integer> map,
+        //map.bind(this.map);
         tick.bind(m_tick);
         sec.bind(m_sec);
+        this.table = table;
     }
 
     public void func(Map<String, Integer> name){
@@ -60,6 +64,12 @@ public class myTask extends Task<ObservableMap<String, Integer>> {
         this.world = world;
     }
 
+    private void updateTable(){
+        table.clear();
+        map.entrySet().stream().forEach(en -> table.add(new EntitiesRunTable(en.getKey(), en.getValue())));
+
+    }
+
     @Override
     protected ObservableMap<String, Integer> call() throws Exception {
 
@@ -69,10 +79,12 @@ public class myTask extends Task<ObservableMap<String, Integer>> {
                 updateMessage(world.getException());
                 return new SimpleMapProperty<>();
             }
-            Platform.runLater(() -> m_tick.set(runningSimulationDetails.getTick()));
-            Platform.runLater(() -> m_sec.set(runningSimulationDetails.getTime()));
+            Platform.runLater(() -> m_tick.set(runningSimulationDetails.getTick().toString()));
+            Platform.runLater(() -> m_sec.set(runningSimulationDetails.getTime().toString()));
             //runningSimulationDetails.getEntities().entrySet().stream().forEach();
-            Platform.runLater(() -> map = runningSimulationDetails.getEntities());
+            Platform.runLater(() ->updateTable());
+            map = runningSimulationDetails.getEntities();
+            //Platform.runLater(() -> map = runningSimulationDetails.getEntities());
             //mmm.bind(ma);
             //updateValue(runningSimulationDetails.getEntities());
 
@@ -127,21 +139,21 @@ public class myTask extends Task<ObservableMap<String, Integer>> {
         return pause;
     }
 
-    public IntegerProperty tickProperty(){
+    public StringProperty tickProperty(){
         return m_tick;
     }
 
-    public LongProperty secProperty(){
+    public StringProperty secProperty(){
         return m_sec;
     }
 
     public void setTick(Integer tick){
-        Platform.runLater(() -> m_tick.set(tick));
+        Platform.runLater(() -> m_tick.set(tick.toString()));
         //m_tick.set(tick);
     }
 
     public void setSce(Long sec){
-        Platform.runLater(() -> m_sec.set(sec));
+        Platform.runLater(() -> m_sec.set(sec.toString()));
     }
 
     public Boolean getPause() {

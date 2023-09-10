@@ -27,7 +27,7 @@ public class ConsoleUI {
 
         pause.bindBidirectional(m_task.pauseProperty());
         pause.set(false);
-        tick.bindBidirectional(m_task.tickProperty());
+        //tick.bindBidirectional(m_task.tickProperty());
         tick.set(0);
 
         boolean validAction = true;
