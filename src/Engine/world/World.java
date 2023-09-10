@@ -82,17 +82,21 @@ public class World implements Serializable {
         DTORunningSimulationDetails runningSimulationDetails = new DTORunningSimulationDetails();
 
         //m_entities.stream().collect(Collectors.groupingBy(Entity::getName, Collectors.summingInt(e -> 1)));
-        Map<String, Integer> entitiesMap = m_entities.stream().collect(Collectors.groupingBy(Entity::getName, Collectors.summingInt(e -> 1)));
+        synchronized (m_entities) {
+            Map<String, Integer> entitiesMap = m_entities.stream().collect(Collectors.groupingBy(Entity::getName, Collectors.summingInt(e -> 1)));
+            runningSimulationDetails.setEntities(entitiesMap);
+        }
 //        MapProperty<String, Integer> entitiesObservableMap = new SimpleMapProperty<>();
 //        try {
 //            entitiesMap.entrySet().stream().forEach(entityEntrySet -> entitiesObservableMap.put(entityEntrySet.getKey(), entityEntrySet.getValue()));
 //        }catch (Exception e){
 //            System.out.println(e.getMessage());
 //        }
-        runningSimulationDetails.setEntities(entitiesMap);
 
-        runningSimulationDetails.setTick(currTick);
-        runningSimulationDetails.setTime(Duration.between(start, Instant.now()).getSeconds());
+        synchronized (start) {
+            runningSimulationDetails.setTick(currTick);
+            runningSimulationDetails.setTime(Duration.between(start, Instant.now()).getSeconds());
+        }
 
         return runningSimulationDetails;
     }
@@ -150,20 +154,23 @@ public class World implements Serializable {
             Map<String, List<Entity>> killAndCreat = new HashMap<>();
             killAndCreat.put("kill", new ArrayList<>());
             killAndCreat.put("creat", new ArrayList<>());
-            m_entities.stream().forEach(entity -> toActive.stream().forEach(actionInterface -> (activeatActian(entity, actionInterface)).forEach((key, value) -> killAndCreat.merge(key, value, (list1, list2) -> {
-                list1.addAll(list2);
-                return list1;
-            }))));
+            synchronized(m_entities) {
+                m_entities.stream().forEach(entity -> toActive.stream().forEach(actionInterface -> (activeatActian(entity, actionInterface)).forEach((key, value) -> killAndCreat.merge(key, value, (list1, list2) -> {
+                    list1.addAll(list2);
+                    return list1;
+                }))));
 
-            map.moveEntities(m_entities);
-            //killAndCreat.forEach((key, value) -> killCreat(key, value));
-            map.deleteEntities(killAndCreat.get("kill"));
-            map.createEntities(killAndCreat.get("creat"));
-            m_entities.removeAll(killAndCreat.get("kill"));
-            m_entities.addAll(killAndCreat.get("creat"));
+                map.moveEntities(m_entities);
+                //killAndCreat.forEach((key, value) -> killCreat(key, value));
+                map.deleteEntities(killAndCreat.get("kill"));
+                map.createEntities(killAndCreat.get("creat"));
+                m_entities.removeAll(killAndCreat.get("kill"));
+                m_entities.addAll(killAndCreat.get("creat"));
+            }
 
-
-            currTick++;
+            synchronized (start) {
+                currTick++;
+            }
 //            aTask.func(m_entities.stream().collect(Collectors.groupingBy(Entity::getName, Collectors.summingInt(e -> 1))));
 //            aTask.setTick(currTick);
 //            aTask.setSce(Duration.between(start, Instant.now()).getSeconds());
