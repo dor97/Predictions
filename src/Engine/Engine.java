@@ -307,6 +307,13 @@ public class Engine {
         cuurentSimuletion.addPopulationToEntity(entityName, population);
     }
 
+    public void addEnvironmentVariableValue(String name, String value) throws NoSuchFileException, UnsupportedFileTypeException, InvalidValue, allReadyExistsException , JAXBException, FileNotFoundException {
+        if(!isFileLoadedInSimulation){
+            loadSimulation(m_fileName);
+        }
+        cuurentSimuletion.addEnvironmentValue(name, value);
+    }
+
     public DTOSimulation getSimulationDto() {
 //        Map<Integer, String> simulations = new HashMap<>();
 //

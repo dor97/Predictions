@@ -54,12 +54,32 @@
           <Tab text="New Execution">
                <content>
                   <BorderPane prefHeight="200.0" prefWidth="200.0">
+                     <bottom>
+                        <HBox spacing="15.0" BorderPane.alignment="CENTER">
+                           <children>
+                              <Button fx:id="clearSimulationButton" mnemonicParsing="false" onAction="#clearSimulation" text="Clear" />
+                              <Button fx:id="startSimulationButton" mnemonicParsing="false" onAction="#startSimulation" text="Start" />
+                           </children>
+                        </HBox>
+                     </bottom>
                      <center>
-                         <fx:include source="../SimulationDetailsTable/SimulationDetailsTable.fxml" />
+                        <HBox fx:id="tablesHbox" BorderPane.alignment="CENTER">
+                           <children>
+                              <TableView fx:id="environmentVarTable">
+                                <columns>
+                                  <TableColumn fx:id="environmentVarColumn" minWidth="-1.0" prefWidth="136.66665649414062" text="Environment Variable" />
+                                  <TableColumn fx:id="valueColumn" minWidth="-1.0" prefWidth="110.66668701171875" text="Value" />
+                                </columns>
+                              </TableView>
+                              <TableView fx:id="entitiesTable">
+                                <columns>
+                                  <TableColumn fx:id="entityColumn" minWidth="-1.0" prefWidth="102.0" text="Entity" />
+                                  <TableColumn fx:id="populationColumn" minWidth="-1.0" prefWidth="138.66668701171875" text="Population" />
+                                </columns>
+                              </TableView>
+                           </children>
+                        </HBox>
                      </center>
-                     <top>
-                        <Button fx:id="runSimulationButton" mnemonicParsing="false" onAction="#runSimulationListener" prefHeight="25.0" prefWidth="605.0" text="Run Simulation" BorderPane.alignment="CENTER" />
-                     </top>
                   </BorderPane>
                </content>
           </Tab>

@@ -1,6 +1,5 @@
 package DesktopUI;
 
-import SimulationDetailsTable.SimulationDetailsTableController;
 import TreeDetails.TreeDetailsController;
 import TreeView.TreeViewController;
 import javafx.application.Application;
@@ -31,12 +30,6 @@ public class DesktopUI extends Application {
         TreeDetailsController treeDetailsController = fxmlLoader.getController();
 
         fxmlLoader = new FXMLLoader();
-        url = getClass().getResource("/SimulationDetailsTable/SimulationDetailsTable.fxml");
-        fxmlLoader.setLocation(url);
-        HBox simulationDetailsTableComponent = fxmlLoader.load(url.openStream());
-        SimulationDetailsTableController simulationDetailsTableController = fxmlLoader.getController();
-
-        fxmlLoader = new FXMLLoader();
         URL mainFXML = getClass().getResource("/resources/javaFXproject.fxml");
         fxmlLoader.setLocation(mainFXML);
         Parent root = fxmlLoader.load();
@@ -44,7 +37,6 @@ public class DesktopUI extends Application {
 
         appController.setTreeViewComponentController(treeViewController);
         appController.setTreeDetailsComponentController(treeDetailsController);
-        appController.setSimulationDetailsTableController(simulationDetailsTableController);
 
         Scene scene = new Scene(root, 600 , 400);
         primaryStage.setScene(scene);
