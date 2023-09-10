@@ -2,14 +2,11 @@ package App;
 import DTO.*;
 import Engine.Engine;
 import TreeDetails.TreeDetailsController;
-import javafx.beans.property.DoubleProperty;
-import javafx.beans.property.SimpleDoubleProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.BorderPane;
@@ -23,6 +20,15 @@ import java.util.ResourceBundle;
 import Engine.myTask;
 
 public class AppController implements Initializable {
+    @FXML private ListView executionListView;
+    @FXML private TableView entitiesRunTable;
+    @FXML private TableColumn entityRunColumn;
+    @FXML private TableColumn populationRunColumn;
+    @FXML private Button rerunButton;
+    @FXML private Label ticksLabel;
+    @FXML private Label ticksValueLabel;
+    @FXML private Label secondsLabel;
+    @FXML private Label secondsValueLabel;
     @FXML private HBox tablesHbox;
     @FXML private Button startSimulationButton;
     @FXML private Button clearSimulationButton;
@@ -42,6 +48,7 @@ public class AppController implements Initializable {
     private Engine engine;
     private ObservableList<EnvironmentVariableTable> environmentVariableTableData = FXCollections.observableArrayList();
     private ObservableList<EntitiesTable> entitiesTableData = FXCollections.observableArrayList();
+    private ObservableList<EntitiesRunTable> entitiesRunTablesData = FXCollections.observableArrayList();
     private int simulationID;
 
 
@@ -57,9 +64,12 @@ public class AppController implements Initializable {
         valueColumn.setCellValueFactory(new PropertyValueFactory<>("value"));
         entityColumn.setCellValueFactory(new PropertyValueFactory<>("entityName"));
         populationColumn.setCellValueFactory(new PropertyValueFactory<>("population"));
+        entityRunColumn.setCellValueFactory(new PropertyValueFactory<>("entityName"));
+        populationRunColumn.setCellValueFactory(new PropertyValueFactory<>("population"));
 
         environmentVarTable.setItems(environmentVariableTableData);
         entitiesTable.setItems(entitiesTableData);
+        entitiesRunTable.setItems(entitiesRunTablesData);
     }
 
     public void setTreeViewComponentController(TreeViewController treeViewController) {
@@ -96,28 +106,24 @@ public class AppController implements Initializable {
     private void fillEntitiesTable(Engine engine) {
 
         DTOSimulationDetails details = engine.getSimulationDetails();
+        entitiesTableData.clear();
         for (DTOEntityData entity : details.getEntitysList()){
-            entitiesTable.getItems().add(new EntitiesTable(entity.getName(), "0"));
+            entitiesTableData.add(new EntitiesTable(entity.getName(), "0"));
         }
-
-        entitiesTable.refresh();
     }
 
     public void fillEnvironmentVariableTable(Engine engine) {
 
         DTOSimulationDetails details = engine.getSimulationDetails();
-
+        environmentVariableTableData.clear();
         for (DTOEnvironmentVariables environmentVariable : details.getEnvironmentVariables()){
-            environmentVarTable.getItems().add(new EnvironmentVariableTable(environmentVariable.getVariableName()+"("+ environmentVariable.getVariableType()+")", ""));
+            environmentVariableTableData.add(new EnvironmentVariableTable(environmentVariable.getVariableName()+"("+ environmentVariable.getVariableType()+")", ""));
         }
-        environmentVarTable.refresh();
     }
 
     public BorderPane getTreeViewComponent(){
         return treeViewComponent;
     }
-
-    public BorderPane getTreeDetailsComponent(){return treeDetailsComponent;}
 
     public void setStage (Stage i_primaryStage){
         this.primaryStage = i_primaryStage;
@@ -155,9 +161,6 @@ public class AppController implements Initializable {
         }catch (Exception e){
             System.out.println(e.getMessage());
         }
-
-
-
     }
 
     public void clearSimulation(ActionEvent actionEvent) {
@@ -169,5 +172,8 @@ public class AppController implements Initializable {
         for (EntitiesTable entity : entitiesTableData){
             entity.getPopulation().setText("0");
         }
+    }
+
+    public void rerun(ActionEvent actionEvent) {
     }
 }
