@@ -8,6 +8,7 @@
 <?import javafx.scene.control.TabPane?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextArea?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.ColumnConstraints?>
@@ -93,18 +94,18 @@
                <content>
                   <GridPane>
                     <columnConstraints>
-                      <ColumnConstraints hgrow="SOMETIMES" />
-                      <ColumnConstraints hgrow="SOMETIMES" />
+                      <ColumnConstraints hgrow="SOMETIMES" maxWidth="318.4000244140625" minWidth="151.2" prefWidth="155.2" />
+                      <ColumnConstraints hgrow="SOMETIMES" maxWidth="448.3999999999999" minWidth="281.5999755859375" prefWidth="444.3999999999999" />
                     </columnConstraints>
                     <rowConstraints>
-                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                      <RowConstraints maxHeight="204.60001220703126" minHeight="10.0" prefHeight="176.60001220703126" vgrow="SOMETIMES" />
+                      <RowConstraints maxHeight="123.9999755859375" minHeight="10.0" prefHeight="123.19998779296876" vgrow="SOMETIMES" />
                     </rowConstraints>
                      <children>
-                        <ListView fx:id="executionListView" GridPane.rowSpan="2" />
+                        <ListView fx:id="executionListView" maxHeight="1.7976931348623157E308" maxWidth="-Infinity" prefHeight="300.0" prefWidth="200.0" GridPane.rowSpan="2" />
                         <HBox prefHeight="100.0" prefWidth="200.0" spacing="5.0" GridPane.columnIndex="1">
                            <children>
-                              <TableView fx:id="entitiesRunTable">
+                              <TableView fx:id="entitiesRunTable" maxWidth="1.7976931348623157E308">
                                 <columns>
                                   <TableColumn fx:id="entityRunColumn" prefWidth="75.0" text="Entity" />
                                   <TableColumn fx:id="populationRunColumn" text="Population" />
@@ -135,6 +136,7 @@
                                     </Button>
                                  </children>
                               </GridPane>
+                              <TextArea fx:id="exceptionArea" maxWidth="1.7976931348623157E308" prefHeight="154.0" prefWidth="229.0" />
                            </children>
                         </HBox>
                      </children>

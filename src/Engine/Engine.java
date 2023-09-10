@@ -1,5 +1,6 @@
 package Engine;
 
+import App.ExecutionListItem;
 import DTO.*;
 import Engine.world.worldDifenichan;
 import com.sun.org.apache.xml.internal.security.signature.ReferenceNotInitializedException;
@@ -7,8 +8,11 @@ import Engine.world.World;
 import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.IntegerProperty;
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import org.omg.CORBA.DynAnyPackage.InvalidValue;
+import javafx.collections.FXCollections;
+
 
 import javax.xml.bind.JAXBException;
 import java.io.*;
@@ -69,18 +73,30 @@ public class Engine {
         return cuurentSimuletion.setSimulation();
     }
 
-    public void updateNewlyFinishedSimulationInLoop(ObservableList<Object> simulations){
+    public void updateNewlyFinishedSimulationInLoop(ObservableList<ExecutionListItem> simulations){
         new Thread(() -> {  while(true)
         {updateNewlyFinishedSimulation(simulations);
             try{Thread.sleep(200);}catch (InterruptedException e){}}
-        });
+        }).start();
     }
 
-    public void updateNewlyFinishedSimulation(ObservableList<Object> simulations){
+    public void updateNewlyFinishedSimulation(ObservableList<ExecutionListItem> simulations){
         synchronized (newlyFinishedSimulationIds){
+            ObservableList<ExecutionListItem> toRemove = FXCollections.observableArrayList();
             for(Integer id : newlyFinishedSimulationIds){
-                Platform.runLater(() -> simulations.get(id));   //TODO make logic when simulation ended
+                for(ExecutionListItem executionListItem : simulations){
+                    if(executionListItem.getID().equals(id)){
+                        toRemove.add(executionListItem);
+                    }
+                }
             }
+
+            Platform.runLater(() -> {for(ExecutionListItem executionListItem : toRemove){//TODO make logic when simulation ended
+                simulations.remove(executionListItem);
+                simulations.add(new ExecutionListItem(executionListItem.getID(), true));
+
+            }});
+
             newlyFinishedSimulationIds.clear();
         }
     }
@@ -95,7 +111,7 @@ public class Engine {
         new Thread(() -> {  while(true)
                                 {threadPoolDetails(wit, run, fin);
                                 try{Thread.sleep(200);}catch (InterruptedException e){}}
-                            });
+                            }).start();
     }
     public void threadPoolDetails(IntegerProperty wit, IntegerProperty run, IntegerProperty fin){
         if(threadPool != null && !threadPool.isTerminated()){
@@ -227,7 +243,10 @@ public class Engine {
     }
 
     public DTODataForReRun getDataForRerun(Integer simulationNum){
-        return worldsList.get(simulationNum).getDataForRerun();
+        if(worldsList.containsKey(simulationNum)) {
+            return worldsList.get(simulationNum).getDataForRerun();
+        }
+        return null;
     }
 
     public void getDataUsingTask(myTask task, Integer simulationId){

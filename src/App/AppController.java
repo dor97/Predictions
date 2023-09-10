@@ -46,6 +46,7 @@ public class AppController implements Initializable {
     @FXML private TreeView<DTOSimulationDetailsItem> detailsTreeView;
     @FXML private TextField loadedFilePathTextBox;
     @FXML private TableColumn<String, Integer> queueManagementTable;
+    @FXML private TextArea exceptionArea;
     private Stage primaryStage;
     private Engine engine;
     private ObservableList<EnvironmentVariableTable> environmentVariableTableData = FXCollections.observableArrayList();
@@ -55,6 +56,7 @@ public class AppController implements Initializable {
     private int simulationID;
     private myTask newTask = null;
     private Integer lastSimulationNum = 0;
+    private Boolean isFirstSimulationForFile = true;
 
 
     @Override
@@ -86,6 +88,7 @@ public class AppController implements Initializable {
                 }
                 lastSimulationNum = selectedValue;
                 newTask = new myTask();
+                exceptionArea.promptTextProperty().bind(newTask.messageProperty());
                 newTask.bindProperties(ticksValueLabel.textProperty(), secondsValueLabel.textProperty(), entitiesRunTablesData);
                 engine.getDataUsingTask(newTask, selectedValue);
                 if (engine.getSimulationStatus(selectedValue) == Status.FINISHED){
@@ -145,7 +148,7 @@ public class AppController implements Initializable {
         DTOSimulationDetails details = engine.getSimulationDetails();
         environmentVariableTableData.clear();
         for (DTOEnvironmentVariables environmentVariable : details.getEnvironmentVariables()){
-            environmentVariableTableData.add(new EnvironmentVariableTable(environmentVariable.getVariableName()+"("+ environmentVariable.getVariableType()+")", ""));
+            environmentVariableTableData.add(new EnvironmentVariableTable(environmentVariable.getVariableName() + "("+ environmentVariable.getVariableType()+")", "", environmentVariable.getVariableName()));
         }
     }
 
@@ -166,7 +169,7 @@ public class AppController implements Initializable {
         for (EnvironmentVariableTable environmentVariable : environmentVariableTableData){
             if (!environmentVariable.getValue().getText().isEmpty()){
                 try{
-                    engine.addEnvironmentVariableValue(environmentVariable.getEnvVarName(), environmentVariable.getValue().getText());
+                    engine.addEnvironmentVariableValue(environmentVariable.getEnvVarNameNoType(), environmentVariable.getValue().getText());
                 }catch (Exception e){
                     System.out.println(e.getMessage());
                 }
@@ -187,6 +190,10 @@ public class AppController implements Initializable {
             engine.setSimulation();
             simulationID = engine.activeSimulation(new myTask());
             executionListViewData.add(new ExecutionListItem(simulationID));
+            if(isFirstSimulationForFile){
+                isFirstSimulationForFile = false;
+                engine.updateNewlyFinishedSimulationInLoop(executionListViewData);
+            }
 
         }catch (Exception e){
             System.out.println(e.getMessage());
@@ -205,5 +212,24 @@ public class AppController implements Initializable {
     }
 
     public void rerun(ActionEvent actionEvent) {
+        if(lastSimulationNum != 0) {
+            entitiesTableData.clear();
+            DTODataForReRun dataForReRun = engine.getDataForRerun(lastSimulationNum);
+            if(dataForReRun == null){
+                return;
+            }
+            for (String entity : dataForReRun.getEntitiesPopulation().keySet()) {
+                entitiesTableData.add(new EntitiesTable(entity, dataForReRun.getEntitiesPopulation().get(entity).toString()));
+                //entitiesTableData.add(new EntitiesTable(entity.getName(), "0"));
+            }
+
+            for(EnvironmentVariableTable environmentVariableTable : environmentVariableTableData){
+                if(dataForReRun.getEnvironmentsValues().containsKey(environmentVariableTable.getEnvVarNameNoType())){
+                    environmentVariableTable.setValueInText(dataForReRun.getEnvironmentsValues().get(environmentVariableTable.getEnvVarNameNoType()).toString());
+                }else{
+                    environmentVariableTable.setValueInText("");
+                }
+            }
+        }
     }
 }

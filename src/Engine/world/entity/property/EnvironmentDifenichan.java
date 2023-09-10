@@ -114,6 +114,9 @@ public class EnvironmentDifenichan implements Serializable {
 
     public void setWithString(String value){
         m_init.convertValueInString(value);
+        if(m_init.getType() == expressionType.INT && m_type == expressionType.FLOAT){
+            m_init.setValue((float)(m_init.getInt()));
+        }
 
         if(m_init.getType() != m_type){
             throw new InvalidValue("In environment variabale " + m_name + " got wrong value type");

@@ -21,6 +21,8 @@ public class EntitiesRunTable {
         return entityName;
     }
 
+    public SimpleIntegerProperty populationProperty(){return population;}
+
     public void setPopulation (SimpleIntegerProperty population){
         this.population = population;
     }
