@@ -44,6 +44,7 @@ public class AppController implements Initializable {
     @FXML private TreeViewController treeViewController;
     @FXML private TreeView<DTOSimulationDetailsItem> detailsTreeView;
     @FXML private TextField loadedFilePathTextBox;
+    @FXML private TableColumn<String, Integer> queueManagementTable;
     private Stage primaryStage;
     private Engine engine;
     private ObservableList<EnvironmentVariableTable> environmentVariableTableData = FXCollections.observableArrayList();
