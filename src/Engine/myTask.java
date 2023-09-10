@@ -37,10 +37,11 @@ public class myTask extends Task<ObservableMap<String, Integer>> {
     private boolean paused = false;
 
     private BooleanProperty pause = new SimpleBooleanProperty();
-    private StringProperty m_tick = new SimpleStringProperty();
-    private StringProperty m_sec = new SimpleStringProperty();
+    private StringProperty m_tick = new SimpleStringProperty("0");
+    private StringProperty m_sec = new SimpleStringProperty("0");
     private Map<String, Integer> map = new HashMap<>(); // MapProperty == SimpleMapProperty
     private ObservableList<EntitiesRunTable> table;
+    private StringProperty text;
 
 
     private World world;
@@ -49,16 +50,10 @@ public class myTask extends Task<ObservableMap<String, Integer>> {
         //map.bind(this.map);
         tick.bind(m_tick);
         sec.bind(m_sec);
+        //text = tick;
         this.table = table;
     }
 
-    public void func(Map<String, Integer> name){
-        //name.bind(valueProperty());
-        ObservableMap<String, Integer> temp = FXCollections.observableHashMap();
-        name.entrySet().stream().forEach(stringIntegerEntry -> temp.put(stringIntegerEntry.getKey(), stringIntegerEntry.getValue()));
-        //temp.put("e1", 5);
-        updateValue(temp);
-    }
 
     public void loadWorld(World world){
         this.world = world;
@@ -73,29 +68,36 @@ public class myTask extends Task<ObservableMap<String, Integer>> {
     @Override
     protected ObservableMap<String, Integer> call() throws Exception {
 
-        while(true){
+        while(!isCancelled()){
             DTORunningSimulationDetails runningSimulationDetails = world.getRunningSimulationDTO();
-            if(runningSimulationDetails == null){
+            if (runningSimulationDetails == null) {
                 updateMessage(world.getException());
                 return new SimpleMapProperty<>();
             }
-            map = runningSimulationDetails.getEntities();
+
+            //map = runningSimulationDetails.getEntities();
             Platform.runLater(() -> m_tick.set(runningSimulationDetails.getTick().toString()));
             Platform.runLater(() -> m_sec.set(runningSimulationDetails.getTime().toString()));
             //runningSimulationDetails.getEntities().entrySet().stream().forEach();
-            Platform.runLater(() ->updateTable());
+            Platform.runLater(() -> {
+                map.clear();
+                map.putAll(runningSimulationDetails.getEntities());
+                updateTable();});
             //Platform.runLater(() -> map = runningSimulationDetails.getEntities());
             //mmm.bind(ma);
             //updateValue(runningSimulationDetails.getEntities());
 
-            if(Thread.currentThread().isInterrupted()){
+            if (Thread.currentThread().isInterrupted()) {
                 return new SimpleMapProperty<>();
             }
-
-            Thread.sleep(200);
+            try {
+                Thread.sleep(300);
+            }catch (InterruptedException e){
+                return new SimpleMapProperty<>();
+            }
         }
 
-
+        return new SimpleMapProperty<>();
 
 
 

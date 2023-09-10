@@ -31,6 +31,7 @@ public class Engine {
     private worldDifenichan worldDif = null;
     private Map<Integer, String> simulationsExceptions;
     private List<Integer> newlyFinishedSimulationIds = new ArrayList<>();
+    private Thread taskThread = null;
 
     public void loadSimulation(String fileName) throws NoSuchFileException, UnsupportedFileTypeException, InvalidValue, allReadyExistsException , JAXBException, FileNotFoundException {
         try {
@@ -232,6 +233,9 @@ public class Engine {
     public void getDataUsingTask(myTask task, Integer simulationId){
         World world;
         Thread taskThread = new Thread(task);
+//        synchronized (this.taskThread) {
+//            this.taskThread = taskThread;
+//        }
         taskThread.setName("TaskThread");
         synchronized (simStatus) {
             world = simStatus.get(simulationId).getWorld();
@@ -244,8 +248,14 @@ public class Engine {
 
     }
 
-    public void stopGettingDataUsingTask(Integer simulationNum){
+    public void stopGettingDataUsingTask(myTask task, Integer simulationNum){
         synchronized (simStatus) {
+//            synchronized (this.taskThread) {
+//            if(taskThread != null) {
+//                taskThread.interrupt();
+//                task.cancel();
+//                }
+//            }
             simStatus.get(simulationNum).getTaskThread().interrupt();
         }
 

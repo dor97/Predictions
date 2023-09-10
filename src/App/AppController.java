@@ -45,6 +45,7 @@ public class AppController implements Initializable {
     @FXML private TreeViewController treeViewController;
     @FXML private TreeView<DTOSimulationDetailsItem> detailsTreeView;
     @FXML private TextField loadedFilePathTextBox;
+    @FXML private TableColumn<String, Integer> queueManagementTable;
     private Stage primaryStage;
     private Engine engine;
     private ObservableList<EnvironmentVariableTable> environmentVariableTableData = FXCollections.observableArrayList();
@@ -52,6 +53,8 @@ public class AppController implements Initializable {
     private ObservableList<EntitiesRunTable> entitiesRunTablesData = FXCollections.observableArrayList();
     private ObservableList<ExecutionListItem> executionListViewData = FXCollections.observableArrayList();
     private int simulationID;
+    private myTask newTask = null;
+    private Integer lastSimulationNum = 0;
 
 
     @Override
@@ -78,7 +81,11 @@ public class AppController implements Initializable {
             if (newValue !=null){
                 ExecutionListItem selectedListItem = newValue;
                 Integer selectedValue = selectedListItem.getID();
-                myTask newTask = new myTask();
+                if(newTask != null){
+                    engine.stopGettingDataUsingTask(newTask, lastSimulationNum);
+                }
+                lastSimulationNum = selectedValue;
+                newTask = new myTask();
                 newTask.bindProperties(ticksValueLabel.textProperty(), secondsValueLabel.textProperty(), entitiesRunTablesData);
                 engine.getDataUsingTask(newTask, selectedValue);
                 if (engine.getSimulationStatus(selectedValue) == Status.FINISHED){
