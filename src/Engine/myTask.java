@@ -79,11 +79,11 @@ public class myTask extends Task<ObservableMap<String, Integer>> {
                 updateMessage(world.getException());
                 return new SimpleMapProperty<>();
             }
+            map = runningSimulationDetails.getEntities();
             Platform.runLater(() -> m_tick.set(runningSimulationDetails.getTick().toString()));
             Platform.runLater(() -> m_sec.set(runningSimulationDetails.getTime().toString()));
             //runningSimulationDetails.getEntities().entrySet().stream().forEach();
             Platform.runLater(() ->updateTable());
-            map = runningSimulationDetails.getEntities();
             //Platform.runLater(() -> map = runningSimulationDetails.getEntities());
             //mmm.bind(ma);
             //updateValue(runningSimulationDetails.getEntities());

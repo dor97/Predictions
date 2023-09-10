@@ -232,6 +232,7 @@ public class Engine {
     public void getDataUsingTask(myTask task, Integer simulationId){
         World world;
         Thread taskThread = new Thread(task);
+        taskThread.setName("TaskThread");
         synchronized (simStatus) {
             world = simStatus.get(simulationId).getWorld();
             simStatus.get(simulationId).setTask(task);

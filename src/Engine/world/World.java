@@ -84,7 +84,11 @@ public class World implements Serializable {
         //m_entities.stream().collect(Collectors.groupingBy(Entity::getName, Collectors.summingInt(e -> 1)));
         Map<String, Integer> entitiesMap = m_entities.stream().collect(Collectors.groupingBy(Entity::getName, Collectors.summingInt(e -> 1)));
         MapProperty<String, Integer> entitiesObservableMap = new SimpleMapProperty<>();
-        entitiesMap.entrySet().stream().forEach(entityEntrySet -> entitiesObservableMap.put(entityEntrySet.getKey(), entityEntrySet.getValue()));
+        try {
+            entitiesMap.entrySet().stream().forEach(entityEntrySet -> entitiesObservableMap.put(entityEntrySet.getKey(), entityEntrySet.getValue()));
+        }catch (Exception e){
+            System.out.println(e.getMessage());
+        }
         runningSimulationDetails.setEntities(entitiesObservableMap);
 
         runningSimulationDetails.setTick(currTick);

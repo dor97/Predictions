@@ -20,7 +20,7 @@ import java.util.ResourceBundle;
 import Engine.myTask;
 
 public class AppController implements Initializable {
-    @FXML private ListView executionListView;
+    @FXML private ListView<ExecutionListItem> executionListView;
     @FXML private TableView entitiesRunTable;
     @FXML private TableColumn entityRunColumn;
     @FXML private TableColumn populationRunColumn;
@@ -49,6 +49,7 @@ public class AppController implements Initializable {
     private ObservableList<EnvironmentVariableTable> environmentVariableTableData = FXCollections.observableArrayList();
     private ObservableList<EntitiesTable> entitiesTableData = FXCollections.observableArrayList();
     private ObservableList<EntitiesRunTable> entitiesRunTablesData = FXCollections.observableArrayList();
+    private ObservableList<ExecutionListItem> executionListViewData = FXCollections.observableArrayList();
     private int simulationID;
 
 
@@ -70,6 +71,17 @@ public class AppController implements Initializable {
         environmentVarTable.setItems(environmentVariableTableData);
         entitiesTable.setItems(entitiesTableData);
         entitiesRunTable.setItems(entitiesRunTablesData);
+        executionListView.setItems(executionListViewData);
+
+        executionListView.getSelectionModel().selectedItemProperty().addListener(((observable, oldValue, newValue) -> {
+            if (newValue !=null){
+                ExecutionListItem selectedListItem = newValue;
+                Integer selectedValue = selectedListItem.getID();
+                myTask newTask = new myTask();
+                newTask.bindProperties(ticksValueLabel.textProperty(), secondsValueLabel.textProperty(), entitiesRunTablesData);
+                engine.getDataUsingTask(newTask, selectedValue);
+            }
+        }));
     }
 
     public void setTreeViewComponentController(TreeViewController treeViewController) {
@@ -158,6 +170,8 @@ public class AppController implements Initializable {
         try{
             engine.setSimulation();
             simulationID = engine.activeSimulation(new myTask());
+            executionListViewData.add(new ExecutionListItem(simulationID));
+
         }catch (Exception e){
             System.out.println(e.getMessage());
         }
