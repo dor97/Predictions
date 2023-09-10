@@ -39,7 +39,7 @@ public class myTask extends Task<ObservableMap<String, Integer>> {
     private BooleanProperty pause = new SimpleBooleanProperty();
     private StringProperty m_tick = new SimpleStringProperty();
     private StringProperty m_sec = new SimpleStringProperty();
-    private MapProperty<String, Integer> map = new SimpleMapProperty<>();
+    private Map<String, Integer> map = new HashMap<>(); // MapProperty == SimpleMapProperty
     private ObservableList<EntitiesRunTable> table;
 
 

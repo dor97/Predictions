@@ -6,11 +6,11 @@ import javafx.collections.ObservableMap;
 import java.util.Map;
 
 public class DTORunningSimulationDetails {
-    private MapProperty<String, Integer> entities;
+    private Map<String, Integer> entities;
     private Integer tick;
     private Long time;
 
-    public void setEntities(MapProperty<String, Integer> entities){
+    public void setEntities(Map<String, Integer> entities){
         this.entities = entities;
     }
 
@@ -22,7 +22,7 @@ public class DTORunningSimulationDetails {
         this.time = time;
     }
 
-    public MapProperty<String, Integer> getEntities(){
+    public Map<String, Integer> getEntities(){
         return entities;
     }
 
