@@ -29,10 +29,10 @@ public class TreeViewController {
 
     public void displayFileDetails(Engine engine, String absolutePath)throws Exception {
         if(pathToSimulation == null || !pathToSimulation.equals(absolutePath)){
-            pathToSimulation = absolutePath;
             detailsTreeView.setRoot(null);
             mainController.clearSimulation();
             engine.loadSimulation(absolutePath);
+            pathToSimulation = absolutePath;
 
         }
         DTOSimulationDetails details = engine.getSimulationDetails();

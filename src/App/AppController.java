@@ -64,7 +64,8 @@ public class AppController implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         alert.setTitle("Error");
-        alert.setWidth(800);
+        alert.setWidth(1000);
+        alert.setHeight(1000);
         if (treeViewController != null && treeDetailsController != null) {
             treeViewController.setMainController(this);
             treeDetailsController.setMainController(this);
