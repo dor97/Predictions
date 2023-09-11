@@ -229,6 +229,12 @@ public class Engine {
         }
     }
 
+    public Boolean isSimulationGotError(Integer simulationNum){
+        synchronized (simStatus){
+            return !simStatus.get(simulationNum).getWorld().getException().equals("");
+        }
+    }
+
     public void pauseSimulation(Integer numSimulation){
         synchronized (simStatus.get(numSimulation).getIsPause()) {
             simStatus.get(numSimulation).setIsPause(true);
