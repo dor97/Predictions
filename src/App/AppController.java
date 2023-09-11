@@ -109,7 +109,7 @@ public class AppController implements Initializable {
     }
 
     public void shutDownSystem(){
-        engine.disposeOfThreadPool();   //TODO kill other threads
+        engine.disposeOfThreadPool();
     }
 
     public void clearSimulation(){
