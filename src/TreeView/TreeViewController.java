@@ -14,6 +14,7 @@ public class TreeViewController {
     private AppController mainController;
     @FXML private TreeView<DTOSimulationDetailsItem> detailsTreeView;
     @FXML private BorderPane borderPaneTreeView;
+    private String pathToSimulation = null;
 
     public void setMainController(AppController mainController) {
         this.mainController = mainController;
@@ -22,7 +23,13 @@ public class TreeViewController {
     public void displayFileDetails(Engine engine, String absolutePath) {
 
         try {
-            engine.loadSimulation(absolutePath);
+            if(pathToSimulation == null || !pathToSimulation.equals(absolutePath)){
+                pathToSimulation = absolutePath;
+                detailsTreeView.setRoot(null);
+                mainController.clearSimulation();
+                engine.loadSimulation(absolutePath);
+
+            }
             DTOSimulationDetails details = engine.getSimulationDetails();
             TreeItem<DTOSimulationDetailsItem> rootItem = new TreeItem<>(details);
             TreeItem<DTOSimulationDetailsItem> entityItem = new TreeItem<>(new DTOSimulationDetailsItem("Entities"));

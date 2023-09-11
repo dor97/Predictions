@@ -36,6 +36,7 @@ public class Engine {
     private Map<Integer, String> simulationsExceptions;
     private List<Integer> newlyFinishedSimulationIds = new ArrayList<>();
     private Thread taskThread = null;
+    private Boolean isTreadPoolShoutDown = false;
 
     public void loadSimulation(String fileName) throws NoSuchFileException, UnsupportedFileTypeException, InvalidValue, allReadyExistsException , JAXBException, FileNotFoundException {
         try {
@@ -54,7 +55,8 @@ public class Engine {
 
     private void loadNewFile(String fileName)throws NoSuchFileException, UnsupportedFileTypeException, InvalidValue, allReadyExistsException , JAXBException, FileNotFoundException{
         if(threadPool != null && !threadPool.isShutdown()){
-            threadPool.shutdown();
+            isTreadPoolShoutDown = true;
+            threadPool.shutdownNow();
         }
         m_fileName = fileName;
         synchronized (simStatus) {
@@ -64,6 +66,7 @@ public class Engine {
             newlyFinishedSimulationIds.clear(); //TODO maybe not (i.e delete this line)
         }
         threadPool = Executors.newFixedThreadPool(numOfThreads);
+        isTreadPoolShoutDown = false;
     }
 
     public List<DTOEnvironmentVariablesValues> setSimulation()throws NoSuchFileException, UnsupportedFileTypeException, InvalidValue, allReadyExistsException , JAXBException, FileNotFoundException{
@@ -147,6 +150,7 @@ public class Engine {
 
     public void disposeOfThreadPool(){
         if(threadPool != null && !threadPool.isTerminated()){
+            isTreadPoolShoutDown = true;
             threadPool.shutdown();
         }
     }
@@ -204,14 +208,20 @@ public class Engine {
             world.setSimulationEnded();
         }
         synchronized (simStatus) {
-            simStatus.get(world.getNumSimulation()).setStatus(Status.FINISHED);
-            simStatus.get(world.getNumSimulation()).setRunningThread(null);
+            if(simStatus != null && simStatus.size() != 0) {
+                simStatus.get(world.getNumSimulation()).setStatus(Status.FINISHED);
+                simStatus.get(world.getNumSimulation()).setRunningThread(null);
+            }
         }
         synchronized (this) {
-            worldsList.put(simulationNum, world);
+            if(worldsList != null && worldsList.size() == 0) {
+                worldsList.put(simulationNum, world);
+            }
         }
         synchronized (newlyFinishedSimulationIds){
-            newlyFinishedSimulationIds.add(world.getNumSimulation());
+            if(newlyFinishedSimulationIds != null && newlyFinishedSimulationIds.size() == 0) {
+                newlyFinishedSimulationIds.add(world.getNumSimulation());
+            }
         }
     }
 
@@ -318,6 +328,9 @@ public class Engine {
     }
 
     public DTOSimulationDetails getSimulationDetails(){
+        if(cuurentSimuletion == null){
+            return null;
+        }
         return cuurentSimuletion.getSimulationDetails();
     }
 

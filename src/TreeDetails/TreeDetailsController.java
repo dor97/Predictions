@@ -33,4 +33,9 @@ public class TreeDetailsController {
         detailsTreeView.setRoot(rootItem);
         mainController.getTreeViewComponent().setCenter(detailsTreeView);
     }
+
+    public void clearData(){
+        detailsTreeView.setRoot(null);
+        //detailsTreeView.getRoot().getChildren().clear();
+    }
 }

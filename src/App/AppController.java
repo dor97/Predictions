@@ -103,6 +103,21 @@ public class AppController implements Initializable {
         
     }
 
+    public void clearSimulation(){
+        environmentVariableTableData.clear();
+        entitiesTableData.clear();
+        entitiesRunTablesData.clear();
+        executionListViewData.clear();
+        //ticksValueLabel.setText("0");
+        //secondsValueLabel.setText("0");
+        newTask = null;
+        lastSimulationNum = 0;
+        treeDetailsController.clearData();
+
+
+
+    }
+
     public void setTreeViewComponentController(TreeViewController treeViewController) {
         this.treeViewController = treeViewController;
         treeViewController.setMainController(this);
