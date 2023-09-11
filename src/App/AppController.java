@@ -58,12 +58,17 @@ public class AppController implements Initializable {
     private Integer lastSimulationNum = 0;
     private Boolean isFirstSimulationForFile = true;
 
+    private Alert alert = new Alert(Alert.AlertType.ERROR);
+
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        alert.setTitle("Error");
+        alert.setWidth(800);
         if (treeViewController != null && treeDetailsController != null) {
             treeViewController.setMainController(this);
             treeDetailsController.setMainController(this);
+            treeViewController.setAlert(alert);
         }
         engine = new Engine();
 
@@ -103,6 +108,10 @@ public class AppController implements Initializable {
         
     }
 
+    public void shutDownSystem(){
+        engine.disposeOfThreadPool();   //TODO kill other threads
+    }
+
     public void clearSimulation(){
         environmentVariableTableData.clear();
         entitiesTableData.clear();
@@ -121,6 +130,7 @@ public class AppController implements Initializable {
     public void setTreeViewComponentController(TreeViewController treeViewController) {
         this.treeViewController = treeViewController;
         treeViewController.setMainController(this);
+        treeViewController.setAlert(alert);
     }
 
     public void setTreeDetailsComponentController(TreeDetailsController treeDetailsController) {
@@ -143,10 +153,14 @@ public class AppController implements Initializable {
         loadedFilePathTextBox.setText(absolutePath);
         loadedFilePathTextBox.setDisable(true);
         System.out.println("get world ");
-
-        treeViewController.displayFileDetails(engine, absolutePath);
-        fillEnvironmentVariableTable(engine);
-        fillEntitiesTable(engine);
+        try {
+            treeViewController.displayFileDetails(engine, absolutePath);
+            fillEnvironmentVariableTable(engine);
+            fillEntitiesTable(engine);
+        }catch (Exception e){
+            alert.setContentText(e.getMessage());
+            alert.show();
+        }
     }
 
     private void fillEntitiesTable(Engine engine) {
@@ -186,6 +200,8 @@ public class AppController implements Initializable {
                 try{
                     engine.addEnvironmentVariableValue(environmentVariable.getEnvVarNameNoType(), environmentVariable.getValue().getText());
                 }catch (Exception e){
+                    alert.setContentText(e.getMessage());
+                    alert.show();
                     System.out.println(e.getMessage());
                 }
             }
@@ -196,6 +212,8 @@ public class AppController implements Initializable {
                 try{
                     engine.addPopulationToEntity(entity.getEntityName(), Integer.parseInt(entity.getPopulation().getText()));
                 }catch (Exception e){
+                    alert.setContentText(e.getMessage());
+                    alert.show();
                     System.out.println(e.getMessage());
                 }
             }
@@ -211,6 +229,8 @@ public class AppController implements Initializable {
             }
 
         }catch (Exception e){
+            alert.setContentText(e.getMessage());
+            alert.show();
             System.out.println(e.getMessage());
         }
     }

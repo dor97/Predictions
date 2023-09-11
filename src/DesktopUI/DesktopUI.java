@@ -43,6 +43,7 @@ public class DesktopUI extends Application {
         appController.setStage(primaryStage);
         primaryStage.setTitle("Predictions");
         primaryStage.show();
+        appController.shutDownSystem();
     }
 
     public static void main(String[] args){

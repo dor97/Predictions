@@ -125,11 +125,11 @@ public class EnvironmentDifenichan implements Serializable {
         if(m_haveRange){
             if(m_init.getType() == expressionType.INT){
                 if(m_init.getInt() > m_highRang || m_init.getInt() < m_lowRange){
-                    throw new InvalidValue("In environment variabale " + m_name + " got value out of range");
+                    throw new InvalidValue("In environment variabale " + m_name + " got value out of range(" + m_lowRange + "-" + m_highRang + ")");
                 }
             } else if (m_init.getType() == expressionType.FLOAT) {
                 if(m_init.getFloat() > m_highRang || m_init.getFloat() < m_lowRange){
-                    throw new InvalidValue("In environment variabale " + m_name + " got value out of range");
+                    throw new InvalidValue("In environment variabale " + m_name + " got value out of range("+ m_lowRange + "-" + m_highRang + ")");
                 }
             }else {
                 throw new InvalidValue("In environment variabale " + m_name + " of type " + m_type + " got range");

@@ -77,10 +77,12 @@ public class Engine {
     }
 
     public void updateNewlyFinishedSimulationInLoop(ObservableList<ExecutionListItem> simulations){
-        new Thread(() -> {  while(true)
-        {updateNewlyFinishedSimulation(simulations);
-            try{Thread.sleep(200);}catch (InterruptedException e){}}
-        }).start();
+        Thread thread = new Thread(() -> {  while(true)
+                                            {updateNewlyFinishedSimulation(simulations);
+                                            try{Thread.sleep(200);}catch (InterruptedException e){}}
+                                         });
+        thread.setDaemon(true);
+        thread.start();
     }
 
     public void updateNewlyFinishedSimulation(ObservableList<ExecutionListItem> simulations){
@@ -111,10 +113,12 @@ public class Engine {
     }
 
     public void bindAndGetThreadPoolDetails(IntegerProperty wit, IntegerProperty run, IntegerProperty fin){
-        new Thread(() -> {  while(true)
-                                {threadPoolDetails(wit, run, fin);
-                                try{Thread.sleep(200);}catch (InterruptedException e){}}
-                            }).start();
+        Thread thread = new Thread(() -> {  while(true)
+                                            {threadPoolDetails(wit, run, fin);
+                                            try{Thread.sleep(200);}catch (InterruptedException e){}}
+                                             });
+        thread.setDaemon(true);
+        thread.start();
     }
     public void threadPoolDetails(IntegerProperty wit, IntegerProperty run, IntegerProperty fin){
         if(threadPool != null && !threadPool.isTerminated()){
@@ -151,7 +155,7 @@ public class Engine {
     public void disposeOfThreadPool(){
         if(threadPool != null && !threadPool.isTerminated()){
             isTreadPoolShoutDown = true;
-            threadPool.shutdown();
+            threadPool.shutdownNow();
         }
     }
 
@@ -262,6 +266,7 @@ public class Engine {
     public void getDataUsingTask(myTask task, Integer simulationId){
         World world;
         Thread taskThread = new Thread(task);
+        taskThread.setDaemon(true);
 //        synchronized (this.taskThread) {
 //            this.taskThread = taskThread;
 //        }

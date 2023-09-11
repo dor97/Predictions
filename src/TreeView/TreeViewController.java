@@ -4,6 +4,7 @@ import App.AppController;
 import DTO.*;
 import Engine.Engine;
 import javafx.fxml.FXML;
+import javafx.scene.control.Alert;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 import javafx.scene.layout.BorderPane;
@@ -16,48 +17,48 @@ public class TreeViewController {
     @FXML private BorderPane borderPaneTreeView;
     private String pathToSimulation = null;
 
+    private Alert alert;
+
     public void setMainController(AppController mainController) {
         this.mainController = mainController;
     }
 
-    public void displayFileDetails(Engine engine, String absolutePath) {
+    public void setAlert(Alert alert){
+        this.alert = alert;
+    }
 
-        try {
-            if(pathToSimulation == null || !pathToSimulation.equals(absolutePath)){
-                pathToSimulation = absolutePath;
-                detailsTreeView.setRoot(null);
-                mainController.clearSimulation();
-                engine.loadSimulation(absolutePath);
-
-            }
-            DTOSimulationDetails details = engine.getSimulationDetails();
-            TreeItem<DTOSimulationDetailsItem> rootItem = new TreeItem<>(details);
-            TreeItem<DTOSimulationDetailsItem> entityItem = new TreeItem<>(new DTOSimulationDetailsItem("Entities"));
-            TreeItem<DTOSimulationDetailsItem> ruleItem = new TreeItem<>(new DTOSimulationDetailsItem("Rules"));
-            TreeItem<DTOSimulationDetailsItem> envItem = new TreeItem<>(new DTOSimulationDetailsItem("Environment Variables"));
-            TreeItem<DTOSimulationDetailsItem> gridItem = new TreeItem<>(new DTOSimulationDetailsItem("Grid"));
-            TreeItem<DTOSimulationDetailsItem> terminationItem = new TreeItem<>(new DTOSimulationDetailsItem("Termination"));
-
-            rootItem.getChildren().add(getEntities(details, entityItem));
-            rootItem.getChildren().add(getRules(details, ruleItem));
-            rootItem.getChildren().add(getEnvVar(details, envItem));
-            rootItem.getChildren().add(getGrid(details,gridItem));
-            rootItem.getChildren().add(getTermination(details,terminationItem));
-
-            detailsTreeView.setRoot(rootItem);
-            mainController.getTreeViewComponent().setLeft(detailsTreeView);
-
-            detailsTreeView.getSelectionModel().selectedItemProperty().addListener(((observable, oldValue, newValue) -> {
-                if (newValue !=null && newValue.getChildren().isEmpty()){
-                    TreeItem<DTOSimulationDetailsItem> selectedTreeItem = newValue;
-                    DTOSimulationDetailsItem selectedValue = selectedTreeItem.getValue();
-                    mainController.displayTreeItemsDetails(selectedValue);
-                }
-            }));
-        }catch (Exception e){
-            System.out.println(e.getMessage());
+    public void displayFileDetails(Engine engine, String absolutePath)throws Exception {
+        if(pathToSimulation == null || !pathToSimulation.equals(absolutePath)){
+            pathToSimulation = absolutePath;
+            detailsTreeView.setRoot(null);
+            mainController.clearSimulation();
+            engine.loadSimulation(absolutePath);
 
         }
+        DTOSimulationDetails details = engine.getSimulationDetails();
+        TreeItem<DTOSimulationDetailsItem> rootItem = new TreeItem<>(details);
+        TreeItem<DTOSimulationDetailsItem> entityItem = new TreeItem<>(new DTOSimulationDetailsItem("Entities"));
+        TreeItem<DTOSimulationDetailsItem> ruleItem = new TreeItem<>(new DTOSimulationDetailsItem("Rules"));
+        TreeItem<DTOSimulationDetailsItem> envItem = new TreeItem<>(new DTOSimulationDetailsItem("Environment Variables"));
+        TreeItem<DTOSimulationDetailsItem> gridItem = new TreeItem<>(new DTOSimulationDetailsItem("Grid"));
+        TreeItem<DTOSimulationDetailsItem> terminationItem = new TreeItem<>(new DTOSimulationDetailsItem("Termination"));
+
+        rootItem.getChildren().add(getEntities(details, entityItem));
+        rootItem.getChildren().add(getRules(details, ruleItem));
+        rootItem.getChildren().add(getEnvVar(details, envItem));
+        rootItem.getChildren().add(getGrid(details,gridItem));
+        rootItem.getChildren().add(getTermination(details,terminationItem));
+
+        detailsTreeView.setRoot(rootItem);
+        mainController.getTreeViewComponent().setLeft(detailsTreeView);
+
+        detailsTreeView.getSelectionModel().selectedItemProperty().addListener(((observable, oldValue, newValue) -> {
+            if (newValue !=null && newValue.getChildren().isEmpty()){
+                TreeItem<DTOSimulationDetailsItem> selectedTreeItem = newValue;
+                DTOSimulationDetailsItem selectedValue = selectedTreeItem.getValue();
+                mainController.displayTreeItemsDetails(selectedValue);
+            }
+        }));
     }
 
     private TreeItem<DTOSimulationDetailsItem> getTermination(DTOSimulationDetails details, TreeItem<DTOSimulationDetailsItem> terminationItem) {
