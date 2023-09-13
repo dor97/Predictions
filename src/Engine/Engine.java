@@ -112,6 +112,48 @@ public class Engine {
         }
     }
 
+    public void bindAndGetThreadPoolDetails2(ObservableList<String> threadPoolList){
+        Thread thread = new Thread(() -> {  while(true)
+        {threadPoolDetails2(threadPoolList);
+            try{Thread.sleep(200);}catch (InterruptedException e){}}
+        });
+        thread.setDaemon(true);
+        thread.start();
+    }
+    public void threadPoolDetails2(ObservableList<String> threadPoolList){
+        if(threadPool != null && !threadPool.isTerminated()){
+            Integer poolSize = 0;
+            Integer finedSimulation = 0;
+            Integer witting = 0;
+//            synchronized (this.poolSize){
+//                poolSize = this.poolSize;
+//            }
+//            synchronized (this) {
+//                finedSimulation = worldsList.size();
+//            }
+            synchronized(simStatus) {
+                for (simulationsStatus simulationsStatus : simStatus.values()) {
+                    if (simulationsStatus.getStatus() == Status.WAITINGTORUN) {
+                        witting++;
+                    } else if (simulationsStatus.getStatus() == Status.RUNNING) {
+                        poolSize++;
+                    } else if (simulationsStatus.getStatus() == Status.FINISHED) {
+                        finedSimulation++;
+                    }
+                }
+            }
+            Platform.runLater(() -> threadPoolList.clear());
+            setThreadPoolProperties2(threadPoolList, witting);
+            setThreadPoolProperties2(threadPoolList, poolSize);
+            setThreadPoolProperties2(threadPoolList, finedSimulation);
+        }
+    }
+
+    private void setThreadPoolProperties2(ObservableList<String> threadPoolList, Integer Value){
+        Platform.runLater(() -> threadPoolList.add("work: " + Value.toString()));
+
+    }
+
     public void bindAndGetThreadPoolDetails(IntegerProperty wit, IntegerProperty run, IntegerProperty fin){
         Thread thread = new Thread(() -> {  while(true)
                                             {threadPoolDetails(wit, run, fin);

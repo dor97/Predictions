@@ -3,6 +3,7 @@ package TreeView;
 import App.AppController;
 import DTO.*;
 import Engine.Engine;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.TreeItem;
@@ -27,11 +28,12 @@ public class TreeViewController {
         this.alert = alert;
     }
 
-    public void displayFileDetails(Engine engine, String absolutePath)throws Exception {
+    public void displayFileDetails(Engine engine, String absolutePath, ObservableList<String> poolThreadList)throws Exception {
         if(pathToSimulation == null || !pathToSimulation.equals(absolutePath)){
             detailsTreeView.setRoot(null);
             mainController.clearSimulation();
             engine.loadSimulation(absolutePath);
+            engine.bindAndGetThreadPoolDetails2(poolThreadList);
             pathToSimulation = absolutePath;
 
         }

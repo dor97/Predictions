@@ -53,7 +53,7 @@ public class AppController implements Initializable {
     @FXML private TreeViewController treeViewController;
     @FXML private TreeView<DTOSimulationDetailsItem> detailsTreeView;
     @FXML private TextField loadedFilePathTextBox;
-    @FXML private TableColumn<String, Integer> queueManagementTable;
+    @FXML private TableColumn<String, String> queueManagementTable;
     @FXML private TextArea exceptionArea;
     private Stage primaryStage;
     private Engine engine;
@@ -61,6 +61,7 @@ public class AppController implements Initializable {
     private ObservableList<EntitiesTable> entitiesTableData = FXCollections.observableArrayList();
     private ObservableList<EntitiesRunTable> entitiesRunTablesData = FXCollections.observableArrayList();
     private ObservableList<ExecutionListItem> executionListViewData = FXCollections.observableArrayList();
+    private ObservableList<String> poolThreadList = FXCollections.observableArrayList();
     private int simulationID;
     private myTask newTask = null;
     private Integer lastSimulationNum = 0;
@@ -171,7 +172,7 @@ public class AppController implements Initializable {
         loadedFilePathTextBox.setDisable(true);
         System.out.println("get world ");
         try {
-            treeViewController.displayFileDetails(engine, absolutePath);
+            treeViewController.displayFileDetails(engine, absolutePath, poolThreadList);
             fillEnvironmentVariableTable(engine);
             fillEntitiesTable(engine);
         }catch (Exception e){
