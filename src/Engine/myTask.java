@@ -5,12 +5,14 @@ import DTO.DTORunningSimulationDetails;
 import Engine.stopException;
 import Engine.world.World;
 import javafx.application.Platform;
+import javafx.beans.binding.Bindings;
 import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.ObservableMap;
 import javafx.concurrent.Task;
 
+import javax.xml.ws.Binding;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -48,8 +50,11 @@ public class myTask extends Task<ObservableMap<String, Integer>> {
 
     public void bindProperties(StringProperty tick, StringProperty sec, ObservableList<EntitiesRunTable> table){//MapProperty<String, Integer> map,
         //map.bind(this.map);
-        tick.bind(m_tick);
-        sec.bind(m_sec);
+        //tick.bind(m_tick);
+        //sec.bind(m_sec);
+        Bindings.bindBidirectional(sec, m_sec);
+        Bindings.bindBidirectional(tick, m_tick);
+        //tick.bindBidirectional(m_tick);
         //text = tick;
         this.table = table;
     }
@@ -71,7 +76,7 @@ public class myTask extends Task<ObservableMap<String, Integer>> {
         while(!isCancelled()){
             DTORunningSimulationDetails runningSimulationDetails = world.getRunningSimulationDTO();
             if (runningSimulationDetails == null) {
-                updateMessage(world.getException());
+                updateMessage("Exception:\n" + world.getException());
                 return new SimpleMapProperty<>();
             }
 
