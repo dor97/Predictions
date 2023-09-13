@@ -75,10 +75,7 @@ public class World implements Serializable {
         isSimulationEnded = true;
     }
 
-    public DTORunningSimulationDetails getRunningSimulationDTO(){
-        if(isSimulationEnded){
-            return null;
-        }
+    public DTORunningSimulationDetails getSimulationRunningDetailsDTO() {
         DTORunningSimulationDetails runningSimulationDetails = new DTORunningSimulationDetails();
 
         //m_entities.stream().collect(Collectors.groupingBy(Entity::getName, Collectors.summingInt(e -> 1)));
@@ -92,13 +89,39 @@ public class World implements Serializable {
 //        }catch (Exception e){
 //            System.out.println(e.getMessage());
 //        }
-
         synchronized (start) {
             runningSimulationDetails.setTick(currTick);
             runningSimulationDetails.setTime(Duration.between(start, Instant.now()).getSeconds());
         }
 
         return runningSimulationDetails;
+    }
+
+    public DTORunningSimulationDetails getRunningSimulationDTO(){
+        if(isSimulationEnded){
+            return null;
+        }
+        return getSimulationRunningDetailsDTO();
+//        DTORunningSimulationDetails runningSimulationDetails = new DTORunningSimulationDetails();
+//
+//        //m_entities.stream().collect(Collectors.groupingBy(Entity::getName, Collectors.summingInt(e -> 1)));
+//        synchronized (m_entities) {
+//            Map<String, Integer> entitiesMap = m_entities.stream().collect(Collectors.groupingBy(Entity::getName, Collectors.summingInt(e -> 1)));
+//            runningSimulationDetails.setEntities(entitiesMap);
+//        }
+//        MapProperty<String, Integer> entitiesObservableMap = new SimpleMapProperty<>();
+//        try {
+//            entitiesMap.entrySet().stream().forEach(entityEntrySet -> entitiesObservableMap.put(entityEntrySet.getKey(), entityEntrySet.getValue()));
+//        }catch (Exception e){
+//            System.out.println(e.getMessage());
+//        }
+//
+//        synchronized (start) {
+//            runningSimulationDetails.setTick(currTick);
+//            runningSimulationDetails.setTime(Duration.between(start, Instant.now()).getSeconds());
+//        }
+//
+//        return runningSimulationDetails;
     }
     public void startSimolesan(Boolean isPause)throws InvalidValue{
         //Utilites.Init(m_environments, m_entitiesDifenichan);

@@ -78,6 +78,7 @@ public class myTask extends Task<ObservableMap<String, Integer>> {
         while(!isCancelled()){
             DTORunningSimulationDetails runningSimulationDetails = world.getRunningSimulationDTO();
             if (runningSimulationDetails == null) {
+                world.getSimulationRunningDetailsDTO();
                 Platform.runLater(() ->exception.set("Exception:\n" + world.getException()));
                 return new SimpleMapProperty<>();
             }
