@@ -4,6 +4,7 @@ import DTO.*;
 import Engine.InvalidValue;
 import Engine.UnsupportedFileTypeException;
 import Engine.allReadyExistsException;
+import Engine.isPause;
 import Engine.world.entity.Entity;
 import Engine.world.entity.EntityDifenichan;
 import Engine.generated.*;
@@ -123,7 +124,7 @@ public class World implements Serializable {
 //
 //        return runningSimulationDetails;
     }
-    public void startSimolesan(Boolean isPause)throws InvalidValue{
+    public void startSimolesan(isPause isPause)throws InvalidValue{
         //Utilites.Init(m_environments, m_entitiesDifenichan);
         List<Entity> toRemove = new ArrayList<>();
         Random random = new Random();
@@ -197,7 +198,7 @@ public class World implements Serializable {
 //            aTask.func(m_entities.stream().collect(Collectors.groupingBy(Entity::getName, Collectors.summingInt(e -> 1))));
 //            aTask.setTick(currTick);
 //            aTask.setSce(Duration.between(start, Instant.now()).getSeconds());
-            if(isPause){
+            if(isPause.getPause()){
                 synchronized (isPause) {
                     System.out.println("pause");
                     try {
@@ -210,7 +211,7 @@ public class World implements Serializable {
                         System.out.println("leave");
                         isSimulationEnded = true;
                         Platform.runLater(() -> isFines.set(true));
-                        isPause = false;
+                        isPause.setPause(false);
                         return;
                         // Handle interruption if needed
                     }
@@ -568,9 +569,9 @@ public class World implements Serializable {
         }
     }
 
-    public void moveOneStep(Boolean isPause){
+    public void moveOneStep(isPause isPause){
         synchronized (isPause){
-            if(isPause){
+            if(isPause.getPause()){
                 synchronized (this){
                     isPause.notifyAll();
                     try {
@@ -584,7 +585,7 @@ public class World implements Serializable {
         }
     }
 
-    public DTOMap getMap(Boolean isPause){
+    public DTOMap getMap(isPause isPause){
         moveOneStep(isPause);
         DTOMap map = new DTOMap();
         map.setMapSize(this.map.getRows(), this.map.getCols());

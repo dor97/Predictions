@@ -9,7 +9,7 @@ public class simulationsStatus {
 
     private Status m_status = Status.WAITINGTORUN;
 
-    private Boolean isPause = false;
+    private isPause isPause = new isPause();
 
     private World world;
     private Thread taskThread = null;
@@ -29,12 +29,12 @@ public class simulationsStatus {
         return world;
     }
 
-    public Boolean getIsPause(){
+    public isPause getIsPause(){
         return isPause;
     }
 
-    public void setIsPause(Boolean pause){
-        isPause = pause;
+    public void setIsPause(boolean pause){
+        isPause.setPause(pause);
     }
 
     public void setSimulationId(Integer simulationId){

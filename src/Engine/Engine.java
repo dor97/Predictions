@@ -201,10 +201,10 @@ public class Engine {
             world = simStatus.get(simulationNum).getWorld();
             simStatus.get(world.getNumSimulation()).setStatus(Status.RUNNING);
             simStatus.get(world.getNumSimulation()).setRunningThread(Thread.currentThread());
-            pause = simStatus.get(world.getNumSimulation()).getIsPause();
+            //pause = simStatus.get(world.getNumSimulation()).getIsPause();
         }
         try {
-            world.startSimolesan(pause);
+            world.startSimolesan(simStatus.get(world.getNumSimulation()).getIsPause());
         }catch (Exception e){
             world.setException(e.getMessage());
             simulationsExceptions.put(world.getNumSimulation(), e.getMessage());
