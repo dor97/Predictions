@@ -4,14 +4,17 @@ import App.AppController;
 import DTO.*;
 import Engine.Engine;
 import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
 import javafx.scene.control.Alert;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 import javafx.scene.layout.BorderPane;
 
+import java.net.URL;
 import java.util.Map;
+import java.util.ResourceBundle;
 
-public class TreeViewController {
+public class TreeViewController implements Initializable {
     private AppController mainController;
     @FXML private TreeView<DTOSimulationDetailsItem> detailsTreeView;
     @FXML private BorderPane borderPaneTreeView;
@@ -51,14 +54,6 @@ public class TreeViewController {
 
         detailsTreeView.setRoot(rootItem);
         mainController.getTreeViewComponent().setLeft(detailsTreeView);
-
-        detailsTreeView.getSelectionModel().selectedItemProperty().addListener(((observable, oldValue, newValue) -> {
-            if (newValue !=null && newValue.getChildren().isEmpty()){
-                TreeItem<DTOSimulationDetailsItem> selectedTreeItem = newValue;
-                DTOSimulationDetailsItem selectedValue = selectedTreeItem.getValue();
-                mainController.displayTreeItemsDetails(selectedValue);
-            }
-        }));
     }
 
     private TreeItem<DTOSimulationDetailsItem> getTermination(DTOSimulationDetails details, TreeItem<DTOSimulationDetailsItem> terminationItem) {
@@ -118,5 +113,18 @@ public class TreeViewController {
         for(String d : data.values()){
             System.out.println(d);
         }
+    }
+
+
+    @Override
+    public void initialize(URL location, ResourceBundle resources) {
+
+        detailsTreeView.getSelectionModel().selectedItemProperty().addListener(((observable, oldValue, newValue) -> {
+            if (newValue !=null && newValue.getChildren().isEmpty()){
+                TreeItem<DTOSimulationDetailsItem> selectedTreeItem = newValue;
+                DTOSimulationDetailsItem selectedValue = selectedTreeItem.getValue();
+                mainController.displayTreeItemsDetails(selectedValue);
+            }
+        }));
     }
 }

@@ -3,17 +3,20 @@ import DTO.*;
 import Engine.Engine;
 import Engine.Status;
 import TreeDetails.TreeDetailsController;
-import javafx.beans.binding.Bindings;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.chart.CategoryAxis;
+import javafx.scene.Scene;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
@@ -21,12 +24,23 @@ import javafx.scene.layout.HBox;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import TreeView.TreeViewController;
+
 import java.io.File;
 import java.net.URL;
+import java.util.List;
 import java.util.ResourceBundle;
 import Engine.myTask;
+import javafx.util.Pair;
 
 public class AppController implements Initializable {
+    @FXML private TableColumn<QueueManagement, String> statusColumn;
+    @FXML private TableColumn<QueueManagement, Integer> amountColumn;
+    @FXML private TableView<QueueManagement> queueManagementTable;
+    @FXML private TreeView<String> resultsTreeView;
+    @FXML private Button resultsGraphButton;
+    @FXML private Button histogramButton;
+    @FXML private Label consistencyValueLabel;
+    @FXML private Label averageValueLabel;
     @FXML private Button pauseButton;
     @FXML private GridPane resultsTab;
     @FXML private ListView<ExecutionListItem> executionListView;
@@ -53,7 +67,6 @@ public class AppController implements Initializable {
     @FXML private TreeViewController treeViewController;
     @FXML private TreeView<DTOSimulationDetailsItem> detailsTreeView;
     @FXML private TextField loadedFilePathTextBox;
-    @FXML private TableColumn<String, Integer> queueManagementTable;
     @FXML private TextArea exceptionArea;
     private Stage primaryStage;
     private Engine engine;
@@ -61,10 +74,12 @@ public class AppController implements Initializable {
     private ObservableList<EntitiesTable> entitiesTableData = FXCollections.observableArrayList();
     private ObservableList<EntitiesRunTable> entitiesRunTablesData = FXCollections.observableArrayList();
     private ObservableList<ExecutionListItem> executionListViewData = FXCollections.observableArrayList();
+    private ObservableList<QueueManagement> queueManagementData = FXCollections.observableArrayList();
     private int simulationID;
     private myTask newTask = null;
     private Integer lastSimulationNum = 0;
     private Boolean isFirstSimulationForFile = true;
+    private LineChart lastSimulationGraph;
 
     private Alert alert = new Alert(Alert.AlertType.ERROR);
 
@@ -80,17 +95,20 @@ public class AppController implements Initializable {
             treeViewController.setAlert(alert);
         }
         engine = new Engine();
-
+        resultsGraphButton.setDisable(true);
         environmentVarColumn.setCellValueFactory(new PropertyValueFactory<>("envVarNameColumn"));
         valueColumn.setCellValueFactory(new PropertyValueFactory<>("value"));
         entityColumn.setCellValueFactory(new PropertyValueFactory<>("entityName"));
         populationColumn.setCellValueFactory(new PropertyValueFactory<>("population"));
         entityRunColumn.setCellValueFactory(new PropertyValueFactory<>("entityName"));
         populationRunColumn.setCellValueFactory(new PropertyValueFactory<>("population"));
+        statusColumn.setCellValueFactory(new PropertyValueFactory<>("status"));
+        amountColumn.setCellValueFactory(new PropertyValueFactory<>("amount"));
 
         environmentVarTable.setItems(environmentVariableTableData);
         entitiesTable.setItems(entitiesTableData);
         entitiesRunTable.setItems(entitiesRunTablesData);
+        queueManagementTable.setItems(queueManagementData);
         executionListView.setItems(executionListViewData);
 
         executionListView.getSelectionModel().selectedItemProperty().addListener(((observable, oldValue, newValue) -> {
@@ -110,19 +128,86 @@ public class AppController implements Initializable {
                 }
                 newTask = new myTask();
                 //exceptionArea.promptTextProperty().bind(newTask.messageProperty());
-
+                resultsGraphButton.setDisable(true);
                 newTask.bindProperties(ticksValueLabel.textProperty(), secondsValueLabel.textProperty(), exceptionArea.promptTextProperty(), entitiesRunTablesData);
                 engine.getDataUsingTask(newTask, selectedValue);
                 if (engine.getSimulationStatus(selectedValue) == Status.FINISHED){
+                    resultsGraphButton.setDisable(false);
                     displaySimulationResults(engine);
                 }
-
+            }
+        }));
+        resultsTreeView.getSelectionModel().selectedItemProperty().addListener(((observable, oldValue, newValue) -> {
+            if (newValue !=null && newValue.getChildren().isEmpty()){
+                TreeItem<String > selectedTreeItem = newValue;
+                String selectedValue = selectedTreeItem.getValue();
+                getConsistencyValue(newValue.getParent().getValue(), newValue.getValue());
+                getAverageValue(newValue.getParent().getValue(), newValue.getValue());
             }
         }));
     }
 
+    private void getAverageValue(String entity, String property) {
+        if (!engine.getPostRunData(lastSimulationNum).getAvPropertyValue().containsKey(entity+"_"+property)){
+            return;
+        }
+        averageValueLabel.setText(engine.getPostRunData(lastSimulationNum).getAvPropertyValue().get(entity+"_"+property).getKey().toString());
+    }
+
     private void displaySimulationResults(Engine engine) {
 
+        fillResultsTreeView();
+    }
+
+    private void getConsistencyValue(String entity, String property) {
+
+        if (!engine.getPostRunData(lastSimulationNum).getPropertyChangeByTick().containsKey(entity+"_"+property)){
+            return;
+        }
+        Float sum = 0f;
+        List<Float> consistencies = engine.getPostRunData(lastSimulationNum).getPropertyChangeByTick().get(entity+"_"+property);
+        Float size = (float)consistencies.size();
+        for (Float consistency : consistencies){
+            sum+=consistency;
+        }
+        Float result = sum/size;
+        consistencyValueLabel.setText(result.toString());
+    }
+
+    private void fillResultsTreeView() {
+
+        DTOSimulationDetailsPostRun results = engine.getPostRunData(lastSimulationNum);
+        TreeItem<String> rootItem = new TreeItem<>(new String("Entities"));
+
+        for (DTOEntitysProperties entity: results.getEntitysProperties().values()){
+            TreeItem<String> entityItem = new TreeItem<>(entity.getName());
+            for (DTOProperty property :entity.getProperties()){
+                entityItem.getChildren().add(new TreeItem<>(property.getName()));
+            }
+            rootItem.getChildren().add(entityItem);
+        }
+
+        resultsTreeView.setRoot(rootItem);
+    }
+
+    private LineChart createLastSimulationGraph() {
+
+        NumberAxis xAxis = new NumberAxis();
+        xAxis.setLabel("Ticks");
+        NumberAxis yAxis = new NumberAxis();
+        yAxis.setLabel("No.of entities");
+        LineChart linechart = new LineChart(xAxis, yAxis);
+        XYChart.Series series = new XYChart.Series();
+        series.setName("Entities Per Tick");
+
+        for (Pair <Integer, Integer> pair : engine.getPostRunData(lastSimulationNum).getNumOfEntitiesPerTick()){
+            int tick = pair.getKey();
+            int entityAmount = pair.getValue();
+            series.getData().add(new XYChart.Data(tick, entityAmount));
+        }
+
+        linechart.getData().add(series);
+        return linechart;
     }
 
     public void shutDownSystem(){
@@ -300,5 +385,19 @@ public class AppController implements Initializable {
 
     public void resumeSimulation(ActionEvent actionEvent) {
         engine.resumeSimulation(lastSimulationNum);
+    }
+
+    public void showGraph(ActionEvent actionEvent) {
+
+        lastSimulationGraph = createLastSimulationGraph();
+        Stage stage = new Stage();
+        stage.setTitle("Entities by Ticks Line Chart");
+        Scene scene  = new Scene(lastSimulationGraph,800,600);
+        stage.setScene(scene);
+        stage.show();
+    }
+
+    public void showHistogram(ActionEvent actionEvent) {
+
     }
 }
