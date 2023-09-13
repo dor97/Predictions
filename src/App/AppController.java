@@ -8,9 +8,14 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.chart.CategoryAxis;
+import javafx.scene.chart.LineChart;
+import javafx.scene.chart.NumberAxis;
+import javafx.scene.chart.XYChart;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
@@ -21,6 +26,8 @@ import java.util.ResourceBundle;
 import Engine.myTask;
 
 public class AppController implements Initializable {
+    @FXML private Button pauseButton;
+    @FXML private GridPane resultsTab;
     @FXML private ListView<ExecutionListItem> executionListView;
     @FXML private TableView entitiesRunTable;
     @FXML private TableColumn entityRunColumn;
@@ -113,7 +120,7 @@ public class AppController implements Initializable {
     }
 
     private void displaySimulationResults(Engine engine) {
-        
+
     }
 
     public void shutDownSystem(){
@@ -279,5 +286,17 @@ public class AppController implements Initializable {
                 }
             }
         }
+    }
+
+    public void pauseSimulation(ActionEvent actionEvent) {
+        engine.pauseSimulation(lastSimulationNum);
+    }
+
+    public void stopSimulation(ActionEvent actionEvent) {
+        engine.stopSimulation(lastSimulationNum);
+    }
+
+    public void resumeSimulation(ActionEvent actionEvent) {
+        engine.resumeSimulation(lastSimulationNum);
     }
 }

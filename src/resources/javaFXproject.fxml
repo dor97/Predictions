@@ -92,7 +92,7 @@
           </Tab>
             <Tab fx:id="entityColumnRun" text="Results">
                <content>
-                  <GridPane>
+                  <GridPane fx:id="resultsTab">
                     <columnConstraints>
                       <ColumnConstraints hgrow="SOMETIMES" maxWidth="318.4000244140625" minWidth="151.2" prefWidth="155.2" />
                       <ColumnConstraints hgrow="SOMETIMES" maxWidth="448.3999999999999" minWidth="281.5999755859375" prefWidth="444.3999999999999" />
@@ -128,12 +128,13 @@
                                     <Label fx:id="ticksValueLabel" text="0" GridPane.columnIndex="1" GridPane.rowIndex="2" />
                                     <Label fx:id="secondsLabel" text="Seconds:" GridPane.rowIndex="3" />
                                     <Label fx:id="secondsValueLabel" text="0" GridPane.columnIndex="1" GridPane.rowIndex="3" />
-                                    <Button fx:id="stopSimulationButton" mnemonicParsing="false" text="Stop" GridPane.rowIndex="1" />
-                                    <Button fx:id="resumeSimulationButton" mnemonicParsing="false" text="Resume" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                                    <Button fx:id="stopSimulationButton" mnemonicParsing="false" onAction="#stopSimulation" text="Stop" GridPane.rowIndex="1" />
+                                    <Button fx:id="resumeSimulationButton" mnemonicParsing="false" onAction="#resumeSimulation" text="Resume" GridPane.columnIndex="1" GridPane.rowIndex="1">
                                        <font>
                                           <Font size="11.0" />
                                        </font>
                                     </Button>
+                                    <Button fx:id="pauseButton" mnemonicParsing="false" onAction="#pauseSimulation" text="Pause" GridPane.columnIndex="1" />
                                  </children>
                               </GridPane>
                               <TextArea fx:id="exceptionArea" maxWidth="1.7976931348623157E308" prefHeight="154.0" prefWidth="229.0" />
