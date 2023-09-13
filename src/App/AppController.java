@@ -93,6 +93,10 @@ public class AppController implements Initializable {
                     engine.stopGettingDataUsingTask(newTask, lastSimulationNum);
                 }
                 lastSimulationNum = selectedValue;
+
+                if (engine.getSimulationStatus(lastSimulationNum) != Status.FINISHED){
+                    rerunButton.setDisable(true);
+                }
                 newTask = new myTask();
                 exceptionArea.promptTextProperty().bind(newTask.messageProperty());
                 newTask.bindProperties(ticksValueLabel.textProperty(), secondsValueLabel.textProperty(), entitiesRunTablesData);
@@ -248,6 +252,11 @@ public class AppController implements Initializable {
     }
 
     public void rerun(ActionEvent actionEvent) {
+
+        if (engine.getSimulationStatus(lastSimulationNum) != Status.FINISHED){
+            return;
+        }
+
         if(lastSimulationNum != 0) {
             entitiesTableData.clear();
             DTODataForReRun dataForReRun = engine.getDataForRerun(lastSimulationNum);
