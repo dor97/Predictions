@@ -87,6 +87,9 @@ public class AppController implements Initializable {
 
         executionListView.getSelectionModel().selectedItemProperty().addListener(((observable, oldValue, newValue) -> {
             if (newValue !=null){
+                ticksValueLabel.setText("0");
+                secondsValueLabel.setText("0");
+                entitiesRunTablesData.clear();
                 ExecutionListItem selectedListItem = newValue;
                 Integer selectedValue = selectedListItem.getID();
                 if(newTask != null){
@@ -122,8 +125,8 @@ public class AppController implements Initializable {
         entitiesTableData.clear();
         entitiesRunTablesData.clear();
         executionListViewData.clear();
-        //ticksValueLabel.setText("0");
-        //secondsValueLabel.setText("0");
+        ticksValueLabel.setText("0");
+        secondsValueLabel.setText("0");
         newTask = null;
         lastSimulationNum = 0;
         treeDetailsController.clearData();
