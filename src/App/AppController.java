@@ -3,6 +3,7 @@ import DTO.*;
 import Engine.Engine;
 import Engine.Status;
 import TreeDetails.TreeDetailsController;
+import javafx.beans.binding.Bindings;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -101,8 +102,9 @@ public class AppController implements Initializable {
                     rerunButton.setDisable(true);
                 }
                 newTask = new myTask();
-                exceptionArea.promptTextProperty().bind(newTask.messageProperty());
-                newTask.bindProperties(ticksValueLabel.textProperty(), secondsValueLabel.textProperty(), entitiesRunTablesData);
+                //exceptionArea.promptTextProperty().bind(newTask.messageProperty());
+
+                newTask.bindProperties(ticksValueLabel.textProperty(), secondsValueLabel.textProperty(), exceptionArea.promptTextProperty(), entitiesRunTablesData);
                 engine.getDataUsingTask(newTask, selectedValue);
                 if (engine.getSimulationStatus(selectedValue) == Status.FINISHED){
                     displaySimulationResults(engine);

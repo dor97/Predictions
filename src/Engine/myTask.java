@@ -44,16 +44,18 @@ public class myTask extends Task<ObservableMap<String, Integer>> {
     private Map<String, Integer> map = new HashMap<>(); // MapProperty == SimpleMapProperty
     private ObservableList<EntitiesRunTable> table;
     private StringProperty text;
+    private StringProperty exception = new SimpleStringProperty();
 
 
     private World world;
 
-    public void bindProperties(StringProperty tick, StringProperty sec, ObservableList<EntitiesRunTable> table){//MapProperty<String, Integer> map,
+    public void bindProperties(StringProperty tick, StringProperty sec, StringProperty exception, ObservableList<EntitiesRunTable> table){//MapProperty<String, Integer> map,
         //map.bind(this.map);
         //tick.bind(m_tick);
         //sec.bind(m_sec);
         Bindings.bindBidirectional(sec, m_sec);
         Bindings.bindBidirectional(tick, m_tick);
+        Bindings.bindBidirectional(exception, this.exception);
         //tick.bindBidirectional(m_tick);
         //text = tick;
         this.table = table;
@@ -76,7 +78,7 @@ public class myTask extends Task<ObservableMap<String, Integer>> {
         while(!isCancelled()){
             DTORunningSimulationDetails runningSimulationDetails = world.getRunningSimulationDTO();
             if (runningSimulationDetails == null) {
-                updateMessage("Exception:\n" + world.getException());
+                Platform.runLater(() ->exception.set("Exception:\n" + world.getException()));
                 return new SimpleMapProperty<>();
             }
 
@@ -96,7 +98,7 @@ public class myTask extends Task<ObservableMap<String, Integer>> {
                 return new SimpleMapProperty<>();
             }
             try {
-                Thread.sleep(300);
+                Thread.sleep(200);
             }catch (InterruptedException e){
                 return new SimpleMapProperty<>();
             }
