@@ -9,9 +9,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Scene;
-import javafx.scene.chart.LineChart;
-import javafx.scene.chart.NumberAxis;
-import javafx.scene.chart.XYChart;
+import javafx.scene.chart.*;
 import javafx.scene.control.*;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -28,6 +26,7 @@ import TreeView.TreeViewController;
 import java.io.File;
 import java.net.URL;
 import java.util.List;
+import java.util.Map;
 import java.util.ResourceBundle;
 import Engine.myTask;
 import javafx.util.Pair;
@@ -62,7 +61,6 @@ public class AppController implements Initializable {
     @FXML private TableColumn<EnvironmentVariableTable, String > environmentVarColumn;
     @FXML private TableView<EnvironmentVariableTable> environmentVarTable;
     @FXML private BorderPane treeViewComponent;
-    @FXML private BorderPane treeDetailsComponent;
     @FXML private TreeDetailsController treeDetailsController;
     @FXML private TreeViewController treeViewController;
     @FXML private TreeView<DTOSimulationDetailsItem> detailsTreeView;
@@ -80,7 +78,8 @@ public class AppController implements Initializable {
     private Integer lastSimulationNum = 0;
     private Boolean isFirstSimulationForFile = true;
     private LineChart lastSimulationGraph;
-
+    private String lastChosenPropertyForHistogram;
+    private String lastChosenEntityForHistogram;
     private Alert alert = new Alert(Alert.AlertType.ERROR);
 
 
@@ -96,6 +95,7 @@ public class AppController implements Initializable {
         }
         engine = new Engine();
         resultsGraphButton.setDisable(true);
+        histogramButton.setDisable(true);
         environmentVarColumn.setCellValueFactory(new PropertyValueFactory<>("envVarNameColumn"));
         valueColumn.setCellValueFactory(new PropertyValueFactory<>("value"));
         entityColumn.setCellValueFactory(new PropertyValueFactory<>("entityName"));
@@ -129,6 +129,7 @@ public class AppController implements Initializable {
                 newTask = new myTask();
                 //exceptionArea.promptTextProperty().bind(newTask.messageProperty());
                 resultsGraphButton.setDisable(true);
+                histogramButton.setDisable(true);
                 newTask.bindProperties(ticksValueLabel.textProperty(), secondsValueLabel.textProperty(), exceptionArea.promptTextProperty(), entitiesRunTablesData);
                 engine.getDataUsingTask(newTask, selectedValue);
                 if (engine.getSimulationStatus(selectedValue) == Status.FINISHED){
@@ -139,8 +140,11 @@ public class AppController implements Initializable {
         }));
         resultsTreeView.getSelectionModel().selectedItemProperty().addListener(((observable, oldValue, newValue) -> {
             if (newValue !=null && newValue.getChildren().isEmpty()){
+                histogramButton.setDisable(false);
                 TreeItem<String > selectedTreeItem = newValue;
                 String selectedValue = selectedTreeItem.getValue();
+                lastChosenPropertyForHistogram = newValue.getValue();
+                lastChosenEntityForHistogram = newValue.getParent().getValue();
                 getConsistencyValue(newValue.getParent().getValue(), newValue.getValue());
                 getAverageValue(newValue.getParent().getValue(), newValue.getValue());
             }
@@ -256,7 +260,7 @@ public class AppController implements Initializable {
         loadedFilePathTextBox.setDisable(true);
         System.out.println("get world ");
         try {
-            treeViewController.displayFileDetails(engine, absolutePath);
+            treeViewController.displayFileDetails(engine, absolutePath, queueManagementData);
             fillEnvironmentVariableTable(engine);
             fillEntitiesTable(engine);
         }catch (Exception e){
@@ -399,5 +403,22 @@ public class AppController implements Initializable {
 
     public void showHistogram(ActionEvent actionEvent) {
 
+        Stage stage = new Stage();
+        stage.setTitle("Properties Histogram");
+        final CategoryAxis xAxis = new CategoryAxis();
+        final NumberAxis yAxis = new NumberAxis();
+        final BarChart<String,Number> barChart = new BarChart<String,Number>(xAxis,yAxis);
+        xAxis.setLabel("Property Value");
+        yAxis.setLabel("Amount");
+
+        XYChart.Series series1 = new XYChart.Series();
+        for (Map.Entry<Object, Integer> property: engine.getPostRunData(lastSimulationNum).getHistogram(lastChosenEntityForHistogram, lastChosenPropertyForHistogram).entrySet()){
+            series1.getData().add(new XYChart.Data(property.getKey().toString(),property.getValue()));
+        }
+
+        Scene scene  = new Scene(barChart,800,600);
+        barChart.getData().addAll(series1);
+        stage.setScene(scene);
+        stage.show();
     }
 }

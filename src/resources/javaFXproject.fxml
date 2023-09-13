@@ -20,11 +20,11 @@
 
 <BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="App.AppController">
    <top>
-      <HBox prefHeight="71.0" prefWidth="600.0" spacing="15.0" BorderPane.alignment="CENTER">
+      <HBox spacing="15.0" BorderPane.alignment="CENTER">
          <children>
             <Button fx:id="loadFileButton" mnemonicParsing="false" onAction="#loadFile" text="Load File" />
-            <TextField fx:id="loadedFilePathTextBox" prefHeight="14.0" prefWidth="298.0" promptText="Currently Loaded File Path" />
-            <TableView fx:id="queueManagementTable">
+            <TextField fx:id="loadedFilePathTextBox" promptText="Currently Loaded File Path" />
+            <TableView fx:id="queueManagementTable" prefHeight="63.0">
               <columns>
                 <TableColumn fx:id="statusColumn" prefWidth="114.0000330209732" text="Status" />
                 <TableColumn fx:id="amountColumn" prefWidth="83.33336639404297" text="Amount" />
@@ -43,7 +43,7 @@
       <Insets />
    </opaqueInsets>
    <center>
-       <TabPane prefHeight="319.0" prefWidth="600.0" tabClosingPolicy="UNAVAILABLE" BorderPane.alignment="CENTER">
+       <TabPane prefHeight="324.0" prefWidth="600.0" tabClosingPolicy="UNAVAILABLE" BorderPane.alignment="CENTER">
         <tabs>
           <Tab text="Details">
                <content>
@@ -51,9 +51,6 @@
                     <left>
                         <fx:include fx:id="treeViewComponent" source="../TreeView/TreeView.fxml" />
                     </left>
-                     <center>
-                        <fx:include fx:id="treeDetailsComponent" source="../TreeDetails/TreeDetails.fxml" />
-                     </center>
                   </BorderPane>
                </content>
             </Tab>
@@ -101,10 +98,10 @@
                       <RowConstraints maxHeight="123.9999755859375" minHeight="10.0" prefHeight="123.19998779296876" vgrow="SOMETIMES" />
                     </rowConstraints>
                      <children>
-                        <ListView fx:id="executionListView" maxHeight="1.7976931348623157E308" maxWidth="-Infinity" prefHeight="300.0" prefWidth="200.0" GridPane.rowSpan="2" />
+                        <ListView fx:id="executionListView" maxHeight="1.7976931348623157E308" maxWidth="-Infinity" GridPane.rowSpan="2" />
                         <HBox prefHeight="100.0" prefWidth="200.0" spacing="5.0" GridPane.columnIndex="1">
                            <children>
-                              <TableView fx:id="entitiesRunTable" maxWidth="1.7976931348623157E308">
+                              <TableView fx:id="entitiesRunTable">
                                 <columns>
                                   <TableColumn fx:id="entityRunColumn" prefWidth="75.0" text="Entity" />
                                   <TableColumn fx:id="populationRunColumn" text="Population" />

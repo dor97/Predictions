@@ -1,6 +1,7 @@
 package Engine;
 
 import App.ExecutionListItem;
+import App.QueueManagement;
 import DTO.*;
 import Engine.world.worldDifenichan;
 import com.sun.org.apache.xml.internal.security.signature.ReferenceNotInitializedException;
@@ -112,7 +113,7 @@ public class Engine {
         }
     }
 
-    public void bindAndGetThreadPoolDetails2(ObservableList<String> threadPoolList){
+    public void bindAndGetThreadPoolDetails2(ObservableList<QueueManagement> threadPoolList){
         Thread thread = new Thread(() -> {  while(true)
         {threadPoolDetails2(threadPoolList);
             try{Thread.sleep(200);}catch (InterruptedException e){}}
@@ -120,7 +121,7 @@ public class Engine {
         thread.setDaemon(true);
         thread.start();
     }
-    public void threadPoolDetails2(ObservableList<String> threadPoolList){
+    public void threadPoolDetails2(ObservableList<QueueManagement> threadPoolList){
         if(threadPool != null && !threadPool.isTerminated()){
             Integer poolSize = 0;
             Integer finedSimulation = 0;
@@ -143,15 +144,14 @@ public class Engine {
                 }
             }
             Platform.runLater(() -> threadPoolList.clear());
-            setThreadPoolProperties2(threadPoolList, witting);
-            setThreadPoolProperties2(threadPoolList, poolSize);
-            setThreadPoolProperties2(threadPoolList, finedSimulation);
+            setThreadPoolProperties2(threadPoolList, witting, "Waiting");
+            setThreadPoolProperties2(threadPoolList, poolSize, "Running");
+            setThreadPoolProperties2(threadPoolList, finedSimulation, "Finished");
         }
     }
 
-    private void setThreadPoolProperties2(ObservableList<String> threadPoolList, Integer Value){
-        Platform.runLater(() -> threadPoolList.add("work: " + Value.toString()));
-
+    private void setThreadPoolProperties2(ObservableList<QueueManagement> threadPoolList, Integer value, String status){
+        Platform.runLater(() -> threadPoolList.add(new QueueManagement(status, value)));
     }
 
     public void bindAndGetThreadPoolDetails(IntegerProperty wit, IntegerProperty run, IntegerProperty fin){

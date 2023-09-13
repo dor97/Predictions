@@ -1,6 +1,7 @@
 package TreeView;
 
 import App.AppController;
+import App.QueueManagement;
 import DTO.*;
 import Engine.Engine;
 import javafx.collections.ObservableList;
@@ -31,7 +32,7 @@ public class TreeViewController implements Initializable {
         this.alert = alert;
     }
 
-    public void displayFileDetails(Engine engine, String absolutePath, ObservableList<String> poolThreadList)throws Exception {
+    public void displayFileDetails(Engine engine, String absolutePath, ObservableList<QueueManagement> poolThreadList)throws Exception {
         if(pathToSimulation == null || !pathToSimulation.equals(absolutePath)){
             detailsTreeView.setRoot(null);
             mainController.clearSimulation();
