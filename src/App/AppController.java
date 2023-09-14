@@ -125,6 +125,8 @@ public class AppController implements Initializable {
 
                 if (engine.getSimulationStatus(lastSimulationNum) != Status.FINISHED){
                     rerunButton.setDisable(true);
+                }else{
+                    rerunButton.setDisable(false);
                 }
                 newTask = new myTask();
                 //exceptionArea.promptTextProperty().bind(newTask.messageProperty());

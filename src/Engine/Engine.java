@@ -260,12 +260,12 @@ public class Engine {
             }
         }
         synchronized (this) {
-            if(worldsList != null && worldsList.size() == 0) {
+            if(worldsList != null) { // && worldsList.size() == 0
                 worldsList.put(simulationNum, world);
             }
         }
         synchronized (newlyFinishedSimulationIds){
-            if(newlyFinishedSimulationIds != null && newlyFinishedSimulationIds.size() == 0) {
+            if(newlyFinishedSimulationIds != null) { // && newlyFinishedSimulationIds.size() == 0
                 newlyFinishedSimulationIds.add(world.getNumSimulation());
             }
         }
@@ -425,6 +425,9 @@ public class Engine {
 
     public DTOSimulationDetailsPostRun getPostRunData(int id) {
         synchronized (this) {
+            if(!worldsList.containsKey(id)){
+                return null;
+            }
             return worldsList.get(id).getPostRunData();
         }
     }

@@ -78,7 +78,14 @@ public class myTask extends Task<ObservableMap<String, Integer>> {
         while(!isCancelled()){
             DTORunningSimulationDetails runningSimulationDetails = world.getRunningSimulationDTO();
             if (runningSimulationDetails == null) {
-                world.getSimulationRunningDetailsDTO();
+                DTORunningSimulationDetails finishedRunning = world.getSimulationRunningDetailsDTO();
+                Platform.runLater(() -> m_tick.set(finishedRunning.getTick().toString()));
+                Platform.runLater(() -> m_sec.set(finishedRunning.getTime().toString()));
+                //runningSimulationDetails.getEntities().entrySet().stream().forEach();
+                Platform.runLater(() -> {
+                    map.clear();
+                    map.putAll(finishedRunning.getEntities());
+                    updateTable();});
                 Platform.runLater(() ->exception.set("Exception:\n" + world.getException()));
                 return new SimpleMapProperty<>();
             }
