@@ -60,7 +60,7 @@ public class Property implements PropertyInterface, Serializable {
     public int getLastTickChanged(){
         return lastTickChanged;
     }
-
+    @Override
     public void addDeltaTicksChanged(Integer delta){
         deltaTicksChangedValue.add(delta);
     }

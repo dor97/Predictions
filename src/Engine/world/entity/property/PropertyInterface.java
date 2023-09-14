@@ -19,5 +19,7 @@ public interface PropertyInterface {
     public int getLastTickChanged();
     public List<Integer> getDeltaTicksChangedValue();
     public Float getDeltaTicksChangedValueAve();
+    public void addDeltaTicksChanged(Integer delta);
+
 
 }
