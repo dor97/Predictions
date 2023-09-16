@@ -20,9 +20,7 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
+import javafx.scene.layout.*;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import TreeView.TreeViewController;
@@ -37,6 +35,9 @@ import javafx.util.Pair;
 
 public class AppController implements Initializable {
 
+    @FXML private TabPane tabPane;
+    @FXML private Tab DetailsTab;
+    @FXML private BorderPane detailsBorderPane;
     @FXML private TableColumn<QueueManagement, String> statusColumn;
     @FXML private TableColumn<QueueManagement, Integer> amountColumn;
     @FXML private TableView<QueueManagement> queueManagementTable;

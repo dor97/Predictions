@@ -1,0 +1,27 @@
+/* Example CSS rules */
+.button {
+    -fx-background-color: #07b454;
+    -fx-text-fill: white;
+    -fx-font-size: 10px;
+}
+#pause{
+    -fx-background-color: #ef0923;
+    -fx-text-fill: white;
+    -fx-font-size: 10px;
+}
+#graphic{
+    -fx-background-color: #a19340;
+    -fx-text-fill: white;
+    -fx-font-size: 10px;
+}
+
+#column{
+    -fx-background-color: #ced0cb;
+}
+
+#loadButton{
+    -fx-background-color: #0758b4;
+    -fx-text-fill: white;
+    -fx-font-size: 10px;
+}
+

@@ -18,16 +18,16 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="App.AppController">
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" stylesheets="@style.css" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="App.AppController">
    <top>
       <HBox spacing="15.0" BorderPane.alignment="CENTER">
          <children>
-            <Button fx:id="loadFileButton" mnemonicParsing="false" onAction="#loadFile" text="Load File" />
+            <Button id="loadButton" fx:id="loadFileButton" mnemonicParsing="false" onAction="#loadFile" text="Load File" />
             <TextField fx:id="loadedFilePathTextBox" promptText="Currently Loaded File Path" />
             <TableView fx:id="queueManagementTable" prefHeight="85.0">
               <columns>
-                <TableColumn fx:id="statusColumn" prefWidth="169.33336889743805" text="Status" />
-                <TableColumn fx:id="amountColumn" prefWidth="168.66664123535156" text="Amount" />
+                <TableColumn id="column" fx:id="statusColumn" prefWidth="169.33336889743805" text="Status" />
+                <TableColumn id="column" fx:id="amountColumn" prefWidth="168.66664123535156" text="Amount" />
               </columns>
             </TableView>
          </children>
@@ -43,24 +43,24 @@
       <Insets />
    </opaqueInsets>
    <center>
-       <TabPane prefHeight="324.0" prefWidth="600.0" tabClosingPolicy="UNAVAILABLE" BorderPane.alignment="CENTER">
+       <TabPane fx:id="tabPane" prefHeight="324.0" prefWidth="600.0" tabClosingPolicy="UNAVAILABLE" BorderPane.alignment="CENTER">
         <tabs>
           <Tab fx:id="DetailsTab" text="Details">
                <content>
-                  <BorderPane fx:id="detailsBorderPane" prefHeight="400.0" prefWidth="1195.0">
-                    <left>
+                  <BorderPane fx:id="detailsBorderPane">
+                    <center>
                         <fx:include fx:id="treeViewComponent" source="../TreeView/TreeView.fxml" />
-                    </left>
+                    </center>
                   </BorderPane>
                </content>
             </Tab>
           <Tab text="New Execution">
                <content>
-                  <BorderPane prefHeight="200.0" prefWidth="200.0">
+                  <BorderPane>
                      <bottom>
                         <HBox spacing="15.0" BorderPane.alignment="CENTER">
                            <children>
-                              <Button fx:id="clearSimulationButton" mnemonicParsing="false" onAction="#clearSimulation" text="Clear" />
+                              <Button id="pause" fx:id="clearSimulationButton" mnemonicParsing="false" onAction="#clearSimulation" text="Clear" />
                               <Button fx:id="startSimulationButton" mnemonicParsing="false" onAction="#startSimulation" text="Start" />
                            </children>
                         </HBox>
@@ -70,14 +70,14 @@
                            <children>
                               <TableView fx:id="environmentVarTable">
                                 <columns>
-                                  <TableColumn fx:id="environmentVarColumn" minWidth="-1.0" prefWidth="136.66665649414062" text="Environment Variable" />
-                                  <TableColumn fx:id="valueColumn" minWidth="-1.0" prefWidth="110.66668701171875" text="Value" />
+                                  <TableColumn id="column" fx:id="environmentVarColumn" minWidth="-1.0" prefWidth="136.66665649414062" text="Environment Variable" />
+                                  <TableColumn id="column" fx:id="valueColumn" minWidth="-1.0" prefWidth="110.66668701171875" text="Value" />
                                 </columns>
                               </TableView>
                               <TableView fx:id="entitiesTable">
                                 <columns>
-                                  <TableColumn fx:id="entityColumn" minWidth="-1.0" prefWidth="102.0" text="Entity" />
-                                  <TableColumn fx:id="populationColumn" minWidth="-1.0" prefWidth="143.9999974568685" text="Population" />
+                                  <TableColumn id="column" fx:id="entityColumn" minWidth="-1.0" prefWidth="102.0" text="Entity" />
+                                  <TableColumn id="column" fx:id="populationColumn" minWidth="-1.0" prefWidth="143.9999974568685" text="Population" />
                                 </columns>
                               </TableView>
                            </children>
@@ -103,8 +103,8 @@
                            <children>
                               <TableView fx:id="entitiesRunTable">
                                 <columns>
-                                  <TableColumn fx:id="entityRunColumn" prefWidth="75.0" text="Entity" />
-                                  <TableColumn fx:id="populationRunColumn" prefWidth="90.66666920979819" text="Population" />
+                                  <TableColumn id="column" fx:id="entityRunColumn" prefWidth="75.0" text="Entity" />
+                                  <TableColumn id="column" fx:id="populationRunColumn" prefWidth="90.66666920979819" text="Population" />
                                 </columns>
                               </TableView>
                               <GridPane>
@@ -124,13 +124,13 @@
                                     <Label fx:id="ticksValueLabel" text="0" GridPane.columnIndex="1" GridPane.rowIndex="2" />
                                     <Label fx:id="secondsLabel" text="Seconds:" GridPane.rowIndex="3" />
                                     <Label fx:id="secondsValueLabel" text="0" GridPane.columnIndex="1" GridPane.rowIndex="3" />
-                                    <Button fx:id="stopSimulationButton" mnemonicParsing="false" onAction="#stopSimulation" text="Stop" GridPane.rowIndex="1" />
+                                    <Button id="pause" fx:id="stopSimulationButton" mnemonicParsing="false" onAction="#stopSimulation" text="Stop" GridPane.rowIndex="1" />
                                     <Button fx:id="resumeSimulationButton" mnemonicParsing="false" onAction="#resumeSimulation" text="Resume" GridPane.columnIndex="1" GridPane.rowIndex="1">
                                        <font>
                                           <Font size="11.0" />
                                        </font>
                                     </Button>
-                                    <Button fx:id="pauseButton" mnemonicParsing="false" onAction="#pauseSimulation" text="Pause" GridPane.columnIndex="1" />
+                                    <Button id="pause" fx:id="pauseButton" mnemonicParsing="false" onAction="#pauseSimulation" text="Pause" GridPane.columnIndex="1" />
                                  </children>
                               </GridPane>
                               <TextArea fx:id="exceptionArea" maxWidth="1.7976931348623157E308" prefHeight="154.0" prefWidth="229.0" />
@@ -151,8 +151,8 @@
                                   <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                                 </rowConstraints>
                                  <children>
-                                    <Button fx:id="resultsGraphButton" mnemonicParsing="false" onAction="#showGraph" text="Graph" GridPane.columnIndex="2" GridPane.rowIndex="2" />
-                                    <Button fx:id="histogramButton" mnemonicParsing="false" onAction="#showHistogram" text="Histogram" GridPane.columnIndex="2" GridPane.rowIndex="1">
+                                    <Button id="graphic" fx:id="resultsGraphButton" mnemonicParsing="false" onAction="#showGraph" text="Graph" GridPane.columnIndex="2" GridPane.rowIndex="2" />
+                                    <Button id="graphic" fx:id="histogramButton" mnemonicParsing="false" onAction="#showHistogram" text="Histogram" GridPane.columnIndex="2" GridPane.rowIndex="1">
                                        <GridPane.margin>
                                           <Insets />
                                        </GridPane.margin>
