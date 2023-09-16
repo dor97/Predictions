@@ -14,7 +14,6 @@ import App.AppController;
 import java.net.URL;
 
 public class DesktopUI extends Application {
-    private static AppController appController;
     @Override
     public void start(Stage primaryStage) throws Exception {
 
@@ -34,7 +33,7 @@ public class DesktopUI extends Application {
         URL mainFXML = getClass().getResource("/resources/javaFXproject.fxml");
         fxmlLoader.setLocation(mainFXML);
         Parent root = fxmlLoader.load();
-        appController = fxmlLoader.getController();
+        AppController appController = fxmlLoader.getController();
 
         appController.setTreeViewComponentController(treeViewController);
         appController.setTreeDetailsComponentController(treeDetailsController);
@@ -44,10 +43,10 @@ public class DesktopUI extends Application {
         appController.setStage(primaryStage);
         primaryStage.setTitle("Predictions");
         primaryStage.show();
+        appController.shutDownSystem();
     }
 
     public static void main(String[] args){
         launch(args);
-        appController.shutDownSystem();
     }
 }
