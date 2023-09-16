@@ -24,10 +24,10 @@
          <children>
             <Button fx:id="loadFileButton" mnemonicParsing="false" onAction="#loadFile" text="Load File" />
             <TextField fx:id="loadedFilePathTextBox" promptText="Currently Loaded File Path" />
-            <TableView fx:id="queueManagementTable" prefHeight="63.0">
+            <TableView fx:id="queueManagementTable" prefHeight="85.0">
               <columns>
-                <TableColumn fx:id="statusColumn" prefWidth="114.0000330209732" text="Status" />
-                <TableColumn fx:id="amountColumn" prefWidth="83.33336639404297" text="Amount" />
+                <TableColumn fx:id="statusColumn" prefWidth="169.33336889743805" text="Status" />
+                <TableColumn fx:id="amountColumn" prefWidth="168.66664123535156" text="Amount" />
               </columns>
             </TableView>
          </children>
@@ -45,9 +45,9 @@
    <center>
        <TabPane prefHeight="324.0" prefWidth="600.0" tabClosingPolicy="UNAVAILABLE" BorderPane.alignment="CENTER">
         <tabs>
-          <Tab text="Details">
+          <Tab fx:id="DetailsTab" text="Details">
                <content>
-                  <BorderPane prefHeight="400.0" prefWidth="1195.0">
+                  <BorderPane fx:id="detailsBorderPane" prefHeight="400.0" prefWidth="1195.0">
                     <left>
                         <fx:include fx:id="treeViewComponent" source="../TreeView/TreeView.fxml" />
                     </left>
@@ -77,7 +77,7 @@
                               <TableView fx:id="entitiesTable">
                                 <columns>
                                   <TableColumn fx:id="entityColumn" minWidth="-1.0" prefWidth="102.0" text="Entity" />
-                                  <TableColumn fx:id="populationColumn" minWidth="-1.0" prefWidth="138.66668701171875" text="Population" />
+                                  <TableColumn fx:id="populationColumn" minWidth="-1.0" prefWidth="143.9999974568685" text="Population" />
                                 </columns>
                               </TableView>
                            </children>
@@ -104,7 +104,7 @@
                               <TableView fx:id="entitiesRunTable">
                                 <columns>
                                   <TableColumn fx:id="entityRunColumn" prefWidth="75.0" text="Entity" />
-                                  <TableColumn fx:id="populationRunColumn" text="Population" />
+                                  <TableColumn fx:id="populationRunColumn" prefWidth="90.66666920979819" text="Population" />
                                 </columns>
                               </TableView>
                               <GridPane>
@@ -138,7 +138,7 @@
                         </HBox>
                         <HBox GridPane.columnIndex="1" GridPane.rowIndex="1">
                            <children>
-                              <TreeView fx:id="resultsTreeView" />
+                              <TreeView fx:id="resultsTreeView" prefHeight="113.0" prefWidth="190.0" />
                               <GridPane>
                                 <columnConstraints>
                                   <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />

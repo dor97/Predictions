@@ -16,6 +16,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
@@ -32,6 +33,7 @@ import Engine.myTask;
 import javafx.util.Pair;
 
 public class AppController implements Initializable {
+
     @FXML private TableColumn<QueueManagement, String> statusColumn;
     @FXML private TableColumn<QueueManagement, Integer> amountColumn;
     @FXML private TableView<QueueManagement> queueManagementTable;
@@ -149,6 +151,9 @@ public class AppController implements Initializable {
                 lastChosenEntityForHistogram = newValue.getParent().getValue();
                 getConsistencyValue(newValue.getParent().getValue(), newValue.getValue());
                 getAverageValue(newValue.getParent().getValue(), newValue.getValue());
+            }
+            else if (!newValue.getChildren().isEmpty()){
+                histogramButton.setDisable(true);
             }
         }));
     }
@@ -396,9 +401,16 @@ public class AppController implements Initializable {
     public void showGraph(ActionEvent actionEvent) {
 
         lastSimulationGraph = createLastSimulationGraph();
+
+        ScrollPane scrollPane = new ScrollPane(lastSimulationGraph);
+        scrollPane.setFitToWidth(false);
+        scrollPane.setFitToHeight(false);
+        scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.ALWAYS);
+        scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.ALWAYS);
+
         Stage stage = new Stage();
         stage.setTitle("Entities by Ticks Line Chart");
-        Scene scene  = new Scene(lastSimulationGraph,800,600);
+        Scene scene  = new Scene(scrollPane,650,450);
         stage.setScene(scene);
         stage.show();
     }
@@ -418,7 +430,13 @@ public class AppController implements Initializable {
             series1.getData().add(new XYChart.Data(property.getKey().toString(),property.getValue()));
         }
 
-        Scene scene  = new Scene(barChart,800,600);
+        ScrollPane scrollPane = new ScrollPane(barChart);
+        scrollPane.setFitToWidth(false);
+        scrollPane.setFitToHeight(false);
+        scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.ALWAYS);
+        scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.ALWAYS);
+
+        Scene scene  = new Scene(scrollPane,650,450);
         barChart.getData().addAll(series1);
         stage.setScene(scene);
         stage.show();
