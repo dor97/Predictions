@@ -247,10 +247,10 @@ public class expressionWithFunc extends expression implements Serializable {
     }
 
     public boolean checkEvaluateIsNumber(){
-        if(!getString().equals("evaluate") && params.size() != 2){
+        if(!getString().equals("evaluate")){
             throw new InvalidValue("evaluate func not correct");
         }
-        expressionType type = m_util.getPropertyType(params.get(0).getString(), params.get(1).getString());
+        expressionType type = m_util.getPropertyType(entityName, propertyName);
         if(type == expressionType.FLOAT || type == expressionType.INT){
             return true;
         }

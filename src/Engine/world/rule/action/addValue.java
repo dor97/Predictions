@@ -97,7 +97,7 @@ public class addValue extends action implements Serializable {  //increase or de
                 throw new InvalidValue("In action " + getActionName() + " the property and the value by are not compatible");
             }
         } else if(m_by.getString().equals("evaluate")){
-            if(m_by.checkEvaluateIsNumber()){
+            if(!m_by.checkEvaluateIsNumber()){
                 throw new InvalidValue("In action " + getActionName() + " got wrong property type in evaluate in by");
             }
         }
