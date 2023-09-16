@@ -2,7 +2,10 @@ package App;
 import DTO.*;
 import Engine.Engine;
 import Engine.Status;
+
 import TreeDetails.TreeDetailsController;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -83,6 +86,7 @@ public class AppController implements Initializable {
     private String lastChosenPropertyForHistogram;
     private String lastChosenEntityForHistogram;
     private Alert alert = new Alert(Alert.AlertType.ERROR);
+    private BooleanProperty isSimulationEnded = new SimpleBooleanProperty(false);
 
 
     @Override
@@ -113,16 +117,31 @@ public class AppController implements Initializable {
         queueManagementTable.setItems(queueManagementData);
         executionListView.setItems(executionListViewData);
 
+        isSimulationEnded.addListener((observable, oldValue, newValue) -> {
+            displaySimulationResults(engine);
+            resultsGraphButton.setDisable(false);});
+
+
         executionListView.getSelectionModel().selectedItemProperty().addListener(((observable, oldValue, newValue) -> {
+            if(newTask != null && engine.getSimulationStatus(lastSimulationNum) == Status.RUNNING){
+                engine.stopGettingDataUsingTask(newTask, lastSimulationNum);
+            }
+
             if (newValue !=null){
                 ticksValueLabel.setText("0");
                 secondsValueLabel.setText("0");
                 entitiesRunTablesData.clear();
+                resultsTreeView.setRoot(null);
+                consistencyValueLabel.setText("");
+                averageValueLabel.setText("");
+                rerunButton.setDisable(true);
+                histogramButton.setDisable(true);
+                resultsGraphButton.setDisable(true);
+                exceptionArea.setText("");
+
                 ExecutionListItem selectedListItem = newValue;
                 Integer selectedValue = selectedListItem.getID();
-                if(newTask != null){
-                    engine.stopGettingDataUsingTask(newTask, lastSimulationNum);
-                }
+
                 lastSimulationNum = selectedValue;
 
                 if (engine.getSimulationStatus(lastSimulationNum) != Status.FINISHED){
@@ -130,11 +149,15 @@ public class AppController implements Initializable {
                 }else{
                     rerunButton.setDisable(false);
                 }
+                if(engine.getSimulationStatus(selectedValue) == Status.WAITINGTORUN){
+                    newTask = null;
+                    return;
+                }
                 newTask = new myTask();
                 //exceptionArea.promptTextProperty().bind(newTask.messageProperty());
                 resultsGraphButton.setDisable(true);
                 histogramButton.setDisable(true);
-                newTask.bindProperties(ticksValueLabel.textProperty(), secondsValueLabel.textProperty(), exceptionArea.promptTextProperty(), entitiesRunTablesData);
+                newTask.bindProperties(ticksValueLabel.textProperty(), secondsValueLabel.textProperty(), exceptionArea.promptTextProperty(), entitiesRunTablesData, isSimulationEnded);
                 engine.getDataUsingTask(newTask, selectedValue);
                 if (engine.getSimulationStatus(selectedValue) == Status.FINISHED){
                     resultsGraphButton.setDisable(false);

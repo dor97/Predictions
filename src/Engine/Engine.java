@@ -338,7 +338,9 @@ public class Engine {
 //                task.cancel();
 //                }
 //            }
-            simStatus.get(simulationNum).getTaskThread().interrupt();
+            synchronized (simStatus.get(simulationNum).getWorld()) {
+                simStatus.get(simulationNum).getTaskThread().interrupt();
+            }
         }
 
     }
