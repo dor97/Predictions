@@ -50,6 +50,7 @@ public class World implements Serializable {
     private Utilites util;
     private int m_rows, m_cols, currTick = 0;
     private Instant start;
+    private Duration elapsedTime = Duration.ZERO;
     private Integer numSimulation = 0;
     private Boolean isSimulationEnded = false;
     private javafx.beans.property.BooleanProperty isFines = new SimpleBooleanProperty();
@@ -93,7 +94,7 @@ public class World implements Serializable {
 //        }
         synchronized (start) {
             runningSimulationDetails.setTick(currTick);
-            runningSimulationDetails.setTime(Duration.between(start, Instant.now()).getSeconds());
+            runningSimulationDetails.setTime(elapsedTime.getSeconds());
         }
 
         return runningSimulationDetails;
@@ -149,6 +150,7 @@ public class World implements Serializable {
         simulationTime = format.format(new Date());
         currTick = 0;
         start = Instant.now();
+
 //        while ((m_ticks.getType() == null || currTick < m_ticks.getInt()) && (m_secondToWork == null || Duration.between(start, Instant.now()).getSeconds() < m_secondToWork.getInt())){
 //            for(Rule r : m_rules) {
 //                if(currTick % r.getTick() == 0 && random.nextDouble() < r.getProbability()) {
@@ -169,6 +171,7 @@ public class World implements Serializable {
         map.setLocations(m_entities);
         List<ActionInterface> toActive = new ArrayList<>();
         while ((m_ticks.getType() == null || currTick < m_ticks.getInt()) && (m_secondToWork.getType() == null || Duration.between(start, Instant.now()).getSeconds() < m_secondToWork.getInt())) {  //&& currTick < 1000
+            elapsedTime = Duration.between(start, Instant.now());
             if(currTick % 1000 == 0) {
                 numOfEntitiesPerTick.add(new Pair<>(currTick, m_entities.size()));
             }
@@ -206,10 +209,10 @@ public class World implements Serializable {
                 synchronized (isPause) {
                     System.out.println("pause");
                     try {
-                        synchronized (this) {
-                            this.notifyAll();
-                            isPause.wait();
-                        }
+                        isPause.notifyAll();
+                        elapsedTime = Duration.between(start, Instant.now());
+                        isPause.wait();
+                        start = Instant.now().minus(elapsedTime);
                         System.out.println("resume");
                     } catch (InterruptedException e) {
                         System.out.println("leave");
@@ -579,18 +582,33 @@ public class World implements Serializable {
 
     public void moveOneStep(isPause isPause){
         synchronized (isPause){
-            if(isPause.getPause()){
-                synchronized (this){
+            if(isPause.getPause()) {
+                try {
                     isPause.notifyAll();
-                    try {
-                        this.wait(2000);
-                    }catch (InterruptedException e){
+                    isPause.wait(2000);
+                } catch (InterruptedException e) {
 
-                    }
                 }
+            }else {
+                throw new InvalidValue("not pause, can't run manually");
             }
-            throw new InvalidValue("not pause, can't run manually");
         }
+
+
+
+//        synchronized (isPause){
+//            if(isPause.getPause()){
+//                isPause.notifyAll();
+//                synchronized (this){
+//                    try {
+//                        this.wait(2000);
+//                    }catch (InterruptedException e){
+//
+//                    }
+//                }
+//            }
+//            throw new InvalidValue("not pause, can't run manually");
+//        }
     }
 
     public DTOMap getMap(isPause isPause){

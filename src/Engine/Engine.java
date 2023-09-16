@@ -297,7 +297,7 @@ public class Engine {
     }
 
     public void moveOneStep(Integer simulationNum){
-        simStatus.get(simulationNum).getWorld().moveOneStep(simStatus.get(simStatus).getIsPause());
+        simStatus.get(simulationNum).getWorld().moveOneStep(simStatus.get(simulationNum).getIsPause());
     }
 
     public DTOMap getMap(Integer simulationNum) {
