@@ -94,6 +94,7 @@ public class AppController implements Initializable {
         alert.setTitle("Error");
         alert.setWidth(1000);
         alert.setHeight(1000);
+        rerunButton.setDisable(true);
         if (treeViewController != null && treeDetailsController != null) {
             treeViewController.setMainController(this);
             treeDetailsController.setMainController(this);
