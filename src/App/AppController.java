@@ -35,6 +35,8 @@ import javafx.util.Pair;
 
 public class AppController implements Initializable {
 
+    @FXML private Button nextButton;
+    @FXML private Button previousButton;
     @FXML private TabPane tabPane;
     @FXML private Tab DetailsTab;
     @FXML private BorderPane detailsBorderPane;
@@ -118,6 +120,8 @@ public class AppController implements Initializable {
         entitiesRunTable.setItems(entitiesRunTablesData);
         queueManagementTable.setItems(queueManagementData);
         executionListView.setItems(executionListViewData);
+        nextButton.setDisable(true);
+        previousButton.setDisable(true);
 
         isSimulationEnded.addListener((observable, oldValue, newValue) -> {
             displaySimulationResults(engine);
@@ -412,14 +416,20 @@ public class AppController implements Initializable {
     }
 
     public void pauseSimulation(ActionEvent actionEvent) {
+        nextButton.setDisable(false);
+        previousButton.setDisable(false);
         engine.pauseSimulation(lastSimulationNum);
     }
 
     public void stopSimulation(ActionEvent actionEvent) {
+        nextButton.setDisable(true);
+        previousButton.setDisable(true);
         engine.stopSimulation(lastSimulationNum);
     }
 
     public void resumeSimulation(ActionEvent actionEvent) {
+        nextButton.setDisable(true);
+        previousButton.setDisable(true);
         engine.resumeSimulation(lastSimulationNum);
     }
 
@@ -465,5 +475,12 @@ public class AppController implements Initializable {
         barChart.getData().addAll(series1);
         stage.setScene(scene);
         stage.show();
+    }
+
+    public void nextSimulationStep(ActionEvent actionEvent) {
+        engine.moveOneStep(lastSimulationNum);
+    }
+
+    public void previousSimulationStep(ActionEvent actionEvent) {
     }
 }

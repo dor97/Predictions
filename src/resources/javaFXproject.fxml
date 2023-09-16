@@ -101,7 +101,7 @@
                         <ListView fx:id="executionListView" maxHeight="1.7976931348623157E308" maxWidth="-Infinity" GridPane.rowSpan="2" />
                         <HBox prefHeight="100.0" prefWidth="200.0" spacing="5.0" GridPane.columnIndex="1">
                            <children>
-                              <TableView fx:id="entitiesRunTable">
+                              <TableView fx:id="entitiesRunTable" prefHeight="174.0" prefWidth="300.0">
                                 <columns>
                                   <TableColumn id="column" fx:id="entityRunColumn" prefWidth="75.0" text="Entity" />
                                   <TableColumn id="column" fx:id="populationRunColumn" prefWidth="90.66666920979819" text="Population" />
@@ -111,6 +111,7 @@
                                 <columnConstraints>
                                   <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
                                   <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
                                 </columnConstraints>
                                 <rowConstraints>
                                   <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
@@ -131,6 +132,8 @@
                                        </font>
                                     </Button>
                                     <Button id="pause" fx:id="pauseButton" mnemonicParsing="false" onAction="#pauseSimulation" text="Pause" GridPane.columnIndex="1" />
+                                    <Button id="ticksButton" fx:id="nextButton" mnemonicParsing="false" onAction="#nextSimulationStep" text="Next" GridPane.columnIndex="2" />
+                                    <Button id="ticksButton" fx:id="previousButton" mnemonicParsing="false" onAction="#previousSimulationStep" text="Previous" GridPane.columnIndex="2" GridPane.rowIndex="1" />
                                  </children>
                               </GridPane>
                               <TextArea fx:id="exceptionArea" maxWidth="1.7976931348623157E308" prefHeight="154.0" prefWidth="229.0" />
@@ -138,7 +141,7 @@
                         </HBox>
                         <HBox GridPane.columnIndex="1" GridPane.rowIndex="1">
                            <children>
-                              <TreeView fx:id="resultsTreeView" prefHeight="113.0" prefWidth="190.0" />
+                              <TreeView fx:id="resultsTreeView" />
                               <GridPane>
                                 <columnConstraints>
                                   <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />

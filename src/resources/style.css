@@ -25,3 +25,8 @@
     -fx-font-size: 10px;
 }
 
+#ticksButton{
+    -fx-background-color: #777272;
+    -fx-text-fill: white;
+    -fx-font-size: 10px;
+}
