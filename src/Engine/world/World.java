@@ -169,7 +169,9 @@ public class World implements Serializable {
         map.setLocations(m_entities);
         List<ActionInterface> toActive = new ArrayList<>();
         while ((m_ticks.getType() == null || currTick < m_ticks.getInt()) && (m_secondToWork.getType() == null || Duration.between(start, Instant.now()).getSeconds() < m_secondToWork.getInt())) {  //&& currTick < 1000
-            numOfEntitiesPerTick.add(new Pair<>(currTick, m_entities.size()));
+            if(currTick % 1000 == 0) {
+                numOfEntitiesPerTick.add(new Pair<>(currTick, m_entities.size()));
+            }
             toActive.clear();
             for(Rule r : m_rules) {
                 toActive.addAll(r.getActionToActive(currTick));
