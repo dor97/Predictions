@@ -8,6 +8,7 @@ import Engine.world.entity.property.PropertyInterface;
 import Engine.world.expression.expressionType;
 import Engine.world.map;
 
+import java.lang.reflect.Type;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -84,6 +85,16 @@ public class Utilites {
 
     public float percent(float hole, float percent){
         return hole * percent / 100f;
+    }
+
+    public expressionType getPropertyType(String entityName, String propertyName){
+        if(!m_entityDifenichan.containsKey(entityName)){
+            return null;
+        }
+        if(!m_entityDifenichan.get(entityName).getPropertys().containsKey(propertyName)){
+            return null;
+        }
+        return m_entityDifenichan.get(entityName).getPropertys().get(propertyName).getType();
     }
 
 }

@@ -1,6 +1,7 @@
 package Engine.world.rule.action;
 
 import DTO.DTOActionData;
+import Engine.InvalidValue;
 import Engine.generated.PRDAction;
 import Engine.utilites.Utilites;
 import Engine.world.entity.Entity;
@@ -26,11 +27,17 @@ public class replace extends action{
         //actionName = action.getType();
         mode = action.getMode();
         checkEntityAndPropertyExist();
+        if(!mode.equals("scratch") && !mode.equals("derived")){
+            throw new InvalidValue("In action replace mode is not defined");
+        }
     }
 
     private void checkEntityAndPropertyExist(){
         if(!m_util.isEntityDifenichanExists(m_entityName)){
             throw new OBJECT_NOT_EXIST("In action replace the entity " + m_entityName + " does not exist.");
+        }
+        if(!m_util.isEntityDifenichanExists(toCreate)){
+            throw new OBJECT_NOT_EXIST("In action replace the entity " + toCreate + " does not exist.");
         }
         if(getCountForSecondaryEntities() != 0 && !m_util.isEntityDifenichanExists(getSecondaryName())){
             throw new OBJECT_NOT_EXIST("In action " + getActionName() + " the entity " + getSecondaryName() + " does not exist.");

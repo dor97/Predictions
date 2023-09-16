@@ -246,6 +246,17 @@ public class expressionWithFunc extends expression implements Serializable {
         //throw new InvalidValue("wrong entity in arg to " + funcName + " func");
     }
 
+    public boolean checkEvaluateIsNumber(){
+        if(!getString().equals("evaluate") && params.size() != 2){
+            throw new InvalidValue("evaluate func not correct");
+        }
+        expressionType type = m_util.getPropertyType(params.get(0).getString(), params.get(1).getString());
+        if(type == expressionType.FLOAT || type == expressionType.INT){
+            return true;
+        }
+        return false;
+    }
+
     @Override
     public String toString(){
         if(!isFunc()){

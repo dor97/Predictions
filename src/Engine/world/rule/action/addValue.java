@@ -96,6 +96,10 @@ public class addValue extends action implements Serializable {  //increase or de
             if (temp == expressionType.FLOAT && m_util.getEntityDifenichan(m_entityName).getPropertys().get(m_propertyName).getType() == expressionType.INT) {
                 throw new InvalidValue("In action " + getActionName() + " the property and the value by are not compatible");
             }
+        } else if(m_by.getString().equals("evaluate")){
+            if(m_by.checkEvaluateIsNumber()){
+                throw new InvalidValue("In action " + getActionName() + " got wrong property type in evaluate in by");
+            }
         }
     }
 
