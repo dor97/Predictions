@@ -6,6 +6,7 @@ import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
@@ -38,7 +39,13 @@ public class DesktopUI extends Application {
         appController.setTreeViewComponentController(treeViewController);
         appController.setTreeDetailsComponentController(treeDetailsController);
 
-        Scene scene = new Scene(root, 600 , 400);
+        ScrollPane scrollPane = new ScrollPane(root);
+        scrollPane.setFitToWidth(false);
+        scrollPane.setFitToHeight(false);
+        scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.ALWAYS);
+        scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.ALWAYS);
+
+        Scene scene = new Scene(scrollPane, 605 , 425);
         primaryStage.setScene(scene);
         appController.setStage(primaryStage);
         primaryStage.setTitle("Predictions");
