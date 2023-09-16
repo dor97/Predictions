@@ -246,6 +246,23 @@ public class expressionWithFunc extends expression implements Serializable {
         //throw new InvalidValue("wrong entity in arg to " + funcName + " func");
     }
 
+    @Override
+    public String toString(){
+        if(!isFunc()){
+            return super.toString();
+        }
+        StringBuilder result = new StringBuilder();
+        result.append(getValue().toString() + "(");
+        for(int i = 0; i < params.size() - 1 ; i++){
+            result.append(params.get(i) + ", ");
+        }
+        if(params.size() != 0){
+            result.append(params.get(params.size() - 1));
+        }
+        result.append(")");
+        return result.toString();
+    }
+
 //    @Override
 //    public String toString(){
 //        return getValue().toString();

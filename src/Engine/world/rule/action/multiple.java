@@ -87,7 +87,7 @@ public class multiple implements subCondition, Serializable {
     public void makeActionDto(DTOActionData actionData) {
         actionData.putData("condition", "multiple");
         actionData.putData("logic", m_logical.toString());
-        actionData.putData("logicSize", ((Integer)(m_conditions.size())).toString());
+        actionData.putData("logic size", ((Integer)(m_conditions.size())).toString());
     }
 
 

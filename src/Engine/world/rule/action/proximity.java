@@ -5,6 +5,8 @@ import Engine.InvalidValue;
 import Engine.generated.PRDAction;
 import Engine.utilites.Utilites;
 import Engine.world.entity.Entity;
+import Engine.world.expression.expressionType;
+import Engine.world.expression.expressionWithFunc;
 import org.omg.CORBA.OBJECT_NOT_EXIST;
 
 import java.util.*;
@@ -15,7 +17,7 @@ public class proximity extends action {
     //private String m_entityName;
     private String targetName;
     private String sourceName;
-    private int envDepth;
+    private expressionWithFunc envDepth;
     private List<ActionInterface> actions;
     private Utilites m_util;
     //private int m_currTick;
@@ -25,7 +27,9 @@ public class proximity extends action {
         //m_entityName = action.getEntity();
         sourceName = action.getPRDBetween().getSourceEntity();
         targetName = action.getPRDBetween().getTargetEntity();
-        envDepth = action.getPRDEnvDepth().getOf().equals("1") ? 1 : 2;
+        //envDepth = action.getPRDEnvDepth().getOf().equals("1") ? 1 : 2;
+        envDepth = new expressionWithFunc(util);
+        envDepth.convertValueInString(action.getPRDEnvDepth().getOf());
         m_util = util;
         action.getPRDActions().getPRDAction();
 
@@ -52,6 +56,8 @@ public class proximity extends action {
     @Override
     public Map<String, List<Entity>> activateAction(Entity entity, int currTick, List<Entity> paramsForFuncs) {
         m_currTick = currTick;
+        envDepth.setEntityParams(paramsForFuncs);
+        envDepth.addToEntityParams(entity);
         List<Entity> targets = m_util.getEntitiesByName(targetName);
         //List<Entity> targets = targetAndSecondaryEntities.stream().filter(targetEntity -> targetEntity.getName().equals(targetName)).collect(Collectors.toList());
         //List<Entity> secondaryEntities = secondaryEntities.stream().filter(secondaryEntity -> !secondaryEntity.getName().equals(targetName)).collect(Collectors.toList());
@@ -62,10 +68,11 @@ public class proximity extends action {
 
         Map<String, List<Entity>> killAndCreat = new HashMap<>();
         //if (secondaryEntities == null || secondaryEntities.size() == 0) {
-            targets.stream().forEach(targetEntity -> loopThroughEntities(entity, targetEntity, secondaryEntities).forEach((key, value) -> killAndCreat.merge(key, value, (list1, list2) -> {
+            targets.stream().forEach(targetEntity -> {envDepth.switchLastEntityParam(targetEntity);
+                loopThroughEntities(entity, targetEntity, secondaryEntities).forEach((key, value) -> killAndCreat.merge(key, value, (list1, list2) -> {
                 list1.addAll(list2);
                 return list1;
-            })));
+            }));});
         //}else{
 
         //}
@@ -78,8 +85,22 @@ public class proximity extends action {
 
     private Map<String, List<Entity>> loopThroughEntities(Entity entity, Entity targetEntity, List<Entity> secondaryEntities) {
         Map<String, List<Entity>> killAndCreat = new HashMap<>();
-        if(isNear(entity, targetEntity)){
-            actions.stream().forEach(action -> activateAction(action, entity, targetEntity, secondaryEntities).forEach((key, value) -> killAndCreat.merge(key, value, (list1, list2) -> {
+        if(getCountForSecondaryEntities() == 0){
+            if(isNear(entity, targetEntity)){
+                actions.stream().forEach(action -> activateAction(action, entity, targetEntity, secondaryEntities).forEach((key, value) -> killAndCreat.merge(key, value, (list1, list2) -> {
+                    list1.addAll(list2);
+                    return list1;
+                })));
+            }
+        }else {
+            envDepth.addToEntityParams(entity);
+            List<Entity> pass = new ArrayList<>();
+            secondaryEntities.stream().forEach(secondaryEntity -> {envDepth.switchLastEntityParam(secondaryEntity);
+                if (isNear(entity, targetEntity)) {
+                    pass.add(secondaryEntity);
+                }
+                });
+            actions.stream().forEach(action -> activateAction(action, entity, targetEntity, pass).forEach((key, value) -> killAndCreat.merge(key, value, (list1, list2) -> {
                 list1.addAll(list2);
                 return list1;
             })));
@@ -90,7 +111,7 @@ public class proximity extends action {
     private Map<String, List<Entity>> activateAction(ActionInterface action, Entity entity, Entity targetEntity, List<Entity> secondaryEntities){
         try {
             if (action.getEntityName().equals(entity.getName())) {
-                if (secondaryEntities == null || secondaryEntities.size() == 0) { //TODO remove secondaryEntities.size() == 0 so not active if didnt find secondaries
+                if (secondaryEntities == null || getCountForSecondaryEntities() == 0) { //TODO remove secondaryEntities.size() == 0 so not active if didnt find secondaries
                     return action.activateAction(entity, m_currTick, new ArrayList<>(Arrays.asList(entity, targetEntity)));
                 } else {
                     Map<String, List<Entity>> killAndCreat = new HashMap<>();
@@ -101,7 +122,7 @@ public class proximity extends action {
                     return killAndCreat;
                 }
             } else if (action.getEntityName().equals(targetEntity.getName())) {
-                if (secondaryEntities == null || secondaryEntities.size() == 0) { //TODO remove secondaryEntities.size() == 0 so not active if didnt find secondaries
+                if (secondaryEntities == null || getCountForSecondaryEntities() == 0) { //TODO remove secondaryEntities.size() == 0 so not active if didnt find secondaries
                     return action.activateAction(targetEntity, m_currTick, new ArrayList<>(Arrays.asList(targetEntity, entity)));
                 } else {
                     Map<String, List<Entity>> killAndCreat = new HashMap<>();
@@ -131,9 +152,17 @@ public class proximity extends action {
     }
 
     private boolean isNear(Entity entity, Entity targetEntity) {
-
-        for (int i = -1 * envDepth; i <= 1 * envDepth; i++) {
-            for (int j = -1 * envDepth; j <= 1 * envDepth; j++) {
+        expressionWithFunc depthExpression = envDepth.decipherValue(entity, m_util, m_currTick);
+        Integer depth;
+        if(depthExpression.getType() == expressionType.FLOAT){
+            depth = (int)depthExpression.getFloat();
+        } else if (depthExpression.getType() == expressionType.INT) {
+            depth = depthExpression.getInt();
+        }else {
+            throw new InvalidValue("In action proximity got wrong depth param");
+        }
+        for (int i = -1 * depth; i <= 1 * depth; i++) {
+            for (int j = -1 * depth; j <= 1 * depth; j++) {
                 if (entity.getPosition().getX() == targetEntity.getPosition().getX() + i && entity.getPosition().getY() == targetEntity.getPosition().getY() + j) {
                     return true;
                 }
@@ -147,7 +176,7 @@ public class proximity extends action {
         DTOActionData actionData = new DTOActionData(getActionName());
         actionData.putData("entity", sourceName);
         actionData.putData("target", targetName);
-        actionData.putData("envDepth", ((Integer)(envDepth)).toString());
+        actionData.putData("envDepth", ((envDepth)).toString());
         actionData.putData("actions", ((Integer)(actions != null ? actions.size() : 0)).toString());
         actionData.putData("secondary", getSecondaryName());
 

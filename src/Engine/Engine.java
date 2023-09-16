@@ -34,7 +34,7 @@ public class Engine {
     private Boolean isFileLoadedInSimulation = false;
     private Map<Integer, simulationsStatus> simStatus = new HashMap<>();
     private worldDifenichan worldDif = null;
-    private Map<Integer, String> simulationsExceptions;
+    //private Map<Integer, String> simulationsExceptions;
     private List<Integer> newlyFinishedSimulationIds = new ArrayList<>();
     private Thread taskThread = null;
     private Boolean isTreadPoolShoutDown = false;
@@ -249,7 +249,7 @@ public class Engine {
             world.startSimolesan(simStatus.get(world.getNumSimulation()).getIsPause());
         }catch (Exception e){
             world.setException(e.getMessage());
-            simulationsExceptions.put(world.getNumSimulation(), e.getMessage());
+            //simulationsExceptions.put(world.getNumSimulation(), e.getMessage());
         }finally {
             world.setSimulationEnded();
         }
