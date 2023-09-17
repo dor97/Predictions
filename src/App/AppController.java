@@ -600,6 +600,8 @@ public class AppController implements Initializable {
         for (DTOEntityData entity : entities) {
             XYChart.Series series = new XYChart.Series<>();
             series.setName(entity.getName());
+            row = 0;
+            column = 0;
             for (DTOMapSpace[] rows : graphicDisplay.getMap()) {
                 for(DTOMapSpace columns : rows){
                     if (columns.getEntityName().equals(entity.getName())){
@@ -607,7 +609,7 @@ public class AppController implements Initializable {
                     }
                     column= column+1;
                 }
-                column=1;
+                column=0;
                 row= row+1;
             }
             simulationSpace.getData().addAll(series);
