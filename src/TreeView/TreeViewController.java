@@ -13,6 +13,7 @@ import javafx.scene.control.TreeView;
 import javafx.scene.layout.BorderPane;
 
 import java.net.URL;
+import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
 
@@ -21,7 +22,7 @@ public class TreeViewController implements Initializable {
     @FXML private TreeView<DTOSimulationDetailsItem> detailsTreeView;
     @FXML private BorderPane borderPaneTreeView;
     private String pathToSimulation = null;
-
+    private List<DTOEntityData> entities;
     private Alert alert;
 
     public void setMainController(AppController mainController) {
@@ -94,6 +95,7 @@ public class TreeViewController implements Initializable {
 
     private TreeItem<DTOSimulationDetailsItem> getEntities(DTOSimulationDetails details, TreeItem<DTOSimulationDetailsItem> entityItem) {
 
+        entities = details.getEntitysList();
         for(DTOEntityData entityData : details.getEntitysList()){
             TreeItem<DTOSimulationDetailsItem> entity = new TreeItem<>(entityData);
             for(DTOPropertyData propertyData : entityData.getPropertList()){
@@ -117,8 +119,6 @@ public class TreeViewController implements Initializable {
             System.out.println(d);
         }
     }
-
-
     @Override
     public void initialize(URL location, ResourceBundle resources) {
 
@@ -129,5 +129,10 @@ public class TreeViewController implements Initializable {
                 mainController.displayTreeItemsDetails(selectedValue);
             }
         }));
+    }
+
+    public List<DTOEntityData> getEntities(){
+
+        return entities;
     }
 }

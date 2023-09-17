@@ -85,6 +85,7 @@ public class AppController implements Initializable {
     @FXML private TextField loadedFilePathTextBox;
     @FXML private TextArea exceptionArea;
     private Stage primaryStage;
+    private Stage graphicDisplayStage;
     private Engine engine;
     private ObservableList<EnvironmentVariableTable> environmentVariableTableData = FXCollections.observableArrayList();
     private ObservableList<EntitiesTable> entitiesTableData = FXCollections.observableArrayList();
@@ -96,6 +97,7 @@ public class AppController implements Initializable {
     private Integer lastSimulationNum = 0;
     private Boolean isFirstSimulationForFile = true;
     private LineChart lastSimulationGraph;
+    private ScatterChart simulationSpace;
     private String lastChosenPropertyForHistogram;
     private String lastChosenEntityForHistogram;
     private Alert alert = new Alert(Alert.AlertType.ERROR);
@@ -132,6 +134,10 @@ public class AppController implements Initializable {
         executionListView.setItems(executionListViewData);
         nextButton.setDisable(true);
         previousButton.setDisable(true);
+        graphicDisplayButton.setDisable(true);
+        pauseButton.setDisable(true);
+        resumeSimulationButton.setDisable(true);
+        stopSimulationButton.setDisable(true);
 
         isSimulationEnded.addListener((observable, oldValue, newValue) -> {
             displaySimulationResults(engine);
@@ -346,7 +352,9 @@ public class AppController implements Initializable {
     }
 
     public void startSimulation(ActionEvent actionEvent) {
-
+        pauseButton.setDisable(false);
+        resumeSimulationButton.setDisable(false);
+        stopSimulationButton.setDisable(false);
         for (EnvironmentVariableTable environmentVariable : environmentVariableTableData){
             if (!environmentVariable.getValue().getText().isEmpty()){
                 try{
@@ -428,6 +436,7 @@ public class AppController implements Initializable {
     public void pauseSimulation(ActionEvent actionEvent) {
         nextButton.setDisable(false);
         previousButton.setDisable(false);
+        graphicDisplayButton.setDisable(false);
         engine.pauseSimulation(lastSimulationNum);
     }
 
@@ -440,6 +449,7 @@ public class AppController implements Initializable {
     public void resumeSimulation(ActionEvent actionEvent) {
         nextButton.setDisable(true);
         previousButton.setDisable(true);
+        graphicDisplayButton.setDisable(true);
         engine.resumeSimulation(lastSimulationNum);
     }
 
@@ -567,6 +577,40 @@ public class AppController implements Initializable {
     }
 
     public void showGraphicDisplay(ActionEvent actionEvent) {
+
         DTOMap graphicDisplay = engine.getMap(lastSimulationNum);
+        graphicDisplayStage = new Stage();
+
+        graphicDisplayStage.setTitle("Simulation Space");
+        final NumberAxis xAxis = new NumberAxis(0, graphicDisplay.getCols(), 5);
+        final NumberAxis yAxis = new NumberAxis(0, graphicDisplay.getRows(), 5);
+        simulationSpace = new ScatterChart(xAxis,yAxis);
+
+        createSimulationSpace(graphicDisplay);
+
+        Scene scene  = new Scene(simulationSpace, 600, 500);
+        graphicDisplayStage.setScene(scene);
+        graphicDisplayStage.show();
+    }
+
+    private void createSimulationSpace(DTOMap graphicDisplay) {
+        double column =0;
+        double row =0;
+        List<DTOEntityData> entities = treeViewController.getEntities();
+        for (DTOEntityData entity : entities) {
+            XYChart.Series series = new XYChart.Series<>();
+            series.setName(entity.getName());
+            for (DTOMapSpace[] rows : graphicDisplay.getMap()) {
+                for(DTOMapSpace columns : rows){
+                    if (columns.getEntityName().equals(entity.getName())){
+                        series.getData().add(new XYChart.Data<>(column, row));
+                    }
+                    column= column+1;
+                }
+                column=1;
+                row= row+1;
+            }
+            simulationSpace.getData().addAll(series);
+        }
     }
 }
