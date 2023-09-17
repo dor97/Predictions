@@ -233,7 +233,7 @@ public class World implements Serializable {
             //aTask.run();
             //Thread.currentThread().isInterrupted();
         }
-        m_entities.stream().forEach(kill -> kill.getProperties().values().stream().forEach(propertyInterface -> {propertyInterface.addDeltaTicksChanged(currTick);consistencyAndAvr.add(new consistencyAndAvr(kill.getName() + "_" + propertyInterface.getName(), propertyInterface.getDeltaTicksChangedValueAve(), propertyInterface.getValue()));}));
+        m_entities.stream().forEach(entity -> entity.getProperties().values().stream().forEach(propertyInterface -> {propertyInterface.addDeltaTicksChanged(currTick);consistencyAndAvr.add(new consistencyAndAvr(entity.getName() + "_" + propertyInterface.getName(), propertyInterface.getDeltaTicksChangedValueAve(), propertyInterface.getValue()));}));
         Platform.runLater(() -> isFines.set(true));
         isSimulationEnded = true;
     }
@@ -325,14 +325,31 @@ public class World implements Serializable {
 //        for(Entity entity : m_entities){
 //            entity.getProperties().values().stream().forEach(propertyInterface -> propertyChangeByTick.put(entity.getName() + "_" + propertyInterface.getName(), addPropertyChangedAv(propertyChangeByTick.get(entity.getName() + "_" + propertyInterface.getName()), propertyInterface.getDeltaTicksChangedValueAve())));
 //        }
-        consistencyAndAvr.stream().forEach(consistencyAndAvrItem -> propertyChangeByTick.put(consistencyAndAvrItem.getName(), addPropertyChangedAv(propertyChangeByTick.get(consistencyAndAvrItem), consistencyAndAvrItem.getConsistency())));
-        //simulationDetailsPostRun.setPropertyChangeByTick(consistencyAndAvr.stream().collect(Collectors.toMap(consistencyAndAvrItem -> consistencyAndAvrItem.getName(), consistencyAndAvrItem -> consistencyAndAvrItem.getConsistency())));
-        simulationDetailsPostRun.setPropertyChangeByTick(propertyChangeByTick);
+        if(isSimulationEnded) {
+            consistencyAndAvr.stream().forEach(consistencyAndAvrItem -> propertyChangeByTick.put(consistencyAndAvrItem.getName(), addPropertyChangedAv(propertyChangeByTick.get(consistencyAndAvrItem), consistencyAndAvrItem.getConsistency())));
+            //simulationDetailsPostRun.setPropertyChangeByTick(consistencyAndAvr.stream().collect(Collectors.toMap(consistencyAndAvrItem -> consistencyAndAvrItem.getName(), consistencyAndAvrItem -> consistencyAndAvrItem.getConsistency())));
+            simulationDetailsPostRun.setPropertyChangeByTick(propertyChangeByTick);
 
-        Map<String, Pair<Float, Integer>> avPropertyValue = new HashMap<>();
-        //m_entities.stream().forEach(entity -> entity.getProperties().values().stream().filter(propertyInterface -> propertyInterface.getType() == propertyType.FLOAT || propertyInterface.getType() == propertyType.INT).forEach(propertyInterface -> avPropertyValue.put(entity.getName() + "_" + propertyInterface.getName(), makeNewAv(avPropertyValue.get(entity.getName() + "_" + propertyInterface.getName()), (Float)propertyInterface.getValue()))));
-        consistencyAndAvr.stream().filter(consistencyAndAvrItem -> consistencyAndAvrItem.getAvr() != null).forEach(consistencyAndAvrItem -> avPropertyValue.put(consistencyAndAvrItem.getName(), makeNewAv(avPropertyValue.get(consistencyAndAvrItem.getName()), consistencyAndAvrItem.getAvr())));
-        simulationDetailsPostRun.setAvPropertyValue(avPropertyValue);
+            Map<String, Pair<Float, Integer>> avPropertyValue = new HashMap<>();
+            //m_entities.stream().forEach(entity -> entity.getProperties().values().stream().filter(propertyInterface -> propertyInterface.getType() == propertyType.FLOAT || propertyInterface.getType() == propertyType.INT).forEach(propertyInterface -> avPropertyValue.put(entity.getName() + "_" + propertyInterface.getName(), makeNewAv(avPropertyValue.get(entity.getName() + "_" + propertyInterface.getName()), (Float)propertyInterface.getValue()))));
+            consistencyAndAvr.stream().filter(consistencyAndAvrItem -> consistencyAndAvrItem.getAvr() != null).forEach(consistencyAndAvrItem -> avPropertyValue.put(consistencyAndAvrItem.getName(), makeNewAv(avPropertyValue.get(consistencyAndAvrItem.getName()), consistencyAndAvrItem.getAvr())));
+            simulationDetailsPostRun.setAvPropertyValue(avPropertyValue);
+        }else{
+            List<consistencyAndAvr> consistencyAndAvrListLiving = new ArrayList<>();
+            m_entities.stream().forEach(entity -> entity.getProperties().values().stream().forEach(propertyInterface -> {propertyInterface.addDeltaTicksChanged(currTick);consistencyAndAvrListLiving.add(new consistencyAndAvr(entity.getName() + "_" + propertyInterface.getName(), propertyInterface.getDeltaTicksChangedValueAve(), propertyInterface.getValue()));}));
+
+            consistencyAndAvr.stream().forEach(consistencyAndAvrItem -> propertyChangeByTick.put(consistencyAndAvrItem.getName(), addPropertyChangedAv(propertyChangeByTick.get(consistencyAndAvrItem), consistencyAndAvrItem.getConsistency())));
+            consistencyAndAvrListLiving.stream().forEach(consistencyAndAvrItem -> propertyChangeByTick.put(consistencyAndAvrItem.getName(), addPropertyChangedAv(propertyChangeByTick.get(consistencyAndAvrItem), consistencyAndAvrItem.getConsistency())));
+
+            //simulationDetailsPostRun.setPropertyChangeByTick(consistencyAndAvr.stream().collect(Collectors.toMap(consistencyAndAvrItem -> consistencyAndAvrItem.getName(), consistencyAndAvrItem -> consistencyAndAvrItem.getConsistency())));
+            simulationDetailsPostRun.setPropertyChangeByTick(propertyChangeByTick);
+
+            Map<String, Pair<Float, Integer>> avPropertyValue = new HashMap<>();
+            //m_entities.stream().forEach(entity -> entity.getProperties().values().stream().filter(propertyInterface -> propertyInterface.getType() == propertyType.FLOAT || propertyInterface.getType() == propertyType.INT).forEach(propertyInterface -> avPropertyValue.put(entity.getName() + "_" + propertyInterface.getName(), makeNewAv(avPropertyValue.get(entity.getName() + "_" + propertyInterface.getName()), (Float)propertyInterface.getValue()))));
+            consistencyAndAvr.stream().filter(consistencyAndAvrItem -> consistencyAndAvrItem.getAvr() != null).forEach(consistencyAndAvrItem -> avPropertyValue.put(consistencyAndAvrItem.getName(), makeNewAv(avPropertyValue.get(consistencyAndAvrItem.getName()), consistencyAndAvrItem.getAvr())));
+            consistencyAndAvrListLiving.stream().filter(consistencyAndAvrItem -> consistencyAndAvrItem.getAvr() != null).forEach(consistencyAndAvrItem -> avPropertyValue.put(consistencyAndAvrItem.getName(), makeNewAv(avPropertyValue.get(consistencyAndAvrItem.getName()), consistencyAndAvrItem.getAvr())));
+            simulationDetailsPostRun.setAvPropertyValue(avPropertyValue);
+        }
 
         simulationDetailsPostRun.setNumOfEntitiesPerTick(numOfEntitiesPerTick);
 
