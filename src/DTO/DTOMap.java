@@ -24,9 +24,9 @@ public class DTOMap {
         for(Integer i = 0; i < m_rows; i++){
             for(Integer j = 0; j < m_cols; j++){
                 if(map[i][j].isOccupied()){
-                    this.map[i][j] = DTOMapSpace.OCCUPIED;
+                    this.map[i][j] = new DTOMapSpace(DTOMapSpaceEnum.OCCUPIED, map[i][j].getEntityName());
                 }else{
-                    this.map[i][j] = DTOMapSpace.FREE;
+                    this.map[i][j] = new DTOMapSpace(DTOMapSpaceEnum.FREE, "");
                 }
             }
         }

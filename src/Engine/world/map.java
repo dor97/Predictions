@@ -51,7 +51,7 @@ public class map {
     private void setLocation(Entity entity, ArrayList<space> spaces){
         int index = random.nextInt(spaces.size());
         //int x = index / m_cols, y = index % m_cols;
-        spaces.get(index).setToOccupied();
+        spaces.get(index).setToOccupied(entity.getName());
         if(entity.getPosition() != null){
             entity.getPosition().setToFree();
         }
@@ -81,7 +81,7 @@ public class map {
         }
         entity.getPosition().setToFree();
         Integer index = random.nextInt(freeSpacesNearEntity.size());
-        freeSpacesNearEntity.get(index).setToOccupied();
+        freeSpacesNearEntity.get(index).setToOccupied(entity.getName());
         entity.setPosition(freeSpacesNearEntity.get(index));
 
     }
