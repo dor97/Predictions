@@ -301,7 +301,7 @@ public class Engine {
     }
 
     public DTOMap getMap(Integer simulationNum) {
-        return simStatus.get(simulationNum).getWorld().getMap(simStatus.get(simStatus).getIsPause());
+        return simStatus.get(simulationNum).getWorld().getMap(simStatus.get(simulationNum).getIsPause());
     }
 
     public DTODataForReRun getDataForRerun(Integer simulationNum){
