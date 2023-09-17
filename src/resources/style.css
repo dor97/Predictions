@@ -30,3 +30,17 @@
     -fx-text-fill: white;
     -fx-font-size: 10px;
 }
+
+#hotStyle{
+    -fx-background-color: #ea640b;
+    -fx-text-fill: white;
+    -fx-font-size: 10px;
+}
+
+#coldStyle{
+    -fx-background-color: #0b9cea;
+    -fx-text-fill: white;
+    -fx-font-size: 10px;
+}
+
+

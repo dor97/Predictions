@@ -20,10 +20,12 @@
 
 <BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" stylesheets="@style.css" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="App.AppController">
    <top>
-      <HBox spacing="15.0" BorderPane.alignment="CENTER">
+      <HBox fx:id="mainHbox" spacing="10.0" BorderPane.alignment="CENTER">
          <children>
             <Button id="loadButton" fx:id="loadFileButton" mnemonicParsing="false" onAction="#loadFile" text="Load File" />
             <TextField fx:id="loadedFilePathTextBox" promptText="Currently Loaded File Path" />
+            <Button id="hotStyle" fx:id="hotStyleButton" mnemonicParsing="false" onAction="#changeStyleHot" text="Hot Style" />
+            <Button id="coldStyle" fx:id="coldStyleButton" mnemonicParsing="false" onAction="#changeStyleCold" text="Cold Style" />
             <TableView fx:id="queueManagementTable" prefHeight="85.0">
               <columns>
                 <TableColumn id="column" fx:id="statusColumn" prefWidth="169.33336889743805" text="Status" />
@@ -54,7 +56,7 @@
                   </BorderPane>
                </content>
             </Tab>
-          <Tab text="New Execution">
+          <Tab fx:id="newExecutionTab" text="New Execution">
                <content>
                   <BorderPane>
                      <bottom>
@@ -86,9 +88,9 @@
                   </BorderPane>
                </content>
           </Tab>
-            <Tab fx:id="entityColumnRun" text="Results">
+            <Tab fx:id="resultsTab" text="Results">
                <content>
-                  <GridPane fx:id="resultsTab">
+                  <GridPane>
                     <columnConstraints>
                       <ColumnConstraints hgrow="SOMETIMES" maxWidth="318.4000244140625" minWidth="151.2" prefWidth="155.2" />
                       <ColumnConstraints hgrow="SOMETIMES" maxWidth="448.3999999999999" minWidth="281.5999755859375" prefWidth="444.3999999999999" />
@@ -160,25 +162,27 @@
                                           <Insets />
                                        </GridPane.margin>
                                     </Button>
-                                    <Label text="Consistency:" GridPane.rowIndex="1">
+                                    <Label fx:id="consistencyLabel" text="Consistency:" GridPane.rowIndex="1">
                                        <GridPane.margin>
                                           <Insets left="5.0" />
                                        </GridPane.margin>
                                     </Label>
                                     <Label fx:id="consistencyValueLabel" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-                                    <Label text="Average:" GridPane.rowIndex="2">
+                                    <Label fx:id="averageLabel" text="Average:" GridPane.rowIndex="2">
                                        <GridPane.margin>
                                           <Insets left="5.0" />
                                        </GridPane.margin>
                                     </Label>
                                     <Label fx:id="averageValueLabel" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                                    <Button fx:id="graphicDisplayButton" mnemonicParsing="false" onAction="#showGraphicDisplay" text="Graphic Diaplay" GridPane.columnIndex="1" />
                                  </children>
                               </GridPane>
                            </children>
                         </HBox>
                      </children>
                   </GridPane>
-               </content></Tab>
+               </content>
+            </Tab>
         </tabs>
       </TabPane>
    </center>

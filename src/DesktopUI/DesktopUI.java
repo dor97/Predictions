@@ -46,7 +46,7 @@ public class DesktopUI extends Application {
         scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.ALWAYS);
         scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.ALWAYS);
 
-        Scene scene = new Scene(scrollPane, 605 , 440);
+        Scene scene = new Scene(scrollPane, 725 , 440);
         primaryStage.setScene(scene);
         appController.setStage(primaryStage);
         primaryStage.setTitle("Predictions");

@@ -35,6 +35,17 @@ import javafx.util.Pair;
 
 public class AppController implements Initializable {
 
+    @FXML private Button graphicDisplayButton;
+    @FXML private Button stopSimulationButton;
+    @FXML private Button resumeSimulationButton;
+    @FXML private Label consistencyLabel;
+    @FXML private Label averageLabel;
+    @FXML private Button loadFileButton;
+    @FXML private HBox mainHbox;
+    @FXML private Tab resultsTab;
+    @FXML private Tab newExecutionTab;
+    @FXML private Button hotStyleButton;
+    @FXML private Button coldStyleButton;
     @FXML private Button nextButton;
     @FXML private Button previousButton;
     @FXML private TabPane tabPane;
@@ -49,7 +60,6 @@ public class AppController implements Initializable {
     @FXML private Label consistencyValueLabel;
     @FXML private Label averageValueLabel;
     @FXML private Button pauseButton;
-    @FXML private GridPane resultsTab;
     @FXML private ListView<ExecutionListItem> executionListView;
     @FXML private TableView entitiesRunTable;
     @FXML private TableColumn entityRunColumn;
@@ -482,5 +492,81 @@ public class AppController implements Initializable {
     }
 
     public void previousSimulationStep(ActionEvent actionEvent) {
+
+    }
+    public void changeStyleHot(ActionEvent actionEvent) {
+        DetailsTab.setStyle("-fx-background-color: yellow;");
+        resultsTab.setStyle("-fx-background-color: red;");
+        newExecutionTab.setStyle("-fx-background-color: orange;");
+        mainHbox.setStyle("-fx-background-color: #f1ce47;");
+        loadFileButton.setStyle("-fx-background-color: #ee7d0c;");
+        detailsBorderPane.setStyle("-fx-background-color: #efba71;");
+        statusColumn.setStyle("-fx-background-color: #efba71;");
+        amountColumn.setStyle("-fx-background-color: #efba71;");
+        environmentVarColumn.setStyle("-fx-background-color: #fc6b3c;");
+        valueColumn.setStyle("-fx-background-color: #fc6b3c;");
+        entityColumn.setStyle("-fx-background-color: #fc6b3c;");
+        populationColumn.setStyle("-fx-background-color: #fc6b3c;");
+        startSimulationButton.setStyle("-fx-background-color: #eac81d;");
+        executionListView.setStyle("-fx-background-color: #fdc076;");
+        entityRunColumn.setStyle("-fx-background-color: #FD7676FF;");
+        populationRunColumn.setStyle("-fx-background-color: #FD7676FF;");
+        resultsTreeView.setStyle("-fx-background-color: #B67878FF;");
+        ticksLabel.setStyle("-fx-background-color: #ffde00;");
+        secondsLabel.setStyle("-fx-background-color: #FF0000FF;");
+        ticksValueLabel.setStyle("-fx-background-color: #ffde00;");
+        secondsValueLabel.setStyle("-fx-background-color: #FF0000FF;");
+        consistencyLabel.setStyle("-fx-background-color: #FF7300FF;");
+        averageLabel.setStyle("-fx-background-color: #d97575;");
+        consistencyValueLabel.setStyle("-fx-background-color: #FF7300FF;");
+        averageValueLabel.setStyle("-fx-background-color: #d97575;");
+        rerunButton.setStyle("-fx-background-color: #eac81d;");
+        resumeSimulationButton.setStyle("-fx-background-color: #eac81d;");
+        nextButton.setStyle("-fx-background-color: #fdc076;");
+        previousButton.setStyle("-fx-background-color: #fdc076;");
+        histogramButton.setStyle("-fx-background-color: #ee7d0c;");
+        resultsGraphButton.setStyle("-fx-background-color: #ee7d0c;");
+        pauseButton.setStyle("-fx-background-color: #FF0000FF;");
+        stopSimulationButton.setStyle("-fx-background-color: #FF0000FF;");
+    }
+    public void changeStyleCold(ActionEvent actionEvent) {
+        DetailsTab.setStyle("-fx-background-color: #0BEAD0FF;");
+        resultsTab.setStyle("-fx-background-color: #0B9CEAFF;");
+        newExecutionTab.setStyle("-fx-background-color: #765EE1FF;");
+        mainHbox.setStyle("-fx-background-color: #5EE197FF;");
+        loadFileButton.setStyle("-fx-background-color: #094ee3;");
+        detailsBorderPane.setStyle("-fx-background-color: #74EFA9FF;");
+        statusColumn.setStyle("-fx-background-color: #0AD6F1FF;");
+        amountColumn.setStyle("-fx-background-color: #0AD6F1FF;");
+        environmentVarColumn.setStyle("-fx-background-color: #A777E5FF;");
+        valueColumn.setStyle("-fx-background-color: #A777E5FF;");
+        entityColumn.setStyle("-fx-background-color: #A777E5FF;");
+        populationColumn.setStyle("-fx-background-color: #A777E5FF;");
+        startSimulationButton.setStyle("-fx-background-color: #6193B2FF;");
+        clearSimulationButton.setStyle("-fx-background-color: #8d77d9;");
+        executionListView.setStyle("-fx-background-color: #1dea76;");
+        entityRunColumn.setStyle("-fx-background-color: #4BA7E0FF;");
+        populationRunColumn.setStyle("-fx-background-color: #4BA7E0FF;");
+        resultsTreeView.setStyle("-fx-background-color: #7897b6;");
+        ticksLabel.setStyle("-fx-background-color: #00d0ff;");
+        secondsLabel.setStyle("-fx-background-color: #96b2bd;");
+        ticksValueLabel.setStyle("-fx-background-color: #00d0ff;");
+        secondsValueLabel.setStyle("-fx-background-color: #96b2bd;");
+        consistencyLabel.setStyle("-fx-background-color: #9887b0;");
+        averageLabel.setStyle("-fx-background-color: #c0afe7;");
+        consistencyValueLabel.setStyle("-fx-background-color: #9887b0;");
+        averageValueLabel.setStyle("-fx-background-color: #c0afe7;");
+        rerunButton.setStyle("-fx-background-color: #1dea76;");
+        resumeSimulationButton.setStyle("-fx-background-color: #1dea76;");
+        nextButton.setStyle("-fx-background-color: #9c76fd;");
+        previousButton.setStyle("-fx-background-color: #9c76fd;");
+        histogramButton.setStyle("-fx-background-color: #00d0ff;");
+        resultsGraphButton.setStyle("-fx-background-color: #00d0ff;");
+        pauseButton.setStyle("-fx-background-color: #994de3;");
+        stopSimulationButton.setStyle("-fx-background-color: #994de3;");
+    }
+
+    public void showGraphicDisplay(ActionEvent actionEvent) {
+        DTOMap graphicDisplay = engine.getMap(lastSimulationNum);
     }
 }
