@@ -70,7 +70,7 @@ public class replace extends action{
                 killAndCreat.put("creat", new ArrayList<>(Arrays.asList(creatEntity(entity))));
             }else {
                 killAndCreat.put("kill", secondaryEntities);
-                killAndCreat.put("creat", secondaryEntities.stream().map(secondaryEntity -> creatEntity(secondaryEntity)).collect(Collectors.toList()));
+                killAndCreat.put("creat", secondaryEntities.stream().limit(m_util.getAmountOfFreeSpace() + 1).map(secondaryEntity -> creatEntity(secondaryEntity)).collect(Collectors.toList()));
 
             }
         }

@@ -507,7 +507,7 @@ public class World implements Serializable {
 //            }
 //        }
 
-        util = new Utilites(m_environments, m_entitiesDifenichan, m_environmentsDifenichen, m_entities);
+        util = new Utilites(m_environments, m_entitiesDifenichan, m_environmentsDifenichen, m_entities, m_rows * m_cols);
         //util.Init(m_environments, m_entitiesDifenichan, m_environmentsDifenichen);
 
         //rules

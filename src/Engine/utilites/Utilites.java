@@ -18,14 +18,16 @@ public class Utilites {
     private Map<String, PropertyInterface> m_environments;
     private Map<String, EntityDifenichan> m_entityDifenichan;
     private List<Entity> m_entities;
+    private Integer mapSize;
     private map m_simulationMap;
 
-    public Utilites(Map<String, PropertyInterface> environments, Map<String, EntityDifenichan> entityDifenichan, Map<String, EnvironmentDifenichan> environmentsDifenichan, List<Entity> entities){
+    public Utilites(Map<String, PropertyInterface> environments, Map<String, EntityDifenichan> entityDifenichan, Map<String, EnvironmentDifenichan> environmentsDifenichan, List<Entity> entities, Integer mapSize){
         m_environments = environments;
         m_entityDifenichan = entityDifenichan;
         m_environmentsDifenichan = environmentsDifenichan;
         //m_simulationMap = simulationMap;
         m_entities = entities;
+        this.mapSize = mapSize;
     }
 
     public void Init(Map<String, PropertyInterface> environments, Map<String, EntityDifenichan> entityDifenichan, Map<String, EnvironmentDifenichan> environmentsDifenichan){
@@ -95,6 +97,10 @@ public class Utilites {
             return null;
         }
         return m_entityDifenichan.get(entityName).getPropertys().get(propertyName).getType();
+    }
+
+    public Integer getAmountOfFreeSpace(){
+        return mapSize - m_entities.size();
     }
 
 }
