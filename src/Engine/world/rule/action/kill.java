@@ -38,6 +38,10 @@ public class kill extends action implements Serializable {
 
     @Override
     public Map<String , List<Entity>> activateAction (Entity i_entity, int currTick, List<Entity> paramsForFuncs){
+        if(i_entity.isDead()){
+            return new HashMap<>();
+        }
+        i_entity.setIsDead(true);
         List<Entity> secondaryEntities = null;
         if(getCountForSecondaryEntities() != 0 && !getSecondaryName().equals(m_entityName)){
             secondaryEntities = getSecondaryEntities();

@@ -19,6 +19,7 @@ public class Entity implements Serializable {
     private Map<String, PropertyInterface> m_propertys;
 
     private space m_position = null;
+    private Boolean isDead = false;
 
 
     public Entity(EntityDifenichan entity) throws InvalidValue {
@@ -122,6 +123,14 @@ public class Entity implements Serializable {
         }
 
         return type;
+    }
+
+    public Boolean isDead(){
+        return isDead;
+    }
+
+    public void setIsDead(Boolean isDead){
+        this.isDead = isDead;
     }
 
     public Map<String, PropertyInterface> getProperties(){

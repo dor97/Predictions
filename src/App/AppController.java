@@ -210,7 +210,7 @@ public class AppController implements Initializable {
                 getConsistencyValue(newValue.getParent().getValue(), newValue.getValue());
                 getAverageValue(newValue.getParent().getValue(), newValue.getValue());
             }
-            else if (!newValue.getChildren().isEmpty()){
+            else if (newValue !=null && !newValue.getChildren().isEmpty()){
                 histogramButton.setDisable(true);
             }
         }));
@@ -483,6 +483,12 @@ public class AppController implements Initializable {
         graphicDisplayButton.setDisable(true);
         resultsGraphButton.setDisable(true);
         engine.resumeSimulation(lastSimulationNum);
+        resultsTreeView.setRoot(null);
+        averageValueLabel.setText("");
+        consistencyValueLabel.setText("");
+        histogramButton.setDisable(true);
+        graphicDisplayButton.setDisable(true);
+        resultsGraphButton.setDisable(true);
     }
 
     public void showGraph(ActionEvent actionEvent) {

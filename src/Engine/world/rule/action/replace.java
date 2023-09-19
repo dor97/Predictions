@@ -55,6 +55,10 @@ public class replace extends action{
 
     @Override
     public Map<String, List<Entity>> activateAction(Entity entity, int m_currTick, List<Entity> paramsForFuncs){
+        if(entity.isDead()){
+            return new HashMap<>();
+        }
+        entity.setIsDead(true);
         List<Entity> secondaryEntities = null;
         if(getCountForSecondaryEntities() != 0 && !getSecondaryName().equals(m_entityName)){
             secondaryEntities = getSecondaryEntities();

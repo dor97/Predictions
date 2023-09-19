@@ -93,7 +93,7 @@ public class myTask extends Task<ObservableMap<String, Integer>> {
                         map.putAll(finishedRunning.getEntities());
                         updateTable();
                     });
-                    Platform.runLater(() -> exception.set("Exception:\n" + world.getException()));
+                    Platform.runLater(() -> exception.set(world.getException()));
                     Platform.runLater(() -> endSimulation.set(!endSimulation.get()));
                     return new SimpleMapProperty<>();
                 }
