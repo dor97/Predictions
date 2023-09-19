@@ -3,6 +3,7 @@ package App;
 import javafx.animation.Animation;
 import javafx.animation.FadeTransition;
 import javafx.animation.ParallelTransition;
+import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.Background;
@@ -12,8 +13,8 @@ import javafx.util.Duration;
 public class EntitiesTable {
     private final SimpleStringProperty entityName;
     private TextField population;
-    private static ParallelTransition pt;
-    private static TextField lastTextField = null;
+    private ParallelTransition pt;
+    //private TextField lastTextField = null;
 
     public EntitiesTable(String i_name, String value){
         this.entityName = new SimpleStringProperty(i_name);
@@ -25,18 +26,33 @@ public class EntitiesTable {
         ft.setAutoReverse(true);
         ft.setCycleCount(Animation.INDEFINITE);
         this.population.setStyle("-fx-background-color: #00d0ff;");
+        this.pt = new ParallelTransition(this.population, ft);
 
-        this.population.setOnMouseClicked( param -> {
-            if(lastTextField != null && pt != null){
-                pt.stop();
-                lastTextField.setOpacity(1);
-                //pt.stop();
+        //this.population.setOnTouchPressed();
+
+        this.population.focusedProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue) {
+                Platform.runLater(() -> pt.play());
+            } else {
+                Platform.runLater(() -> {if(pt != null){
+                     pt.stop();
+                     this.population.setOpacity(1);
+                }});
 
             }
-            lastTextField = this.population;
-            this.pt = new ParallelTransition(this.population, ft);
-            pt.play();
         });
+
+//        this.population.setOnTouchPressed( param -> {
+//            if(lastTextField != null && pt != null){
+//                pt.stop();
+//                lastTextField.setOpacity(1);
+//                //pt.stop();
+//
+//            }
+//            lastTextField = this.population;
+//            this.pt = new ParallelTransition(this.population, ft);
+//            pt.play();
+//        });
 
         //this.population.addEventHandler();
         //pt.stop();

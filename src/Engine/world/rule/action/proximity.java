@@ -163,12 +163,20 @@ public class proximity extends action {
         }
         for (int i = -1 * depth; i <= 1 * depth; i++) {
             for (int j = -1 * depth; j <= 1 * depth; j++) {
-                if (entity.getPosition().getX() == targetEntity.getPosition().getX() + i && entity.getPosition().getY() == targetEntity.getPosition().getY() + j) {
+                if (entity.getPosition().getX() == getX(targetEntity.getPosition().getX() + i) && entity.getPosition().getY() == getY(targetEntity.getPosition().getY() + j)) {
                     return true;
                 }
             }
         }
         return false;
+    }
+
+    public Integer getX(int x){
+        return ((x % m_util.getMapRowSize()) + m_util.getMapRowSize()) % m_util.getMapRowSize();
+    }
+
+    public Integer getY(int Y){
+        return ((Y % m_util.getMapColSize()) + m_util.getMapColSize()) % m_util.getMapColSize();
     }
 
     @Override

@@ -19,15 +19,20 @@ public class Utilites {
     private Map<String, EntityDifenichan> m_entityDifenichan;
     private List<Entity> m_entities;
     private Integer mapSize;
+    private Integer mapColSize;
+    private Integer mapRowSize;
     private map m_simulationMap;
 
-    public Utilites(Map<String, PropertyInterface> environments, Map<String, EntityDifenichan> entityDifenichan, Map<String, EnvironmentDifenichan> environmentsDifenichan, List<Entity> entities, Integer mapSize){
+    public Utilites(Map<String, PropertyInterface> environments, Map<String, EntityDifenichan> entityDifenichan, Map<String, EnvironmentDifenichan> environmentsDifenichan, List<Entity> entities, Integer mapRowSize, Integer mapColSize){
         m_environments = environments;
         m_entityDifenichan = entityDifenichan;
         m_environmentsDifenichan = environmentsDifenichan;
         //m_simulationMap = simulationMap;
         m_entities = entities;
-        this.mapSize = mapSize;
+        this.mapSize = mapColSize * mapRowSize;
+        this.mapRowSize = mapRowSize;
+        this.mapColSize = mapColSize;
+
     }
 
     public void Init(Map<String, PropertyInterface> environments, Map<String, EntityDifenichan> entityDifenichan, Map<String, EnvironmentDifenichan> environmentsDifenichan){
@@ -101,6 +106,14 @@ public class Utilites {
 
     public Integer getAmountOfFreeSpace(){
         return mapSize - m_entities.size();
+    }
+
+    public Integer getMapColSize(){
+        return mapColSize;
+    }
+
+    public Integer getMapRowSize(){
+        return mapRowSize;
     }
 
 }
