@@ -426,7 +426,7 @@ public class Engine {
     }
 
     public DTOSimulationDetailsPostRun getPostRunData(int id) {
-        synchronized (this) {
+        synchronized (simStatus) {
             if(!simStatus.containsKey(id)){
                 return null;
             }
