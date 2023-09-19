@@ -427,10 +427,11 @@ public class Engine {
 
     public DTOSimulationDetailsPostRun getPostRunData(int id) {
         synchronized (this) {
-            if(!worldsList.containsKey(id)){
+            if(!simStatus.containsKey(id)){
                 return null;
             }
-            return worldsList.get(id).getPostRunData();
+            //return worldsList.get(id).getPostRunData();
+            return simStatus.get(id).getWorld().getPostRunData();
         }
     }
 
