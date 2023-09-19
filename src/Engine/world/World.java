@@ -304,18 +304,19 @@ public class World implements Serializable {
         }
 
         DTOSimulationDetailsPostRun simulationDetailsPostRun = new DTOSimulationDetailsPostRun();
-
-        final Map<String, Integer> entityAmountPostRun = m_entities.stream().collect(Collectors.groupingBy(entity -> entity.getName(), Collectors.summingInt(e -> 1)));
-        List<DTOEntityPostRun> entityPostRuns = m_entitiesDifenichan.values().stream().map(entityDifenichan -> new DTOEntityPostRun(entityDifenichan.getName(), entityDifenichan.getAmount(), entityAmountPostRun.get(entityDifenichan.getName()))).collect(Collectors.toList());
-        simulationDetailsPostRun.setEntitiesPostRuns(entityPostRuns);
-        Map<String, List<DTOEntityHistogram>>entitiesHistogram = m_entitiesDifenichan.keySet().stream().collect(Collectors.toMap(entityDifenichanName -> entityDifenichanName,
-                entityDifenichanName -> m_entities.stream()
-                        .filter(entity -> entity.getName().equals(entityDifenichanName))
-                        .map(entity -> entity.makeDtoEntity())
-                        .collect(Collectors.toList())
-        ));
-        //Map<String, List<DTOEntityHistogram>>entitiesHistogram = m_entities.stream().map(entity -> entity.makeDtoEntity()).collect(Collectors.groupingBy(entityHistogram -> entityHistogram.getName()));
-        simulationDetailsPostRun.setEntitiesHistogram(entitiesHistogram);
+        synchronized (m_entities) {
+            final Map<String, Integer> entityAmountPostRun = m_entities.stream().collect(Collectors.groupingBy(entity -> entity.getName(), Collectors.summingInt(e -> 1)));
+            List<DTOEntityPostRun> entityPostRuns = m_entitiesDifenichan.values().stream().map(entityDifenichan -> new DTOEntityPostRun(entityDifenichan.getName(), entityDifenichan.getAmount(), entityAmountPostRun.get(entityDifenichan.getName()))).collect(Collectors.toList());
+            simulationDetailsPostRun.setEntitiesPostRuns(entityPostRuns);
+            Map<String, List<DTOEntityHistogram>> entitiesHistogram = m_entitiesDifenichan.keySet().stream().collect(Collectors.toMap(entityDifenichanName -> entityDifenichanName,
+                    entityDifenichanName -> m_entities.stream()
+                            .filter(entity -> entity.getName().equals(entityDifenichanName))
+                            .map(entity -> entity.makeDtoEntity())
+                            .collect(Collectors.toList())
+            ));
+            //Map<String, List<DTOEntityHistogram>>entitiesHistogram = m_entities.stream().map(entity -> entity.makeDtoEntity()).collect(Collectors.groupingBy(entityHistogram -> entityHistogram.getName()));
+            simulationDetailsPostRun.setEntitiesHistogram(entitiesHistogram);
+        }
 
 
         Map<String, DTOEntitysProperties> entitysPropertiesMap = m_entitiesDifenichan.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, entity -> entity.getValue().makeDtoEntitysProperties()));
@@ -336,8 +337,12 @@ public class World implements Serializable {
             simulationDetailsPostRun.setAvPropertyValue(avPropertyValue);
         }else{
             List<consistencyAndAvr> consistencyAndAvrListLiving = new ArrayList<>();
-            m_entities.stream().forEach(entity -> entity.getProperties().values().stream().forEach(propertyInterface -> {propertyInterface.addDeltaTicksChanged(currTick);consistencyAndAvrListLiving.add(new consistencyAndAvr(entity.getName() + "_" + propertyInterface.getName(), propertyInterface.getDeltaTicksChangedValueAve(), propertyInterface.getValue()));}));
-
+            synchronized (m_entities) {
+                m_entities.stream().forEach(entity -> entity.getProperties().values().stream().forEach(propertyInterface -> {
+                    propertyInterface.addDeltaTicksChanged(currTick);
+                    consistencyAndAvrListLiving.add(new consistencyAndAvr(entity.getName() + "_" + propertyInterface.getName(), propertyInterface.getDeltaTicksChangedValueAve(), propertyInterface.getValue()));
+                }));
+            }
             consistencyAndAvr.stream().forEach(consistencyAndAvrItem -> propertyChangeByTick.put(consistencyAndAvrItem.getName(), addPropertyChangedAv(propertyChangeByTick.get(consistencyAndAvrItem), consistencyAndAvrItem.getConsistency())));
             consistencyAndAvrListLiving.stream().forEach(consistencyAndAvrItem -> propertyChangeByTick.put(consistencyAndAvrItem.getName(), addPropertyChangedAv(propertyChangeByTick.get(consistencyAndAvrItem), consistencyAndAvrItem.getConsistency())));
 
