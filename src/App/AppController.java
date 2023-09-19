@@ -200,6 +200,7 @@ public class AppController implements Initializable {
                 }
             }
         }));
+        //loadFileButton.setStyle();
         resultsTreeView.getSelectionModel().selectedItemProperty().addListener(((observable, oldValue, newValue) -> {
             if (newValue !=null && newValue.getChildren().isEmpty()){
                 histogramButton.setDisable(false);
