@@ -114,6 +114,7 @@
                                   <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
                                   <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
                                     <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
                                 </columnConstraints>
                                 <rowConstraints>
                                   <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
@@ -135,10 +136,10 @@
                                     </Button>
                                     <Button id="pause" fx:id="pauseButton" mnemonicParsing="false" onAction="#pauseSimulation" text="Pause" GridPane.columnIndex="1" />
                                     <Button id="ticksButton" fx:id="nextButton" mnemonicParsing="false" onAction="#nextSimulationStep" text="Next Tick" GridPane.columnIndex="2" />
-                                    <Button id="ticksButton" fx:id="previousButton" mnemonicParsing="false" onAction="#previousSimulationStep" text="Previous " GridPane.columnIndex="2" GridPane.rowIndex="1" />
+                                    <TextArea fx:id="exceptionArea" maxWidth="1.7976931348623157E308" prefHeight="154.0" prefWidth="229.0" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.rowIndex="2" GridPane.rowSpan="2" />
+                                    <Label fx:id="exceptionLabel" text="Exceptions:" GridPane.columnIndex="2" GridPane.rowIndex="1" />
                                  </children>
                               </GridPane>
-                              <TextArea fx:id="exceptionArea" maxWidth="1.7976931348623157E308" prefHeight="154.0" prefWidth="229.0" />
                            </children>
                         </HBox>
                         <HBox GridPane.columnIndex="1" GridPane.rowIndex="1">

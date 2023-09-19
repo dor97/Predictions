@@ -47,7 +47,6 @@ public class AppController implements Initializable {
     @FXML private Button hotStyleButton;
     @FXML private Button coldStyleButton;
     @FXML private Button nextButton;
-    @FXML private Button previousButton;
     @FXML private TabPane tabPane;
     @FXML private Tab DetailsTab;
     @FXML private BorderPane detailsBorderPane;
@@ -97,6 +96,7 @@ public class AppController implements Initializable {
     private Integer lastSimulationNum = 0;
     private Boolean isFirstSimulationForFile = true;
     private LineChart lastSimulationGraph;
+    private BarChart lastSimulationHistogram;
     private ScatterChart simulationSpace;
     private String lastChosenPropertyForHistogram;
     private String lastChosenEntityForHistogram;
@@ -132,15 +132,15 @@ public class AppController implements Initializable {
         entitiesRunTable.setItems(entitiesRunTablesData);
         queueManagementTable.setItems(queueManagementData);
         executionListView.setItems(executionListViewData);
+
         nextButton.setDisable(true);
-        previousButton.setDisable(true);
         graphicDisplayButton.setDisable(true);
         pauseButton.setDisable(true);
         resumeSimulationButton.setDisable(true);
         stopSimulationButton.setDisable(true);
 
         isSimulationEnded.addListener((observable, oldValue, newValue) -> {
-            displaySimulationResults(engine);
+            displaySimulationResults();
             resultsGraphButton.setDisable(false);});
 
 
@@ -166,6 +166,19 @@ public class AppController implements Initializable {
 
                 lastSimulationNum = selectedValue;
 
+                if (engine.getSimulationStatus(lastSimulationNum) == Status.RUNNING){
+                    pauseButton.setDisable(false);
+                    resumeSimulationButton.setDisable(false);
+                    stopSimulationButton.setDisable(false);
+                }
+                else {
+                    pauseButton.setDisable(true);
+                    resumeSimulationButton.setDisable(true);
+                    stopSimulationButton.setDisable(true);
+                    nextButton.setDisable(true);
+                    graphicDisplayButton.setDisable(true);
+                }
+
                 if (engine.getSimulationStatus(lastSimulationNum) != Status.FINISHED){
                     rerunButton.setDisable(true);
                 }else{
@@ -183,7 +196,7 @@ public class AppController implements Initializable {
                 engine.getDataUsingTask(newTask, selectedValue);
                 if (engine.getSimulationStatus(selectedValue) == Status.FINISHED){
                     resultsGraphButton.setDisable(false);
-                    displaySimulationResults(engine);
+                    displaySimulationResults();
                 }
             }
         }));
@@ -210,7 +223,7 @@ public class AppController implements Initializable {
         averageValueLabel.setText(engine.getPostRunData(lastSimulationNum).getAvPropertyValue().get(entity+"_"+property).getKey().toString());
     }
 
-    private void displaySimulationResults(Engine engine) {
+    private void displaySimulationResults() {
 
         fillResultsTreeView();
     }
@@ -242,7 +255,9 @@ public class AppController implements Initializable {
             }
             rootItem.getChildren().add(entityItem);
         }
-
+        if (resultsTreeView.getRoot() != null){
+            resultsTreeView.getRoot().getChildren().clear();
+        }
         resultsTreeView.setRoot(rootItem);
     }
 
@@ -264,6 +279,22 @@ public class AppController implements Initializable {
 
         linechart.getData().add(series);
         return linechart;
+    }
+
+    private BarChart createLastSimulationHistogram() {
+
+        final CategoryAxis xAxis = new CategoryAxis();
+        final NumberAxis yAxis = new NumberAxis();
+        final BarChart<String,Number> barChart = new BarChart<String,Number>(xAxis,yAxis);
+        xAxis.setLabel("Property Value");
+        yAxis.setLabel("Amount");
+
+        XYChart.Series series1 = new XYChart.Series();
+        for (Map.Entry<Object, Integer> property: engine.getPostRunData(lastSimulationNum).getHistogram(lastChosenEntityForHistogram, lastChosenPropertyForHistogram).entrySet()){
+            series1.getData().add(new XYChart.Data(property.getKey().toString(),property.getValue()));
+        }
+        barChart.getData().addAll(series1);
+        return barChart;
     }
 
     public void shutDownSystem(){
@@ -352,9 +383,6 @@ public class AppController implements Initializable {
     }
 
     public void startSimulation(ActionEvent actionEvent) {
-        pauseButton.setDisable(false);
-        resumeSimulationButton.setDisable(false);
-        stopSimulationButton.setDisable(false);
         for (EnvironmentVariableTable environmentVariable : environmentVariableTableData){
             if (!environmentVariable.getValue().getText().isEmpty()){
                 try{
@@ -435,21 +463,25 @@ public class AppController implements Initializable {
 
     public void pauseSimulation(ActionEvent actionEvent) {
         nextButton.setDisable(false);
-        previousButton.setDisable(false);
+        pauseButton.setDisable(true);
+        resumeSimulationButton.setDisable(false);
         graphicDisplayButton.setDisable(false);
+        resultsGraphButton.setDisable(false);
         engine.pauseSimulation(lastSimulationNum);
+        fillResultsTreeView();
     }
 
     public void stopSimulation(ActionEvent actionEvent) {
         nextButton.setDisable(true);
-        previousButton.setDisable(true);
         engine.stopSimulation(lastSimulationNum);
     }
 
     public void resumeSimulation(ActionEvent actionEvent) {
         nextButton.setDisable(true);
-        previousButton.setDisable(true);
+        resumeSimulationButton.setDisable(true);
+        pauseButton.setDisable(false);
         graphicDisplayButton.setDisable(true);
+        resultsGraphButton.setDisable(true);
         engine.resumeSimulation(lastSimulationNum);
     }
 
@@ -472,37 +504,24 @@ public class AppController implements Initializable {
 
     public void showHistogram(ActionEvent actionEvent) {
 
-        Stage stage = new Stage();
-        stage.setTitle("Properties Histogram");
-        final CategoryAxis xAxis = new CategoryAxis();
-        final NumberAxis yAxis = new NumberAxis();
-        final BarChart<String,Number> barChart = new BarChart<String,Number>(xAxis,yAxis);
-        xAxis.setLabel("Property Value");
-        yAxis.setLabel("Amount");
-
-        XYChart.Series series1 = new XYChart.Series();
-        for (Map.Entry<Object, Integer> property: engine.getPostRunData(lastSimulationNum).getHistogram(lastChosenEntityForHistogram, lastChosenPropertyForHistogram).entrySet()){
-            series1.getData().add(new XYChart.Data(property.getKey().toString(),property.getValue()));
-        }
-
-        ScrollPane scrollPane = new ScrollPane(barChart);
+        lastSimulationHistogram = createLastSimulationHistogram();
+        ScrollPane scrollPane = new ScrollPane(lastSimulationHistogram);
         scrollPane.setFitToWidth(false);
         scrollPane.setFitToHeight(false);
         scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.ALWAYS);
         scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.ALWAYS);
 
+        Stage stage = new Stage();
         Scene scene  = new Scene(scrollPane,650,450);
-        barChart.getData().addAll(series1);
         stage.setScene(scene);
         stage.show();
     }
 
     public void nextSimulationStep(ActionEvent actionEvent) {
         engine.moveOneStep(lastSimulationNum);
-    }
-
-    public void previousSimulationStep(ActionEvent actionEvent) {
-
+        if (simulationSpace != null){
+            createSimulationSpace(engine.getMap(lastSimulationNum));
+        }
     }
     public void changeStyleHot(ActionEvent actionEvent) {
         DetailsTab.setStyle("-fx-background-color: yellow;");
@@ -533,7 +552,6 @@ public class AppController implements Initializable {
         rerunButton.setStyle("-fx-background-color: #eac81d;");
         resumeSimulationButton.setStyle("-fx-background-color: #eac81d;");
         nextButton.setStyle("-fx-background-color: #fdc076;");
-        previousButton.setStyle("-fx-background-color: #fdc076;");
         histogramButton.setStyle("-fx-background-color: #ee7d0c;");
         resultsGraphButton.setStyle("-fx-background-color: #ee7d0c;");
         pauseButton.setStyle("-fx-background-color: #FF0000FF;");
@@ -569,7 +587,6 @@ public class AppController implements Initializable {
         rerunButton.setStyle("-fx-background-color: #1dea76;");
         resumeSimulationButton.setStyle("-fx-background-color: #1dea76;");
         nextButton.setStyle("-fx-background-color: #9c76fd;");
-        previousButton.setStyle("-fx-background-color: #9c76fd;");
         histogramButton.setStyle("-fx-background-color: #00d0ff;");
         resultsGraphButton.setStyle("-fx-background-color: #00d0ff;");
         pauseButton.setStyle("-fx-background-color: #994de3;");
@@ -594,6 +611,8 @@ public class AppController implements Initializable {
     }
 
     private void createSimulationSpace(DTOMap graphicDisplay) {
+
+        simulationSpace.getData().clear();
         double column =0;
         double row =0;
         List<DTOEntityData> entities = treeViewController.getEntities();
