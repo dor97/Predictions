@@ -21,7 +21,7 @@
 
 <BorderPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" stylesheets="@style.css" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="App.AppController">
    <top>
-      <HBox fx:id="mainHbox" prefHeight="130.0" spacing="10.0" BorderPane.alignment="CENTER">
+      <HBox fx:id="mainHbox" spacing="10.0" BorderPane.alignment="CENTER">
          <children>
             <Button id="loadButton" fx:id="loadFileButton" mnemonicParsing="false" onAction="#loadFile" text="Load File" />
             <TextField fx:id="loadedFilePathTextBox" promptText="Currently Loaded File Path" HBox.hgrow="ALWAYS" />
