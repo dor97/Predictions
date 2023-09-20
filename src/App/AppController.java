@@ -7,6 +7,7 @@ import TreeDetails.TreeDetailsController;
 import javafx.animation.Animation;
 import javafx.animation.FadeTransition;
 import javafx.animation.ParallelTransition;
+import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.collections.FXCollections;
@@ -112,8 +113,7 @@ public class AppController implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         alert.setTitle("Error");
-        alert.setWidth(1000);
-        alert.setHeight(1000);
+
         rerunButton.setDisable(true);
         if (treeViewController != null && treeDetailsController != null) {
             treeViewController.setMainController(this);
@@ -405,6 +405,7 @@ public class AppController implements Initializable {
                     alert.setContentText(e.getMessage());
                     alert.show();
                     System.out.println(e.getMessage());
+                    return;
                 }
             }
         }
@@ -417,6 +418,7 @@ public class AppController implements Initializable {
                     alert.setContentText(e.getMessage());
                     alert.show();
                     System.out.println(e.getMessage());
+                    return;
                 }
             }
         }
@@ -427,7 +429,24 @@ public class AppController implements Initializable {
             executionListViewData.add(new ExecutionListItem(simulationID));
             if(isFirstSimulationForFile){
                 isFirstSimulationForFile = false;
-                engine.updateNewlyFinishedSimulationInLoop(executionListViewData);
+                //engine.updateNewlyFinishedSimulationInLoop(executionListViewData);
+                Thread thread = new Thread(() -> {  while(true)
+                {List<Integer> ids = engine.updateNewlyFinishedSimulation(executionListViewData);
+                    if(ids.size() != 0) {
+                        StringBuilder result = new StringBuilder();
+                        result.append("The following simulations are done: ");
+                        ids.stream().forEach(id -> result.append(id.toString() + "  "));
+                        Platform.runLater(() -> { Alert fines = new Alert(Alert.AlertType.INFORMATION);
+                                                  fines.setTitle("simulation/s finished");
+
+                                                  //fines.setHeight(200);
+                                                  fines.setContentText(result.toString());
+                                                  fines.show();});
+                    }
+                    try{Thread.sleep(200);}catch (InterruptedException e){}}
+                });
+                thread.setDaemon(true);
+                thread.start();
             }
 
         }catch (Exception e){

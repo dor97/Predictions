@@ -86,7 +86,7 @@ public class Engine {
         thread.start();
     }
 
-    public void updateNewlyFinishedSimulation(ObservableList<ExecutionListItem> simulations){
+    public List<Integer> updateNewlyFinishedSimulation(ObservableList<ExecutionListItem> simulations){
         synchronized (newlyFinishedSimulationIds){
             ObservableList<ExecutionListItem> toRemove = FXCollections.observableArrayList();
             for(Integer id : newlyFinishedSimulationIds){
@@ -102,8 +102,10 @@ public class Engine {
                 simulations.add(new ExecutionListItem(executionListItem.getID(), true));
 
             }});
-
+            List<Integer> res = new ArrayList<>();
+            newlyFinishedSimulationIds.stream().forEach(id -> res.add(id));
             newlyFinishedSimulationIds.clear();
+            return res;
         }
     }
 

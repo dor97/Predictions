@@ -41,15 +41,16 @@ public class DesktopUI extends Application {
         appController.setTreeDetailsComponentController(treeDetailsController);
 
         ScrollPane scrollPane = new ScrollPane(root);
-        scrollPane.setFitToWidth(false);
-        scrollPane.setFitToHeight(false);
+        scrollPane.setFitToWidth(true);
+        scrollPane.setFitToHeight(true);
         scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.ALWAYS);
         scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.ALWAYS);
 
-        Scene scene = new Scene(scrollPane, 725 , 440);
+        Scene scene = new Scene(scrollPane, 1000, 850);
         primaryStage.setScene(scene);
         appController.setStage(primaryStage);
         primaryStage.setTitle("Predictions");
+
         primaryStage.show();
         appController.shutDownSystem();
     }
