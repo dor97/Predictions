@@ -27,6 +27,7 @@
             <TextField fx:id="loadedFilePathTextBox" promptText="Currently Loaded File Path" HBox.hgrow="ALWAYS" />
             <Button id="hotStyle" fx:id="hotStyleButton" mnemonicParsing="false" onAction="#changeStyleHot" text="Hot Style" />
             <Button id="coldStyle" fx:id="coldStyleButton" mnemonicParsing="false" onAction="#changeStyleCold" text="Cold Style" />
+            <Button id="defaultStyleButton" fx:id="defaultStyleButton" mnemonicParsing="false" onAction="#changeToDefaultStyle" text="Default Style" />
             <TableView fx:id="queueManagementTable" minHeight="-Infinity" minWidth="-Infinity" prefHeight="120.0">
               <columns>
                 <TableColumn id="column" fx:id="statusColumn" prefWidth="169.33336889743805" text="Status" />

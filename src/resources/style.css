@@ -49,4 +49,10 @@
     -fx-font-size: 10px;
 }
 
+#defaultStyleButton{
+    -fx-background-color: #ced0cb;
+    -fx-text-fill: #050505;
+    -fx-font-size: 10px;
+}
+
 

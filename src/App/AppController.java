@@ -40,6 +40,7 @@ import javafx.util.Pair;
 
 public class AppController implements Initializable {
 
+    @FXML private Button defaultStyleButton;
     @FXML private Button graphicDisplayButton;
     @FXML private Button stopSimulationButton;
     @FXML private Button resumeSimulationButton;
@@ -686,5 +687,46 @@ public class AppController implements Initializable {
             }
             simulationSpace.getData().addAll(series);
         }
+    }
+
+    public void changeToDefaultStyle(ActionEvent actionEvent) {
+        DetailsTab.setStyle(null);
+        resultsTab.setStyle(null);
+        newExecutionTab.setStyle(null);
+        mainHbox.setStyle(null);
+        loadFileButton.setStyle(null);
+        detailsBorderPane.setStyle(null);
+        statusColumn.setStyle(null);
+        amountColumn.setStyle(null);
+        environmentVarColumn.setStyle(null);
+        valueColumn.setStyle(null);
+        entityColumn.setStyle(null);
+        populationColumn.setStyle(null);
+        startSimulationButton.setStyle(null);
+        clearSimulationButton.setStyle(null);
+        executionListView.setStyle(null);
+        entityRunColumn.setStyle(null);
+        populationRunColumn.setStyle(null);
+        resultsTreeView.setStyle(null);
+        ticksLabel.setStyle(null);
+        secondsLabel.setStyle(null);
+        ticksValueLabel.setStyle(null);
+        secondsValueLabel.setStyle(null);
+        consistencyLabel.setStyle(null);
+        averageLabel.setStyle(null);
+        consistencyValueLabel.setStyle(null);
+        averageValueLabel.setStyle(null);
+        rerunButton.setStyle(null);
+        resumeSimulationButton.setStyle(null);
+        nextButton.setStyle(null);
+        histogramButton.setStyle(null);
+        resultsGraphButton.setStyle(null);
+        pauseButton.setStyle(null);
+        stopSimulationButton.setStyle(null);
+        graphicDisplayButton.setStyle(null);
+        queueManagementTable.refresh();
+        environmentVarTable.refresh();
+        entitiesTable.refresh();
+        entitiesRunTable.refresh();
     }
 }
