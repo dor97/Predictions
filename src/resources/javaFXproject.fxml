@@ -19,7 +19,7 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" stylesheets="@style.css" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="App.AppController">
+<BorderPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" prefHeight="700.0" stylesheets="@style.css" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="App.AppController">
    <top>
       <HBox fx:id="mainHbox" prefHeight="130.0" spacing="10.0" BorderPane.alignment="CENTER">
          <children>
@@ -59,15 +59,15 @@
             </Tab>
           <Tab fx:id="newExecutionTab" text="New Execution">
                <content>
-                  <BorderPane>
+                  <BorderPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity">
                      <bottom>
                         <HBox alignment="TOP_CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" spacing="100.0" BorderPane.alignment="CENTER">
                            <children>
-                              <Button id="pause" fx:id="clearSimulationButton" maxWidth="1.7976931348623157E308" minWidth="-Infinity" mnemonicParsing="false" onAction="#clearSimulation" prefWidth="60.0" text="Clear">
+                              <Button id="pause" fx:id="clearSimulationButton" maxHeight="-Infinity" maxWidth="1.7976931348623157E308" minWidth="-Infinity" mnemonicParsing="false" onAction="#clearSimulation" prefWidth="60.0" text="Clear">
                                  <font>
                                     <Font size="21.0" />
                                  </font></Button>
-                              <Button fx:id="startSimulationButton" maxWidth="1.7976931348623157E308" minWidth="-Infinity" mnemonicParsing="false" onAction="#startSimulation" prefWidth="60.0" text="Start" />
+                              <Button fx:id="startSimulationButton" maxHeight="-Infinity" maxWidth="1.7976931348623157E308" minWidth="-Infinity" mnemonicParsing="false" onAction="#startSimulation" prefWidth="60.0" text="Start" />
                            </children>
                         </HBox>
                      </bottom>
