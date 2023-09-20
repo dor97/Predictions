@@ -4,6 +4,9 @@ import Engine.Engine;
 import Engine.Status;
 
 import TreeDetails.TreeDetailsController;
+import javafx.animation.Animation;
+import javafx.animation.FadeTransition;
+import javafx.animation.ParallelTransition;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.collections.FXCollections;
@@ -31,6 +34,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
 import Engine.myTask;
+import javafx.util.Duration;
 import javafx.util.Pair;
 
 public class AppController implements Initializable {
@@ -102,6 +106,7 @@ public class AppController implements Initializable {
     private String lastChosenEntityForHistogram;
     private Alert alert = new Alert(Alert.AlertType.ERROR);
     private BooleanProperty isSimulationEnded = new SimpleBooleanProperty(false);
+    private ParallelTransition pt;
 
 
     @Override
@@ -201,6 +206,15 @@ public class AppController implements Initializable {
             }
         }));
         //loadFileButton.setStyle();
+
+        FadeTransition ft = new FadeTransition(Duration.millis(1000));//Duration.INDEFINITE
+        ft.setFromValue(1);
+        ft.setToValue(0.4);
+        ft.setAutoReverse(true);
+        ft.setCycleCount(Animation.INDEFINITE);
+        pt = new ParallelTransition(loadFileButton, ft);
+        pt.play();
+
         resultsTreeView.getSelectionModel().selectedItemProperty().addListener(((observable, oldValue, newValue) -> {
             if (newValue !=null && newValue.getChildren().isEmpty()){
                 histogramButton.setDisable(false);
@@ -331,6 +345,8 @@ public class AppController implements Initializable {
         fileChooser.setTitle("Open File");
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("xml files", "*.xml"));
         File selectedFile = fileChooser.showOpenDialog(primaryStage);
+        pt.stop();
+        loadFileButton.setOpacity(1);
 
         if (selectedFile == null) {
             return;
