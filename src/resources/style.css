@@ -43,4 +43,10 @@
     -fx-font-size: 10px;
 }
 
+.tables-rows-text-fields{
+    -fx-background-color: #ffffff;
+    -fx-text-fill: #050505;
+    -fx-font-size: 10px;
+}
+
 

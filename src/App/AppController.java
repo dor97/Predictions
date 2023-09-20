@@ -256,9 +256,6 @@ public class AppController implements Initializable {
             }
             rootItem.getChildren().add(entityItem);
         }
-        if (resultsTreeView.getRoot() != null){
-            resultsTreeView.getRoot().getChildren().clear();
-        }
         resultsTreeView.setRoot(rootItem);
     }
 
@@ -529,6 +526,9 @@ public class AppController implements Initializable {
         if (simulationSpace != null){
             createSimulationSpace(engine.getMap(lastSimulationNum));
         }
+        consistencyValueLabel.setText("");
+        averageValueLabel.setText("");
+        fillResultsTreeView();
     }
     public void changeStyleHot(ActionEvent actionEvent) {
         DetailsTab.setStyle("-fx-background-color: yellow;");
@@ -563,6 +563,12 @@ public class AppController implements Initializable {
         resultsGraphButton.setStyle("-fx-background-color: #ee7d0c;");
         pauseButton.setStyle("-fx-background-color: #FF0000FF;");
         stopSimulationButton.setStyle("-fx-background-color: #FF0000FF;");
+        clearSimulationButton.setStyle("-fx-background-color: #FF0000FF;");
+        graphicDisplayButton.setStyle("-fx-background-color: #efba71;");
+        queueManagementTable.refresh();
+        environmentVarTable.refresh();
+        entitiesTable.refresh();
+        entitiesRunTable.refresh();
     }
     public void changeStyleCold(ActionEvent actionEvent) {
         DetailsTab.setStyle("-fx-background-color: #0BEAD0FF;");
@@ -598,6 +604,11 @@ public class AppController implements Initializable {
         resultsGraphButton.setStyle("-fx-background-color: #00d0ff;");
         pauseButton.setStyle("-fx-background-color: #994de3;");
         stopSimulationButton.setStyle("-fx-background-color: #994de3;");
+        graphicDisplayButton.setStyle("-fx-background-color: #96b2bd;");
+        queueManagementTable.refresh();
+        environmentVarTable.refresh();
+        entitiesTable.refresh();
+        entitiesRunTable.refresh();
     }
 
     public void showGraphicDisplay(ActionEvent actionEvent) {

@@ -25,7 +25,7 @@ public class EnvironmentVariableTable {
         ft.setToValue(0.25);
         ft.setAutoReverse(true);
         ft.setCycleCount(Animation.INDEFINITE);
-        this.value.setStyle("-fx-background-color: #00d0ff;");
+        this.value.getStyleClass().add("tables-rows-text-fields");
         this.pt = new ParallelTransition(this.value, ft);
 
         //this.population.setOnTouchPressed();

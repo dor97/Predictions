@@ -25,7 +25,8 @@ public class EntitiesTable {
         ft.setToValue(0.25);
         ft.setAutoReverse(true);
         ft.setCycleCount(Animation.INDEFINITE);
-        this.population.setStyle("-fx-background-color: #00d0ff;");
+        this.population.getStyleClass().add("tables-rows-text-fields");
+//        this.population.setStyle("-fx-background-color: #00d0ff;");
         this.pt = new ParallelTransition(this.population, ft);
 
         //this.population.setOnTouchPressed();
