@@ -1,7 +1,7 @@
 package Engine.world.rule.actionDefinition;
 
 import Engine.InvalidValue;
-import Engine.generated2.PRDAction;
+import Engine.generated.PRDAction;
 
 public class calculationDefinition extends actionDefinition{
 
