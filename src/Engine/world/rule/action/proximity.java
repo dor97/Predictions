@@ -10,7 +10,6 @@ import Engine.world.expression.expressionWithFunc;
 import org.omg.CORBA.OBJECT_NOT_EXIST;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class proximity extends action {
 
@@ -31,7 +30,7 @@ public class proximity extends action {
         envDepth = new expressionWithFunc(util);
         envDepth.convertValueInString(action.getPRDEnvDepth().getOf());
         m_util = util;
-        action.getPRDActions().getPRDAction();
+//        action.getPRDActions().getPRDAction();
 
         actions = new ArrayList<>();
         actionFactory factory = new actionFactory();
@@ -39,6 +38,45 @@ public class proximity extends action {
             actions.add(factory.makeAction(thanAction, util, getRuleName()));
         }
         checkEntityAndPropertyExist();
+    }
+
+    public proximity(proximity action, Utilites util, String ruleName) {
+        super(action, util, ruleName);
+        //m_entityName = action.getEntity();
+        sourceName = action.getSourceName();
+        targetName = action.getTargetEntity();
+        //envDepth = action.getPRDEnvDepth().getOf().equals("1") ? 1 : 2;
+        envDepth = new expressionWithFunc(util);
+        envDepth.convertValueInString(action.getEnvDepth());
+        m_util = util;
+
+        actions = new ArrayList<>();
+        actionFactory factory = new actionFactory();
+
+        for(ActionInterface act : action.getThen()){
+            actions.add(act.clone(util, ruleName));
+        }
+        checkEntityAndPropertyExist();
+    }
+    @Override
+    public proximity clone(Utilites util, String ruleName){
+        return new proximity(this, util, ruleName);
+    }
+
+    public List<ActionInterface> getThen(){
+        return actions;
+    }
+
+    public String getEnvDepth(){
+        return envDepth.getValue().toString();
+    }
+
+    public String getSourceName(){
+        return sourceName;
+    }
+
+    public String getTargetEntity(){
+        return targetName;
     }
 
     private void checkEntityAndPropertyExist(){

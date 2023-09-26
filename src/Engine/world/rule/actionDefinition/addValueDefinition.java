@@ -1,8 +1,7 @@
 package Engine.world.rule.actionDefinition;
 
 import Engine.InvalidValue;
-import Engine.generated.PRDAction;
-import Engine.world.expression.expressionWithFunc;
+import Engine.generated2.PRDAction;
 
 public class addValueDefinition extends actionDefinition{
     public addValueDefinition(PRDAction action, String ruleName) throws InvalidValue {

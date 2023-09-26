@@ -5,8 +5,6 @@ import Engine.InvalidValue;
 import Engine.generated.PRDAction;
 import Engine.utilites.Utilites;
 import Engine.world.entity.Entity;
-import Engine.world.entity.EntityDifenichan;
-import Engine.world.expression.expressionWithFunc;
 import org.omg.CORBA.OBJECT_NOT_EXIST;
 
 import java.util.*;
@@ -30,6 +28,35 @@ public class replace extends action{
         if(!mode.equals("scratch") && !mode.equals("derived")){
             throw new InvalidValue("In action replace mode is not defined");
         }
+    }
+
+    public replace(replace action, Utilites util, String ruleName){
+        super(action, util, ruleName);
+        m_entityName = action.getToKill();
+        toCreate = action.getToCreate();
+        m_util = util;
+        //actionName = action.getType();
+        mode = action.getMode();
+        checkEntityAndPropertyExist();
+        if(!mode.equals("scratch") && !mode.equals("derived")){
+            throw new InvalidValue("In action replace mode is not defined");
+        }
+    }
+
+    public replace clone(Utilites util, String ruleName){
+        return new replace(this, util, ruleName);
+    }
+
+    public String getMode(){
+        return mode;
+    }
+
+    private String getToCreate(){
+        return toCreate;
+    }
+
+    public String getToKill(){
+        return m_entityName;
     }
 
     private void checkEntityAndPropertyExist(){

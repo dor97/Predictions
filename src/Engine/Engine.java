@@ -38,6 +38,95 @@ public class Engine {
     private List<Integer> newlyFinishedSimulationIds = new ArrayList<>();
     private Thread taskThread = null;
     private Boolean isTreadPoolShoutDown = false;
+    private Map<String, worldDifenichan> worldDifenichanCollecen = new HashMap<>();
+    private Map<String, Map<applicationDetails, simulationApprovementManager>> approvementManager = new HashMap<>();
+    private Map<String, World> userCurrentSimulation= new HashMap<>();
+
+    public final Set<String> _getWorldDifenichanCollecen(){
+        return worldDifenichanCollecen.keySet();
+    }
+
+    public void _askToRunASimulation(String simulationName, String userName, Integer amountToRun, Integer ticks, Integer sec){
+        synchronized (approvementManager) {
+            applicationDetails details = new applicationDetails(simulationName, approvementStatus.WAITING, ticks, sec);
+            if (approvementManager.containsKey(userName)) {
+                if (approvementManager.get(userName).containsKey(details)) {
+                    approvementManager.get(userName).get(details).addToAmountToRun(amountToRun);
+                } else {
+                    approvementManager.get(userName).put(details, new simulationApprovementManager(simulationName, userName, amountToRun, ticks, sec));
+                }
+            } else {
+                Map<applicationDetails, simulationApprovementManager> temp = new HashMap<>();
+                temp.put(details, new simulationApprovementManager(simulationName, userName, amountToRun, ticks, sec));
+                approvementManager.put(userName, temp);
+            }
+        }
+    }
+
+    public Boolean _approveSimulation(String userName, String simulationName, Integer ticks, Integer sec){
+        if(approvementManager.containsKey(userName)) {
+            applicationDetails details = new applicationDetails(simulationName, approvementStatus.WAITING, ticks, sec);
+            if (approvementManager.get(userName).containsKey(details)) {
+                simulationApprovementManager manager = approvementManager.get(userName).get(details);
+                approvementManager.get(userName).remove(details);
+                applicationDetails temp = new applicationDetails(simulationName, approvementStatus.APPROVED, ticks, sec);
+                manager.setStatus(approvementStatus.APPROVED);
+                approvementManager.get(userName).put(temp, manager);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public Boolean _denySimulation(String userName, String simulationName, Integer ticks, Integer sec){
+        if(approvementManager.containsKey(userName)) {
+            applicationDetails details = new applicationDetails(simulationName, approvementStatus.WAITING, ticks, sec);
+            if (approvementManager.get(userName).containsKey(simulationName)) {
+                simulationApprovementManager manager = approvementManager.get(userName).get(details);
+                approvementManager.get(userName).remove(details);
+                applicationDetails temp = new applicationDetails(simulationName, approvementStatus.DENIED, ticks, sec);
+                manager.setStatus(approvementStatus.DENIED);
+                approvementManager.get(userName).put(temp, manager);
+                //approvementManager.get(userName).get(simulationName).setStatus(approvementStatus.DENIED);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public final Map<String, Map<applicationDetails, simulationApprovementManager>> _getApprovementManager(){
+        return approvementManager;
+    }
+
+    public final Map<applicationDetails, simulationApprovementManager> _getApprovementManager(String userName){
+        return approvementManager.get(userName);
+    }
+
+    public void startThreadPool(Integer numberOFThreads){
+        if(threadPool != null && !threadPool.isShutdown()){
+            isTreadPoolShoutDown = true;
+            threadPool.shutdownNow();
+        }
+
+        threadPool = Executors.newFixedThreadPool(numberOFThreads);
+        isTreadPoolShoutDown = false;
+    }
+
+    public void _loadSimulationDefinition(String fileName) throws NoSuchFileException, UnsupportedFileTypeException, InvalidValue, allReadyExistsException , JAXBException, FileNotFoundException {
+        worldDifenichan worldDif = new worldDifenichan();
+        worldDif.loadFile(fileName);
+        if(worldDifenichanCollecen.containsKey(worldDif.getName())){
+            throw new allReadyExistsException("simulation name all ready exists");
+        }
+        worldDifenichanCollecen.put(worldDif.getName(), worldDif);
+    }
+
+    public void loadSimulationFromDefinition(World world, String simulationName, String userName){
+        world = new World();
+        simulationApprovementManager manager = approvementManager.get(userName).get(simulationName);
+        world.loadSimulation(worldDifenichanCollecen.get(simulationName), manager.getTicks(), manager.getSec());
+        //numOfThreads = 3;
+    }
 
     public void loadSimulation(String fileName) throws NoSuchFileException, UnsupportedFileTypeException, InvalidValue, allReadyExistsException , JAXBException, FileNotFoundException {
         try {
@@ -205,6 +294,103 @@ public class Engine {
 
     public void bindToWhenFines(BooleanProperty isFines){
         cuurentSimuletion.bindToWhenFines(isFines);
+    }
+
+    public List<DTOEnvironmentVariablesValues> _prepareSimulation(String userName, String simulationName, myTask aTask, Map<String, String> environmentsValues, Map<String, Integer> entitiesPopulation, Integer ticks, Integer sec) throws NoSuchFileException, UnsupportedFileTypeException, InvalidValue, allReadyExistsException , JAXBException, FileNotFoundException,  InvalidValue, ReferenceNotInitializedException{
+//        if(approvementManager.containsKey(userName) || approvementManager.get(userName).containsKey(simulationName) || !approvementManager.get(userName).get(simulationName).getStatus().equals(approvementStatus.APPROVED)){
+//            return null;
+//        }
+        applicationDetails details = new applicationDetails(simulationName, approvementStatus.APPROVED, ticks, sec);
+        synchronized (approvementManager) {
+            if (!approvementManager.containsKey(userName) || !approvementManager.get(userName).containsKey(details)) {
+                return null;
+            }
+            approvementManager.get(userName).get(details).decreasedAmount();
+            applicationDetails temp = new applicationDetails(simulationName, approvementStatus.USED, ticks, sec);
+            if (approvementManager.get(userName).containsKey(temp)) {
+                approvementManager.get(userName).get(temp).addToAmountToRun(1);
+            } else {
+                approvementManager.get(userName).put(temp, new simulationApprovementManager(simulationName, userName, 1, ticks, sec));
+            }
+        }
+
+        World world = new World();
+        loadSimulationFromDefinition(world, simulationName, userName);
+
+        for(String name : environmentsValues.keySet()){
+            addEnvironmentVariableValue(world, name, environmentsValues.get(name));
+        }
+
+        for(String name : entitiesPopulation.keySet()){
+            addPopulationToEntity(world, name, entitiesPopulation.get(name));
+        }
+
+        List<DTOEnvironmentVariablesValues> environmentVariablesValues = world.setSimulation();
+        synchronized (userCurrentSimulation) {
+            userCurrentSimulation.put(userName, world);
+        }
+
+        return environmentVariablesValues;
+    }
+
+    public int _startSimulation(String userName, String simulationName, myTask aTask)throws InvalidValue, ReferenceNotInitializedException{
+        int simulationNum;
+        synchronized (userCurrentSimulation) {
+            simulationNum = activeSimulation(userCurrentSimulation.get(userName), aTask);
+            userCurrentSimulation.remove(userName);
+        }
+        return simulationNum;
+    }
+
+//    public DTOSimulationStartDetails startSimulation(String userName, String simulationName, myTask aTask, Map<String, String> environmentsValues, Map<String, Integer> entitiesPopulation) throws NoSuchFileException, UnsupportedFileTypeException, InvalidValue, allReadyExistsException , JAXBException, FileNotFoundException,  InvalidValue, ReferenceNotInitializedException{
+//        if(approvementManager.containsKey(userName) || approvementManager.get(userName).containsKey(simulationName) || !approvementManager.get(userName).get(simulationName).getStatus().equals(simulationApprovementManager.approvementStatus.APPROVED)){
+//            return null;
+//        }
+//        World world = new World();
+//        loadSimulationFromDefinition(world, simulationName);
+//
+//        for(String name : environmentsValues.keySet()){
+//            addEnvironmentVariableValue(world, name, environmentsValues.get(name));
+//        }
+//
+//        for(String name : entitiesPopulation.keySet()){
+//            addPopulationToEntity(world, name, entitiesPopulation.get(name));
+//        }
+//
+//        List<DTOEnvironmentVariablesValues> environmentVariablesValues = world.setSimulation();
+//        int simulationNum = activeSimulation(world, aTask);
+//        DTOSimulationStartDetails simulationStartDetails = new DTOSimulationStartDetails(simulationNum, environmentVariablesValues);
+//
+//        return simulationStartDetails;
+//
+//    }
+
+    public int activeSimulation(World world, myTask aTask)throws InvalidValue, ReferenceNotInitializedException{
+        int simulationNum;
+        synchronized (this.simulationNum) {
+            simulationNum = ++this.simulationNum;
+        }
+        if(world == null){
+            throw new ReferenceNotInitializedException("Simulation wasn't load");
+        }
+        //simulationNum++;
+        world.setNumSimulation(simulationNum);
+        simulationsStatus temp = new simulationsStatus();
+        temp.setSimulationId(simulationNum);
+        temp.setTask(aTask);
+        temp.setWorld(world);
+        synchronized (simStatus) {
+            simStatus.put(simulationNum, temp);
+        }
+        isFileLoadedInSimulation = false;
+        synchronized (poolSize){
+            poolSize++;
+        }
+        threadPool.execute(() -> activeSimulationUsingThread(aTask, simulationNum));
+        //world = null;
+        //cuurentSimuletion.startSimolesan();
+        //worldsList.put(simulationNum, cuurentSimuletion);
+        return simulationNum;
     }
 
     public int activeSimulation(myTask aTask)throws InvalidValue, ReferenceNotInitializedException{
@@ -407,11 +593,25 @@ public class Engine {
         cuurentSimuletion.addPopulationToEntity(entityName, population);
     }
 
+    public void addPopulationToEntity(World world, String entityName, int population) throws NoSuchFileException, UnsupportedFileTypeException, InvalidValue, allReadyExistsException , JAXBException, FileNotFoundException {
+        if(!isFileLoadedInSimulation){
+            loadSimulation(m_fileName);
+        }
+        world.addPopulationToEntity(entityName, population);
+    }
+
     public void addEnvironmentVariableValue(String name, String value) throws NoSuchFileException, UnsupportedFileTypeException, InvalidValue, allReadyExistsException , JAXBException, FileNotFoundException {
         if(!isFileLoadedInSimulation){
             loadSimulation(m_fileName);
         }
         cuurentSimuletion.addEnvironmentValue(name, value);
+    }
+
+    public void addEnvironmentVariableValue(World world, String name, String value) throws NoSuchFileException, UnsupportedFileTypeException, InvalidValue, allReadyExistsException , JAXBException, FileNotFoundException {
+        if(!isFileLoadedInSimulation){
+            loadSimulation(m_fileName);
+        }
+        world.addEnvironmentValue(name, value);
     }
 
     public DTOSimulation getSimulationDto() {

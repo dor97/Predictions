@@ -35,7 +35,16 @@ public class Utilites {
 
     }
 
-    public void Init(Map<String, PropertyInterface> environments, Map<String, EntityDifenichan> entityDifenichan, Map<String, EnvironmentDifenichan> environmentsDifenichan){
+    public Utilites(Map<String, EntityDifenichan> entityDifenichan, Map<String, EnvironmentDifenichan> environmentsDifenichan, Integer mapRowSize, Integer mapColSize) {
+        m_entityDifenichan = entityDifenichan;
+        m_environmentsDifenichan = environmentsDifenichan;
+        //m_simulationMap = simulationMap;
+        this.mapSize = mapColSize * mapRowSize;
+        this.mapRowSize = mapRowSize;
+        this.mapColSize = mapColSize;
+    }
+
+        public void Init(Map<String, PropertyInterface> environments, Map<String, EntityDifenichan> entityDifenichan, Map<String, EnvironmentDifenichan> environmentsDifenichan){
         m_environments = environments;
         m_entityDifenichan = entityDifenichan;
         m_environmentsDifenichan = environmentsDifenichan;

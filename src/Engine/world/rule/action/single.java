@@ -16,7 +16,7 @@ import java.util.Arrays;
 
 public class single implements subCondition, Serializable {
 
-    enum opertor{ EQUAL, UNEQUAL, BIGGER, LITTLE}
+    public enum opertor{ EQUAL, UNEQUAL, BIGGER, LITTLE}
     private String m_entityName;
     private String m_propertyName;
     private opertor m_op;
@@ -36,6 +36,43 @@ public class single implements subCondition, Serializable {
         }
         m_util = util;
         cheackUserInput();
+    }
+
+    public single(single condition, Utilites util){
+        m_entityName = condition.getEntity();
+        m_propertyName = condition.getProperty();
+        m_op = getOp();
+        m_exprecn = new expressionWithFunc(util);
+        try {
+            m_exprecn.convertValueInString(condition.getValue());
+        }catch (InvalidValue e){
+            throw new InvalidValue(e.getMessage() + ". In single in action condition");
+        }
+        m_util = util;
+        cheackUserInput();
+    }
+
+    public subCondition clone(Utilites util){
+        return new single(this, util);
+    }
+    public String getSingularity(){
+        return "single";
+    }
+
+    public String getValue(){
+        return m_exprecn.getValue().toString();
+    }
+
+    public opertor getOp(){
+        return m_op;
+    }
+
+    public String getProperty(){
+        return m_propertyName;
+    }
+
+    public String getEntity(){
+        return m_entityName;
     }
 
     private void cheackUserInput() throws InvalidValue {

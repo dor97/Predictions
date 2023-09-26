@@ -1,7 +1,6 @@
 package Engine.world.entity.property;
 
 import Engine.generated.PRDEnvProperty;
-import Engine.world.expression.expressionType;
 import Engine.InvalidValue;
 
 import java.io.Serializable;

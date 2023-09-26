@@ -1,6 +1,7 @@
 package Engine.world.rule.action;
 
 import DTO.DTOActionData;
+import Engine.utilites.Utilites;
 import Engine.world.entity.Entity;
 import Engine.InvalidValue;
 
@@ -13,5 +14,7 @@ public interface subCondition {
     public boolean shouldIgnore(Entity entity);
 
     public void makeActionDto(DTOActionData actionData);
+    public String getSingularity();
+    public subCondition clone(Utilites util);
 
 }

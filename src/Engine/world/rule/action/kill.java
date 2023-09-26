@@ -23,7 +23,19 @@ public class kill extends action implements Serializable {
         cheackUserInput();
     }
 
-    private void cheackUserInput() throws InvalidValue {
+    public kill(action action, Utilites util, String ruleName) throws  InvalidValue {
+        super(action, util, ruleName);
+        m_entityName = action.getEntity();
+        //actionName = action.getType();
+        m_util = util;
+        cheackUserInput();
+    }
+
+    public kill clone(Utilites util, String ruleName){
+        return new kill(this, util, ruleName);
+    }
+
+        private void cheackUserInput() throws InvalidValue {
         checkEntityExist();
     }
 

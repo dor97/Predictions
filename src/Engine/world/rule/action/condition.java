@@ -4,8 +4,6 @@ import DTO.DTOActionData;
 import Engine.utilites.Utilites;
 import Engine.world.entity.Entity;
 import Engine.generated.PRDAction;
-import Engine.world.expression.expression;
-import Engine.world.expression.expressionType;
 import Engine.InvalidValue;
 import org.omg.CORBA.OBJECT_NOT_EXIST;
 
@@ -60,6 +58,50 @@ public class condition extends action implements Serializable {
             }
         }
         checkEntityAndPropertyExist(util);
+    }
+
+    public condition(condition action, Utilites util, String ruleName) throws InvalidValue {
+        super(action, util, ruleName);
+        m_entity = action.getEntity();
+        m_subCon = action.getSubCondition().clone(util);
+//        if(action.getPRDCondition().getSingularity().equals("multiple")){
+//            m_subCon = new multiple(action.getPRDCondition(), util);
+//        }
+//        else if (action.getPRDCondition().getSingularity().equals("single")){
+//            m_subCon = new single(action.getPRDCondition(), util);
+//        }
+        actionFactory factory = new actionFactory();
+        m_then = new ArrayList<>();
+
+
+        for(ActionInterface thanAction : action.getThen()){
+            m_then.add(thanAction.clone(util, ruleName));
+        }
+
+
+        if(action.isHaveElse()){
+            m_else = new ArrayList<>();
+            for(ActionInterface elseAction : action.getElse()){
+                m_else.add(elseAction.clone(util, ruleName));
+            }
+        }
+        checkEntityAndPropertyExist(util);
+    }
+
+    public Boolean isHaveElse(){
+        return m_else != null;
+    }
+
+    public List<ActionInterface> getThen(){
+        return m_then;
+    }
+
+    public List<ActionInterface> getElse(){
+        return m_else;
+    }
+
+    public subCondition getSubCondition(){
+        return m_subCon;
     }
     private void checkEntityAndPropertyExist(Utilites util){
         if(!util.isEntityDifenichanExists(m_entity)){

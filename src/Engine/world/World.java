@@ -16,9 +16,7 @@ import Engine.world.rule.action.ActionInterface;
 import Engine.world.expression.expressionType;
 import Engine.utilites.Utilites;
 import javafx.application.Platform;
-import javafx.beans.property.MapProperty;
 import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.SimpleMapProperty;
 import javafx.util.Pair;
 
 import javax.xml.bind.JAXBContext;
@@ -45,6 +43,8 @@ public class World implements Serializable {
     //private Map<String, DTOEnvironmentVariables> m_enviromentsDto = new HashMap<>();
     private expression m_ticks = null;
     private expression m_secondToWork = null;
+    private Integer ticks = null;
+    private Integer secondToWork = null;
     private SimpleDateFormat format = new SimpleDateFormat("dd-MM-yyyy | hh.mm.ss");
     private String simulationTime = null;
     private Utilites util;
@@ -56,6 +56,9 @@ public class World implements Serializable {
     private javafx.beans.property.BooleanProperty isFines = new SimpleBooleanProperty();
     private map map;
     private String exception = "";
+    private String simulationName = "";
+    private Integer sleep;
+    private Instant startSleepTime;
     private List<consistencyAndAvr> consistencyAndAvr = new ArrayList<>();
 
     private List<Pair<Integer, Integer>> numOfEntitiesPerTick = new ArrayList<>();
@@ -170,7 +173,7 @@ public class World implements Serializable {
         map = new map(m_rows, m_cols);  //TODO change
         map.setLocations(m_entities);
         List<ActionInterface> toActive = new ArrayList<>();
-        while ((m_ticks.getType() == null || currTick < m_ticks.getInt()) && (m_secondToWork.getType() == null || Duration.between(start, Instant.now()).getSeconds() < m_secondToWork.getInt())) {  //&& currTick < 1000
+        while ((ticks == null || currTick < ticks) && (secondToWork == null || Duration.between(start, Instant.now()).getSeconds() < secondToWork)) {  //&& currTick < 1000
             elapsedTime = Duration.between(start, Instant.now());
             if(currTick % 1000 == 0) {
                 numOfEntitiesPerTick.add(new Pair<>(currTick, m_entities.size()));
@@ -201,6 +204,21 @@ public class World implements Serializable {
 
             synchronized (start) {
                 currTick++;
+            }
+
+            if(sleep != null && sleep != 0){
+                startSleepTime = Instant.now();
+                while (Duration.between(startSleepTime, Instant.now()).getSeconds() < sleep){
+                    elapsedTime = Duration.between(start, Instant.now());
+//                    try {     //TODO to add?
+//                        Thread.sleep(400);
+//                    }catch (InterruptedException e){
+//                        isSimulationEnded = true;
+//                        Platform.runLater(() -> isFines.set(true));
+//                        isPause.setPause(false);
+//                        return;
+//                    }
+                }
             }
 //            aTask.func(m_entities.stream().collect(Collectors.groupingBy(Entity::getName, Collectors.summingInt(e -> 1))));
 //            aTask.setTick(currTick);
@@ -456,6 +474,32 @@ public class World implements Serializable {
         return DTOList;
     }
 
+    public void loadSimulation(worldDifenichan worldDifenichan, Integer ticks, Integer secondToWork) throws allReadyExistsException, InvalidValue{
+        m_cols = worldDifenichan.getCols();
+        m_rows = worldDifenichan.getRows();
+
+        m_environmentsDifenichen = worldDifenichan.getEnvironmentsDifenichen().entrySet().stream().collect(Collectors.toMap(entry -> entry.getKey(), entry -> new EnvironmentDifenichan(entry.getValue())));
+
+        m_entitiesDifenichan = worldDifenichan.getEntityDifenichan().entrySet().stream().collect(Collectors.toMap(entry -> entry.getKey(), entry -> new EntityDifenichan(entry.getValue())));
+
+        util = new Utilites(m_environments, m_entitiesDifenichan, m_environmentsDifenichen, m_entities, m_rows, m_cols);
+
+        m_rules = worldDifenichan.getRules().stream().map(rule -> rule.clone(util)).collect(Collectors.toList());
+
+//        m_ticks = worldDifenichan.getTicks();
+//        m_secondToWork = worldDifenichan.getSecondToWork();
+        this.ticks = ticks;
+        this.secondToWork = secondToWork;
+        simulationName = worldDifenichan.getName();
+        sleep = worldDifenichan.getSleep();
+
+    }
+
+    public final String getSimulationName(){
+        return simulationName;
+    }
+
+
     public int loadFile(String xmlFile)throws NoSuchFileException , UnsupportedFileTypeException, allReadyExistsException, InvalidValue, JAXBException, FileNotFoundException {
         PRDWorld xmlWorld = new PRDWorld();
 
@@ -522,8 +566,10 @@ public class World implements Serializable {
 
         m_ticks = new expression();
         m_secondToWork = new expression();
-        Optional<List<Object>> secondOrTicks = Optional.ofNullable((List<Object>) xmlWorld.getPRDTermination().getPRDBySecondOrPRDByTicks());
-        secondOrTicks.ifPresent(t -> getTermination(t));
+        simulationName = xmlWorld.getName();
+        sleep = xmlWorld.getSleep();
+//        Optional<List<Object>> secondOrTicks = Optional.ofNullable((List<Object>) xmlWorld.getPRDTermination().getPRDBySecondOrPRDByTicks());
+//        secondOrTicks.ifPresent(t -> getTermination(t));
 
 //        m_ticks = new expression();
 //        Optional<Integer> time = Optional.ofNullable().ifPresent(t -> t.getCount()))));
@@ -533,11 +579,12 @@ public class World implements Serializable {
 //        Optional<Integer> second = Optional.ofNullable(((PRDBySecond)xmlWorld.getPRDTermination().getPRDBySecondOrPRDByTicks().get(1)).getCount());
 //        second.ifPresent((s) -> m_secondToWork.setValue(s));
 
-        if(m_ticks.getType() == null && m_secondToWork.getType() == null && xmlWorld.getPRDTermination().getPRDByUser() == null){
-            throw new InvalidValue("No termination method was added");
-        }
+//        if(m_ticks.getType() == null && m_secondToWork.getType() == null && xmlWorld.getPRDTermination().getPRDByUser() == null){
+//            throw new InvalidValue("No termination method was added");
+//        }
 
-        return xmlWorld.getPRDThreadCount();
+        //return xmlWorld.getPRDThreadCount();
+        return 3;
     }
 
     private void getTermination(List<Object> secondOrTicks){

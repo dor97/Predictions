@@ -59,6 +59,50 @@ public class calculation extends action implements Serializable {
         cheackUserInput();
     }
 
+    public calculation(calculation action, Utilites util, String ruleName) throws InvalidValue{
+        super(action, util, ruleName);
+        m_entityName = action.getEntity();
+        m_propertyName = action.getPropertyName();
+        m_util = util;
+        m_value1 = action.getArg1();
+        m_value2 = action.getArg2();
+        isMultiply = action.isMultiply();
+//        if(action.isMultiply()){
+//            m_value1 = action.getPRDMultiply().getArg1();
+//            m_value2 = action.getPRDMultiply().getArg2();
+//        }else{
+//            m_value1 = action.getPRDDivide().getArg1();
+//            m_value2 = action.getPRDDivide().getArg2();
+//            isMultiply = false;
+//        }
+        m_arg1 = new expressionWithFunc(util);
+        m_arg2 = new expressionWithFunc(util);
+        try {
+            m_arg1.convertValueInString(m_value1);
+            m_arg2.convertValueInString(m_value2);
+        }catch (InvalidValue e){
+            throw new InvalidValue(e.getMessage() + ". In action " + action.getType());
+        }
+        //actionName = action.getType();
+        cheackUserInput();
+    }
+
+    @Override
+    public action clone(Utilites util, String ruleName){
+        return new calculation(this, util, ruleName);
+    }
+
+    public String getArg1(){
+        return m_value1;
+    }
+
+    public String getArg2(){
+        return m_value2;
+    }
+    private Boolean isMultiply(){
+        return isMultiply;
+    }
+
     private void cheackUserInput() throws InvalidValue{
         checkEntityAndPropertyExist();
         checkTypeValid(m_arg1);

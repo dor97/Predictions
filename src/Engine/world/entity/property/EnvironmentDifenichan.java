@@ -40,6 +40,30 @@ public class EnvironmentDifenichan implements Serializable {
 
     }
 
+    public EnvironmentDifenichan(EnvironmentDifenichan p){
+        m_name = p.getName();
+        m_type = p.getType();
+        if(p.haveRange()) {
+            m_haveRange = true;
+            m_lowRange = p.getLowRange();
+            m_highRang = p.getHighRange();
+            if(m_highRang < m_lowRange){
+                //excepcen
+            }
+        }
+        //m_randomlyIneceat = p.getPRDValue().isRandomInitialize();
+        //if(m_randomlyIneceat == true){
+        //    return;
+        //}
+        m_init = new expression();
+        m_init.convertValueInString(p.getInit().getValue().toString());
+        //m_init.convertValueInString(p.getPRDValue().getInit());
+        //if(m_type != m_init.getType()){
+        //   //exepcen
+        //}
+
+    }
+
     public expressionType getType(){
         return m_type;
     }
