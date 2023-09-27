@@ -150,13 +150,13 @@ public class addValue extends action implements Serializable {  //increase or de
 
     private void checkEntityAndPropertyExist(){
         if(!m_util.isEntityDifenichanExists(m_entityName)){
-            throw new OBJECT_NOT_EXIST("In action " + getActionName() + " the entity " + m_entity + " does not exist.");
+            throw new OBJECT_NOT_EXIST("In action " + getActionName() + " the entity " + m_entityName + " does not exist.");
         }
         if(getCountForSecondaryEntities() != 0 && !m_util.isEntityDifenichanExists(getSecondaryName())){
             throw new OBJECT_NOT_EXIST("In action " + getActionName() + " the entity " + getSecondaryName() + " does not exist.");
         }
         if(!m_util.getEntityDifenichan(m_entityName).getPropertys().containsKey(m_propertyName)){
-            throw new OBJECT_NOT_EXIST("In action " + getActionName() + " the property " + m_propertyName + " of entity " + m_entity +" does not exist.");
+            throw new OBJECT_NOT_EXIST("In action " + getActionName() + " the property " + m_entityName + " of entity " + m_entity +" does not exist.");
         }
     }
 
