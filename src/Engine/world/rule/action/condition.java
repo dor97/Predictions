@@ -88,6 +88,11 @@ public class condition extends action implements Serializable {
         checkEntityAndPropertyExist(util);
     }
 
+    @Override
+    public action clone(Utilites util, String ruleName){
+        return new condition(this, util, ruleName);
+    }
+
     public Boolean isHaveElse(){
         return m_else != null;
     }
