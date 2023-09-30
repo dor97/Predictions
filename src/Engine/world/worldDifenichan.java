@@ -22,7 +22,7 @@ import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
-
+import DTO.*;
 
 public class worldDifenichan {
 
@@ -32,11 +32,11 @@ public class worldDifenichan {
     private Integer m_cols, m_rows;
     private String name;
     private Integer sleep;
-
+    private Integer runningCounter = 0;
     private final static String JAXB_XML_GAME_PACKAGE_NAME = "Engine.generated";
 
 
-    public int loadFile(String xmlFile)throws NoSuchFileException , UnsupportedFileTypeException, allReadyExistsException, InvalidValue, JAXBException, FileNotFoundException {
+    public void loadFile(String xmlFile)throws NoSuchFileException , UnsupportedFileTypeException, allReadyExistsException, InvalidValue, JAXBException, FileNotFoundException {
         PRDWorld xmlWorld = new PRDWorld();
 
         //load file
@@ -118,7 +118,7 @@ public class worldDifenichan {
 //        }
 
         //return xmlWorld.getPRDThreadCount();
-        return 3; //TODO change
+        //return 3; //TODO change
     }
 
 //    private void getTermination(List<Object> secondOrTicks){
@@ -151,6 +151,56 @@ public class worldDifenichan {
         JAXBContext jc = JAXBContext.newInstance(JAXB_XML_GAME_PACKAGE_NAME);
         Unmarshaller u = jc.createUnmarshaller();
         return (PRDWorld) u.unmarshal(in);
+    }
+
+    public DTOSimulationDetails getSimulationDetails(){
+        DTOSimulationDetails DTO = new DTOSimulationDetails();
+
+        for(EntityDifenichan entity : m_entitiesDifenichan.values()){
+            DTO.addEntity(entity.makeDtoEntity());
+        }
+
+        for(Rule rule : m_rules){
+            DTO.addRule(rule.makeDtoRule());
+        }
+
+        DTO.setEnvironments(getEnvironmentDetails());
+
+        DTO.setGridSize(m_rows, m_cols);
+
+        DTOTerminationData terminationData = new DTOTerminationData();
+//        if(m_ticks.getType() != null){
+//            terminationData.putData(terminationType.TICKS.toString(), ((Integer)m_ticks.getInt()).toString());
+//            //DTO.(terminationType.TICKS, m_ticks.getInt()));
+//        }
+//
+//        if(m_secondToWork.getType() != null){
+//            terminationData.putData(terminationType.SECOND.toString(), ((Integer)m_secondToWork.getInt()).toString());
+//            //DTO.addTermination(new DTOTerminationData(terminationType.SECOND, m_secondToWork.getInt()));
+//        }
+        DTO.setTermination(terminationData);
+
+        DTO.setName(name);
+
+        return DTO;
+    }
+
+    public List<DTOEnvironmentVariables> getEnvironmentDetails(){
+        List<DTOEnvironmentVariables> DTOList = new ArrayList<>();
+
+        for(EnvironmentDifenichan environmentDifenichan : m_environmentsDifenichen.values()){
+            DTOList.add(environmentDifenichan.makeDtoEnvironment());
+        }
+
+        return DTOList;
+    }
+
+    public Integer getRunningCounter(){
+        return runningCounter;
+    }
+
+    public void increaseRunningCounter(){
+        runningCounter++;
     }
 
     public Integer getSleep(){

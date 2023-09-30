@@ -1,6 +1,8 @@
-package Engine;
+package DTO;
 
-public class simulationApprovementManager {
+
+
+public class DTOsimulationApprovementManager {
     private approvementStatus status;
     private String simulationName;
     private String userName;
@@ -8,34 +10,25 @@ public class simulationApprovementManager {
     private Integer ticks;
     private Integer sec;
     private Integer id;
-    private Integer amountRun = 0;
-    private Integer currentRun = 0;
-    private Integer done = 0;
+    private Integer amountRun;
+    private Integer currentRun;
+    private Integer done;
 
-    public simulationApprovementManager(String simulationName, String userName, Integer amountToRun, Integer ticks, Integer sec, Integer id){
+    public DTOsimulationApprovementManager(String simulationName, String userName, approvementStatus status, Integer amountToRun, Integer  amountRun, Integer ticks, Integer sec, Integer id, Integer currentRun, Integer done){
         this.simulationName = simulationName;
         this.userName = userName;
         this.amountToRun = amountToRun;
+        this.amountRun = amountRun;
         this.ticks = ticks;
         this.sec = sec;
         this.id = id;
-        status = approvementStatus.WAITING;
-    }
-
-    public void increaseCurrentRun(){
-        currentRun++;
-    }
-
-    public void decreaseCurrentRun(){
-        currentRun--;
+        this.status = status;
+        this.currentRun = currentRun;
+        this.done = done;
     }
 
     public Integer getCurrentRun(){
         return currentRun;
-    }
-
-    public void increaseDone(){
-        done++;
     }
 
     public Integer getDone(){
@@ -46,13 +39,6 @@ public class simulationApprovementManager {
         return id;
     }
 
-    public Integer getAmountRun(){
-        return amountRun;
-    }
-
-    public void setStatus(approvementStatus status){
-        this.status = status;
-    }
 
     public Integer getTicks(){
         return ticks;
@@ -81,12 +67,5 @@ public class simulationApprovementManager {
         return amountToRun - amountRun;
     }
 
-    //public void addToAmountToRun(Integer add){
-//        amountToRun += add;
-//    }
-
-    public void increaseAmountRun(){
-        amountRun += 1;
-    }
 
 }

@@ -51,6 +51,7 @@ public class World implements Serializable {
     private int m_rows, m_cols, currTick = 0;
     private Instant start;
     private Duration elapsedTime = Duration.ZERO;
+    private String userName;
     private Integer numSimulation = 0;
     private Boolean isSimulationEnded = false;
     private javafx.beans.property.BooleanProperty isFines = new SimpleBooleanProperty();
@@ -59,6 +60,7 @@ public class World implements Serializable {
     private String simulationName = "";
     private Integer sleep;
     private Instant startSleepTime;
+    private Integer requestId;
     private List<consistencyAndAvr> consistencyAndAvr = new ArrayList<>();
 
     private List<Pair<Integer, Integer>> numOfEntitiesPerTick = new ArrayList<>();
@@ -474,7 +476,7 @@ public class World implements Serializable {
         return DTOList;
     }
 
-    public void loadSimulation(worldDifenichan worldDifenichan, Integer ticks, Integer secondToWork) throws allReadyExistsException, InvalidValue{
+    public void loadSimulation(worldDifenichan worldDifenichan, Integer ticks, Integer secondToWork, String userName) throws allReadyExistsException, InvalidValue{
         m_cols = worldDifenichan.getCols();
         m_rows = worldDifenichan.getRows();
 
@@ -492,11 +494,22 @@ public class World implements Serializable {
         this.secondToWork = secondToWork;
         simulationName = worldDifenichan.getName();
         sleep = worldDifenichan.getSleep();
+        this.userName = userName;
 
+    }
+    public void setRequestId(Integer requestId){
+        this.requestId = requestId;
+    }
+
+    public Integer getRequestId(){
+        return requestId;
     }
 
     public final String getSimulationName(){
         return simulationName;
+    }
+    public final String getUserName(){
+        return userName;
     }
 
 

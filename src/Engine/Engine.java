@@ -12,7 +12,6 @@ import javafx.beans.property.IntegerProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import org.omg.CORBA.DynAnyPackage.InvalidValue;
-import javafx.collections.FXCollections;
 
 
 import javax.xml.bind.JAXBException;
@@ -40,66 +39,139 @@ public class Engine {
     private Boolean isTreadPoolShoutDown = false;
     private Map<String, worldDifenichan> worldDifenichanCollecen = new HashMap<>();
     private Map<String, Map<applicationDetails, simulationApprovementManager>> approvementManager = new HashMap<>();
+    private Map<Integer, simulationApprovementManager> approvManager = new HashMap<>();
     private Map<String, World> userCurrentSimulation= new HashMap<>();
+    private Integer IDToRunSimulation = 0;
 
     public final Set<String> _getWorldDifenichanCollecen(){
-        return worldDifenichanCollecen.keySet();
+        synchronized (worldDifenichanCollecen) {
+            return worldDifenichanCollecen.keySet();
+        }
     }
-
-    public void _askToRunASimulation(String simulationName, String userName, Integer amountToRun, Integer ticks, Integer sec){
-        synchronized (approvementManager) {
-            applicationDetails details = new applicationDetails(simulationName, approvementStatus.WAITING, ticks, sec);
-            if (approvementManager.containsKey(userName)) {
-                if (approvementManager.get(userName).containsKey(details)) {
-                    approvementManager.get(userName).get(details).addToAmountToRun(amountToRun);
-                } else {
-                    approvementManager.get(userName).put(details, new simulationApprovementManager(simulationName, userName, amountToRun, ticks, sec));
-                }
-            } else {
-                Map<applicationDetails, simulationApprovementManager> temp = new HashMap<>();
-                temp.put(details, new simulationApprovementManager(simulationName, userName, amountToRun, ticks, sec));
-                approvementManager.put(userName, temp);
+    public Integer _getNumOfRunningOfASimulation(String name){
+        synchronized (worldDifenichanCollecen){
+            if (!worldDifenichanCollecen.containsKey(name)) {
+                return null;
             }
+            return worldDifenichanCollecen.get(name).getRunningCounter();
         }
     }
 
-    public Boolean _approveSimulation(String userName, String simulationName, Integer ticks, Integer sec){
-        if(approvementManager.containsKey(userName)) {
-            applicationDetails details = new applicationDetails(simulationName, approvementStatus.WAITING, ticks, sec);
-            if (approvementManager.get(userName).containsKey(details)) {
-                simulationApprovementManager manager = approvementManager.get(userName).get(details);
-                approvementManager.get(userName).remove(details);
-                applicationDetails temp = new applicationDetails(simulationName, approvementStatus.APPROVED, ticks, sec);
-                manager.setStatus(approvementStatus.APPROVED);
-                approvementManager.get(userName).put(temp, manager);
+    public List<DTOSystemData> _getSystemData(){
+        List<DTOSystemData> systemData = new ArrayList<>();
+
+        simStatus.entrySet().stream().forEach(entry -> {
+            DTOSystemData data = new DTOSystemData();
+            data.setSimulationId(entry.getKey());
+            data.setUserName(entry.getValue().getWorld().getUserName());
+            data.setSimulationName(entry.getValue().getWorld().getSimulationName());
+            data.setRequestId(entry.getValue().getWorld().getRequestId());
+            systemData.add(data);
+            });
+
+        return systemData;
+    }
+
+    public Integer _askToRunASimulation(String simulationName, String userName, Integer amountToRun, Integer ticks, Integer sec){
+        Integer id;
+        synchronized (IDToRunSimulation){
+            id = IDToRunSimulation;
+            IDToRunSimulation++;
+        }
+        synchronized (approvManager){
+            approvManager.put(id, new simulationApprovementManager(simulationName, userName, amountToRun, ticks, sec, id));
+        }
+        return id;
+//
+//
+//        synchronized (approvementManager) {
+//            applicationDetails details = new applicationDetails(simulationName, approvementStatus.WAITING, ticks, sec);
+//            if (approvementManager.containsKey(userName)) {
+//                if (approvementManager.get(userName).containsKey(details)) {
+//                    approvementManager.get(userName).get(details).addToAmountToRun(amountToRun);
+//                } else {
+//                    approvementManager.get(userName).put(details, new simulationApprovementManager(simulationName, userName, amountToRun, ticks, sec));
+//                }
+//            } else {
+//                Map<applicationDetails, simulationApprovementManager> temp = new HashMap<>();
+//                temp.put(details, new simulationApprovementManager(simulationName, userName, amountToRun, ticks, sec));
+//                approvementManager.put(userName, temp);
+//            }
+//        }
+    }
+
+    public Boolean _approveSimulation(Integer id){
+//        if(approvementManager.containsKey(userName)) {
+//            applicationDetails details = new applicationDetails(simulationName, approvementStatus.WAITING, ticks, sec);
+//            if (approvementManager.get(userName).containsKey(details)) {
+//                simulationApprovementManager manager = approvementManager.get(userName).get(details);
+//                approvementManager.get(userName).remove(details);
+//                applicationDetails temp = new applicationDetails(simulationName, approvementStatus.APPROVED, ticks, sec);
+//                manager.setStatus(approvementStatus.APPROVED);
+//                approvementManager.get(userName).put(temp, manager);
+//                return true;
+//            }
+//        }
+        synchronized (approvManager){
+            if(approvManager.containsKey(id)) {
+                approvManager.get(id).setStatus(approvementStatus.APPROVED);
                 return true;
             }
+            return false;
         }
-        return false;
     }
 
-    public Boolean _denySimulation(String userName, String simulationName, Integer ticks, Integer sec){
-        if(approvementManager.containsKey(userName)) {
-            applicationDetails details = new applicationDetails(simulationName, approvementStatus.WAITING, ticks, sec);
-            if (approvementManager.get(userName).containsKey(simulationName)) {
-                simulationApprovementManager manager = approvementManager.get(userName).get(details);
-                approvementManager.get(userName).remove(details);
-                applicationDetails temp = new applicationDetails(simulationName, approvementStatus.DENIED, ticks, sec);
-                manager.setStatus(approvementStatus.DENIED);
-                approvementManager.get(userName).put(temp, manager);
-                //approvementManager.get(userName).get(simulationName).setStatus(approvementStatus.DENIED);
+    public Boolean _denySimulation(Integer id){
+//        if(approvementManager.containsKey(userName)) {
+//            applicationDetails details = new applicationDetails(simulationName, approvementStatus.WAITING, ticks, sec);
+//            if (approvementManager.get(userName).containsKey(simulationName)) {
+//                simulationApprovementManager manager = approvementManager.get(userName).get(details);
+//                approvementManager.get(userName).remove(details);
+//                applicationDetails temp = new applicationDetails(simulationName, approvementStatus.DENIED, ticks, sec);
+//                manager.setStatus(approvementStatus.DENIED);
+//                approvementManager.get(userName).put(temp, manager);
+//                //approvementManager.get(userName).get(simulationName).setStatus(approvementStatus.DENIED);
+//                return true;
+//            }
+//        }
+//        return false;
+        synchronized (approvManager){
+            if(approvManager.containsKey(id)) {
+                approvManager.get(id).setStatus(approvementStatus.DENIED);
                 return true;
             }
+            return false;
         }
-        return false;
     }
 
-    public final Map<String, Map<applicationDetails, simulationApprovementManager>> _getApprovementManager(){
-        return approvementManager;
+//    public final Map<String, Map<applicationDetails, simulationApprovementManager>> _getApprovementManager(){
+//        return approvementManager;
+//    }
+
+    public DTO.approvementStatus getDTOApprovementStatus(approvementStatus status){
+        if (status.equals(approvementStatus.APPROVED)){
+            return DTO.approvementStatus.APPROVED;
+        }
+        if (status.equals(approvementStatus.DENIED)){
+            return DTO.approvementStatus.DENIED;
+        }
+        if (status.equals(approvementStatus.WAITING)){
+            return DTO.approvementStatus.WAITING;
+        }
+        return DTO.approvementStatus.USED;
+    }
+    public final Map<Integer, DTOsimulationApprovementManager> _getApprovementManager(){
+        return approvManager.entrySet().stream().collect(Collectors.toMap(entry -> entry.getKey(),
+                                                                        entry -> new DTOsimulationApprovementManager(entry.getValue().getSimulationName(), entry.getValue().getUserName(), getDTOApprovementStatus(entry.getValue().getStatus()), entry.getValue().getAmountToRun(), entry.getValue().getAmountRun(), entry.getValue().getTicks(), entry.getValue().getSec(), entry.getValue().getId(), entry.getValue().getCurrentRun(), entry.getValue().getDone())));
     }
 
-    public final Map<applicationDetails, simulationApprovementManager> _getApprovementManager(String userName){
-        return approvementManager.get(userName);
+//    public final Map<applicationDetails, simulationApprovementManager> _getApprovementManager(String userName){
+//        return approvementManager.get(userName);
+//    }
+
+    public final Map<Integer, DTOsimulationApprovementManager> _getApprovementManager(String userName){
+        return approvManager.entrySet().stream().filter(entry -> entry.getValue().getUserName().equals(userName)).collect(Collectors.toMap(entry -> entry.getKey(),
+                entry -> new DTOsimulationApprovementManager(entry.getValue().getSimulationName(), entry.getValue().getUserName(), getDTOApprovementStatus(entry.getValue().getStatus()), entry.getValue().getAmountToRun(), entry.getValue().getAmountRun(), entry.getValue().getTicks(), entry.getValue().getSec(), entry.getValue().getId(), entry.getValue().getCurrentRun(), entry.getValue().getDone())));
     }
 
     public void startThreadPool(Integer numberOFThreads){
@@ -121,11 +193,11 @@ public class Engine {
         worldDifenichanCollecen.put(worldDif.getName(), worldDif);
     }
 
-    public void loadSimulationFromDefinition(World world, String simulationName, String userName){
-        world = new World();
-        simulationApprovementManager manager = approvementManager.get(userName).get(simulationName);
-        world.loadSimulation(worldDifenichanCollecen.get(simulationName), manager.getTicks(), manager.getSec());
-        //numOfThreads = 3;
+    public void loadSimulationFromDefinition(World world, Integer id, String simulationName, String userName){
+        //world = new World();
+        simulationApprovementManager manager = approvManager.get(id);
+        //simulationApprovementManager manager = approvementManager.get(userName).get(simulationName);
+        world.loadSimulation(worldDifenichanCollecen.get(simulationName), manager.getTicks(), manager.getSec(), userName);
     }
 
     public void loadSimulation(String fileName) throws NoSuchFileException, UnsupportedFileTypeException, InvalidValue, allReadyExistsException , JAXBException, FileNotFoundException {
@@ -296,26 +368,32 @@ public class Engine {
         cuurentSimuletion.bindToWhenFines(isFines);
     }
 
-    public List<DTOEnvironmentVariablesValues> _prepareSimulation(String userName, String simulationName, myTask aTask, Map<String, String> environmentsValues, Map<String, Integer> entitiesPopulation, Integer ticks, Integer sec) throws NoSuchFileException, UnsupportedFileTypeException, InvalidValue, allReadyExistsException , JAXBException, FileNotFoundException,  InvalidValue, ReferenceNotInitializedException{
+    public List<DTOEnvironmentVariablesValues> _prepareSimulation(Integer id, String userName, String simulationName, Map<String, String> environmentsValues, Map<String, Integer> entitiesPopulation, Integer ticks, Integer sec) throws NoSuchFileException, UnsupportedFileTypeException, InvalidValue, allReadyExistsException , JAXBException, FileNotFoundException,  InvalidValue, ReferenceNotInitializedException{
 //        if(approvementManager.containsKey(userName) || approvementManager.get(userName).containsKey(simulationName) || !approvementManager.get(userName).get(simulationName).getStatus().equals(approvementStatus.APPROVED)){
 //            return null;
 //        }
-        applicationDetails details = new applicationDetails(simulationName, approvementStatus.APPROVED, ticks, sec);
-        synchronized (approvementManager) {
-            if (!approvementManager.containsKey(userName) || !approvementManager.get(userName).containsKey(details)) {
+//        applicationDetails details = new applicationDetails(simulationName, approvementStatus.APPROVED, ticks, sec);
+//        synchronized (approvementManager) {
+//            if (!approvementManager.containsKey(userName) || !approvementManager.get(userName).containsKey(details)) {
+//                return null;
+//            }
+//            approvementManager.get(userName).get(details).decreasedAmount();
+//            applicationDetails temp = new applicationDetails(simulationName, approvementStatus.USED, ticks, sec);
+//            if (approvementManager.get(userName).containsKey(temp)) {
+//                approvementManager.get(userName).get(temp).addToAmountToRun(1);
+//            } else {
+//                approvementManager.get(userName).put(temp, new simulationApprovementManager(simulationName, userName, 1, ticks, sec));
+//            }
+//        }
+        synchronized (approvManager){
+            if(approvManager.containsKey(id) || !approvManager.get(id).getStatus().equals(approvementStatus.APPROVED) || approvManager.get(id).getRemainingRun().equals(0)) {
                 return null;
-            }
-            approvementManager.get(userName).get(details).decreasedAmount();
-            applicationDetails temp = new applicationDetails(simulationName, approvementStatus.USED, ticks, sec);
-            if (approvementManager.get(userName).containsKey(temp)) {
-                approvementManager.get(userName).get(temp).addToAmountToRun(1);
-            } else {
-                approvementManager.get(userName).put(temp, new simulationApprovementManager(simulationName, userName, 1, ticks, sec));
             }
         }
 
         World world = new World();
-        loadSimulationFromDefinition(world, simulationName, userName);
+        loadSimulationFromDefinition(world, id, simulationName, userName);
+        world.setRequestId(id);
 
         for(String name : environmentsValues.keySet()){
             addEnvironmentVariableValue(world, name, environmentsValues.get(name));
@@ -333,11 +411,26 @@ public class Engine {
         return environmentVariablesValues;
     }
 
-    public int _startSimulation(String userName, String simulationName, myTask aTask)throws InvalidValue, ReferenceNotInitializedException{
+    public int _startSimulation(Integer id, String userName, String simulationName)throws InvalidValue, ReferenceNotInitializedException{
         int simulationNum;
+        if(!approvManager.containsKey(id)){
+            return -1;
+        }
+        synchronized (approvManager.get(id)){
+            if(!approvManager.containsKey(id) || !approvManager.get(id).getStatus().equals(approvementStatus.APPROVED) || approvManager.get(id).getRemainingRun().equals(0)) {
+                return -1;
+            }
+            approvManager.get(id).increaseAmountRun();
+            if(approvManager.get(id).getRemainingRun().equals(0)){
+                approvManager.get(id).setStatus(approvementStatus.USED);
+            }
+        }
         synchronized (userCurrentSimulation) {
-            simulationNum = activeSimulation(userCurrentSimulation.get(userName), aTask);
+            simulationNum = activeSimulation(userCurrentSimulation.get(userName), id);
             userCurrentSimulation.remove(userName);
+        }
+        synchronized (worldDifenichanCollecen){
+            worldDifenichanCollecen.get(simulationName).increaseRunningCounter();
         }
         return simulationNum;
     }
@@ -365,7 +458,7 @@ public class Engine {
 //
 //    }
 
-    public int activeSimulation(World world, myTask aTask)throws InvalidValue, ReferenceNotInitializedException{
+    public int activeSimulation(World world, Integer id)throws InvalidValue, ReferenceNotInitializedException{
         int simulationNum;
         synchronized (this.simulationNum) {
             simulationNum = ++this.simulationNum;
@@ -377,7 +470,7 @@ public class Engine {
         world.setNumSimulation(simulationNum);
         simulationsStatus temp = new simulationsStatus();
         temp.setSimulationId(simulationNum);
-        temp.setTask(aTask);
+        //temp.setTask(aTask);
         temp.setWorld(world);
         synchronized (simStatus) {
             simStatus.put(simulationNum, temp);
@@ -386,7 +479,7 @@ public class Engine {
         synchronized (poolSize){
             poolSize++;
         }
-        threadPool.execute(() -> activeSimulationUsingThread(aTask, simulationNum));
+        threadPool.execute(() -> activeSimulationUsingThread(simulationNum, id));
         //world = null;
         //cuurentSimuletion.startSimolesan();
         //worldsList.put(simulationNum, cuurentSimuletion);
@@ -414,14 +507,14 @@ public class Engine {
         synchronized (poolSize){
             poolSize++;
         }
-        threadPool.execute(() -> activeSimulationUsingThread(aTask, simulationNum));
+        threadPool.execute(() -> activeSimulationUsingThread(simulationNum, 0));
         cuurentSimuletion = null;
         //cuurentSimuletion.startSimolesan();
         //worldsList.put(simulationNum, cuurentSimuletion);
         return simulationNum;
     }
 
-    private void activeSimulationUsingThread(myTask aTask, Integer simulationNum){
+    private void activeSimulationUsingThread(Integer simulationNum, Integer id){
         Boolean pause;
         World world;
         synchronized (poolSize){
@@ -433,6 +526,9 @@ public class Engine {
             simStatus.get(world.getNumSimulation()).setRunningThread(Thread.currentThread());
             //pause = simStatus.get(world.getNumSimulation()).getIsPause();
         }
+        synchronized (approvManager.get(id)){
+            approvManager.get(id).increaseCurrentRun();
+        }
         try {
             world.startSimolesan(simStatus.get(world.getNumSimulation()).getIsPause());
         }catch (Exception e){
@@ -440,6 +536,10 @@ public class Engine {
             //simulationsExceptions.put(world.getNumSimulation(), e.getMessage());
         }finally {
             world.setSimulationEnded();
+        }
+        synchronized (approvManager.get(id)){
+            approvManager.get(id).decreaseCurrentRun();
+            approvManager.get(id).increaseDone();
         }
         synchronized (simStatus) {
             if(simStatus != null && simStatus.size() != 0) {
@@ -570,11 +670,33 @@ public class Engine {
 //        }
     }
 
-    public DTOSimulationDetails getSimulationDetails(){
-        if(cuurentSimuletion == null){
-            return null;
+    public DTOSimulationDetails getSimulationDetails(String name){
+        synchronized (worldDifenichanCollecen) {
+            if (worldDifenichanCollecen.get(name) == null) {
+                return null;
+            }
+            return worldDifenichanCollecen.get(name).getSimulationDetails();
         }
-        return cuurentSimuletion.getSimulationDetails();
+    }
+
+    public DTOSimulationsDetails getSimulationsDetails(){
+        DTOSimulationsDetails simulationsDetails = new DTOSimulationsDetails();
+        synchronized (worldDifenichanCollecen){
+            worldDifenichanCollecen.entrySet().stream().forEach(entry -> simulationsDetails.addSimulationDetails(entry.getKey(), entry.getValue().getSimulationDetails()));
+        }
+        return simulationsDetails;
+    }
+
+    public DTORunningSimulationDetails getRunningSimulationDTO(Integer id){
+        synchronized (simStatus.get(id)){
+            return simStatus.get(id).getWorld().getRunningSimulationDTO();
+        }
+    }
+
+    public Boolean isSimulationRunning(Integer id){
+        synchronized (simStatus.get(id)){
+            return simStatus.get(id).getStatus().equals(Status.RUNNING);
+        }
     }
 
     public List<DTOEnvironmentVariables> getEnvironmentDetails(){ return cuurentSimuletion.getEnvironmentDetails();}
