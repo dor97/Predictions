@@ -40,29 +40,6 @@ public class propertyDifenichan implements Serializable {
 
     }
 
-    public propertyDifenichan(propertyDifenichan p) throws InvalidValue{
-        m_name = p.getName();
-        m_type =p.getType();
-        if(p.haveRange()) {
-            haveRange = true;
-            m_lowRange = p.getLowRange();
-            m_highRang = p.getHighRange();
-            if(m_highRang < m_lowRange){
-                throw new InvalidValue("In property " + m_name + " the value in 'to' is bigger than the one in 'from'.");
-            }
-        }
-        m_randomlyIneceat = p.isRandom();
-        if(m_randomlyIneceat == true){
-            return;
-        }
-        m_init = new expression();
-        m_init.convertValueInString(p.getInit().getValue().toString());
-        if(m_type != m_init.getType() && (!(m_type == expressionType.FLOAT && m_init.getType() == expressionType.INT))){
-            throw new InvalidValue("In property " + m_name + " got a wrong type value");
-        }
-
-    }
-
     public expressionType getType(){
         return m_type;
     }

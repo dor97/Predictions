@@ -37,23 +37,6 @@ public class EntityDifenichan implements Serializable {
         }
     }
 
-    public EntityDifenichan(EntityDifenichan e){
-        m_name = e.getName();
-        //m_amount = e.getPRDPopulation();
-        m_amount = e.getAmount();
-        m_propertys = new HashMap<>();
-        for(propertyDifenichan p : e.getPropertys().values()){
-            if(m_propertys.containsKey(p.getName())){
-                throw new allReadyExistsException("property varuble " + p.getName() + " all ready exists in entity" + e.getName());
-            }
-            try {
-                m_propertys.put(p.getName(), new propertyDifenichan(p));
-            }catch (InvalidValue invalidValue){
-                throw new InvalidValue(invalidValue.getMessage() + ". referred in entity " + m_name);
-            }
-        }
-    }
-
     public void addProperty(propertyDifenichan propertyToAdd){
         m_propertys.put(propertyToAdd.getName(), propertyToAdd);
     }

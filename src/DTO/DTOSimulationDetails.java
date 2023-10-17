@@ -15,11 +15,7 @@ public class DTOSimulationDetails extends DTOSimulationDetailsItem{
 
     private List<DTOEnvironmentVariables> environmentVariables = new ArrayList<>();
     private DTOGrid gridSize = new DTOGrid();
-    private String name = "world";
 
-    public void setName(String name){
-        this.name = name;
-    }
 
     public DTOGrid getGridSize(){
         return gridSize;
@@ -63,6 +59,6 @@ public class DTOSimulationDetails extends DTOSimulationDetailsItem{
 
     @Override
     public String toString(){
-        return name;
+        return "world";
     }
 }

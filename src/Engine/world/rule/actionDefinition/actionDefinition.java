@@ -1,27 +1,26 @@
 package Engine.world.rule.actionDefinition;
 
 import Engine.generated.PRDAction;
+import Engine.utilites.Utilites;
 import Engine.world.expression.expression;
 import Engine.world.expression.expressionType;
 import Engine.world.rule.action.single;
 
 public class actionDefinition{
-    private boolean isSecondaryAll = false;
-    private int countForSecondaryEntities = 0;
-    private String m_secondaryEntity = "";
-    private single condition = null;
-    private String m_ruleName;
-    private String actionName = "";
+    private String actionName;
     private String entityName;
-    private String targetEntity;
-    protected int m_currTick = 0;
+    private String m_ruleName;
+    private String m_secondaryEntity;
+    private Integer countForSecondaryEntities;
+    private Boolean isSecondaryAll;
+    private setDefinition condition;
+
 
     public actionDefinition(PRDAction action, String ruleName){
         actionName = action.getType();
         entityName = action.getEntity();
         if(actionName.equals("proximity")){
             entityName = action.getPRDBetween().getSourceEntity();
-            targetEntity = action.getPRDBetween().getTargetEntity();
         } else if (actionName.equals("replace")) {
             entityName = action.getKill();
         }

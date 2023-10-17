@@ -30,26 +30,6 @@ public class action implements ActionInterface, Serializable {
     protected int m_currTick = 0;
 
     public action(){}
-    public action(ActionInterface action, Utilites util, String ruleName){
-        actionName = action.getType();
-        entityName = action.getEntity();
-//        if(actionName.equals("proximity")){
-//            entityName = action.getPRDBetween().getSourceEntity();
-//            //targetEntity = action.getPRDBetween().getTargetEntity();
-//        } else if (actionName.equals("replace")) {
-//            entityName = action.getKill();
-//        }
-        m_ruleName = ruleName;
-        m_util = util;
-        if(action.getCountForSecondaryEntities() != 0){
-            m_secondaryEntity = action.getSecondaryName();
-            expression temp = new expression();
-            countForSecondaryEntities = action.getCountForSecondaryEntities();
-            if(action.getCondition() != null){
-                condition = new single(action.getCondition(), util);
-            }
-        }
-    }
     public action(PRDAction action, Utilites util, String ruleName){
         actionName = action.getType();
         entityName = action.getEntity();
@@ -77,19 +57,6 @@ public class action implements ActionInterface, Serializable {
             }
         }
     }
-
-    public action clone(Utilites util, String ruleName){
-        return new action(this, util, ruleName);
-    }
-    @Override
-    public String getType(){
-        return actionName;
-    }
-    @Override
-    public String getEntity(){
-        return entityName;
-    }
-
     @Override
     public String getEntityName() {
         return entityName;

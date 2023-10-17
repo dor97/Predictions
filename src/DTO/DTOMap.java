@@ -1,6 +1,7 @@
 package DTO;
 
 import Engine.InvalidValue;
+import Engine.world.map;
 import Engine.world.space;
 
 public class DTOMap {

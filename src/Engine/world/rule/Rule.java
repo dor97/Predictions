@@ -2,6 +2,7 @@ package Engine.world.rule;
 
 import DTO.DTORuleData;
 import Engine.utilites.Utilites;
+import Engine.world.entity.Entity;
 import Engine.generated.PRDAction;
 import Engine.generated.PRDRule;
 import Engine.world.rule.action.*;
@@ -26,35 +27,6 @@ public class Rule implements Serializable {
         m_actions = new ArrayList<>();
         random = new Random();
     }
-
-    public Rule(Rule rule, Utilites util) throws InvalidValue {
-        m_name = rule.getName();
-        m_ticks = rule.getTicks();
-        m_probability = rule.getProbability();
-        random = new Random();
-        m_actions = new ArrayList<>();
-        actionFactory factory = new actionFactory();
-
-        for(ActionInterface action : rule.getActions()){
-            try {
-                m_actions.add(action.clone(util, m_name));
-            }
-            catch (OBJECT_NOT_EXIST e){
-                throw new OBJECT_NOT_EXIST(e.getMessage() + " referred to in rule " + m_name);
-            }
-            catch (ArithmeticException e){
-                throw new ArithmeticException(e.getMessage() + " referred to in rule " + m_name);
-            }
-            catch (InvalidValue e){
-                throw new InvalidValue(e.getMessage() + " referred to in rule " + m_name);
-            }
-            //catch (Exception e){
-            //    throw new Exception(e.getMessage() + " referred to in rule " + m_name);
-            //}
-
-        }
-    }
-
 
     public Rule(PRDRule rule, Utilites util) throws InvalidValue {
         m_name = rule.getName();
@@ -91,22 +63,6 @@ public class Rule implements Serializable {
             //}
 
         }
-    }
-
-    public Rule clone(Utilites util){
-        return new Rule(this, util);
-    }
-
-    public List<ActionInterface> getActions(){
-        return m_actions;
-    }
-
-    public Integer getTicks(){
-        return m_ticks;
-    }
-
-    public String getName(){
-        return m_name;
     }
 
     public ActionInterface getAction(String Action){

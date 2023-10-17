@@ -42,7 +42,7 @@ public class TreeViewController implements Initializable {
             pathToSimulation = absolutePath;
 
         }
-        DTOSimulationDetails details = engine.getSimulationDetails("USER");
+        DTOSimulationDetails details = engine.getSimulationDetails();
         TreeItem<DTOSimulationDetailsItem> rootItem = new TreeItem<>(details);
         TreeItem<DTOSimulationDetailsItem> entityItem = new TreeItem<>(new DTOSimulationDetailsItem("Entities"));
         TreeItem<DTOSimulationDetailsItem> ruleItem = new TreeItem<>(new DTOSimulationDetailsItem("Rules"));

@@ -31,36 +31,6 @@ public class multiple implements subCondition, Serializable {
             }
         }
     }
-
-    public multiple(multiple condition, Utilites util) throws InvalidValue {
-        m_conditions = new ArrayList<>();
-        m_logical = condition.getLogical();
-
-        for(subCondition subCondition : condition.getConditions()){
-            if(subCondition.getSingularity().equals("multiple")){
-                m_conditions.add(subCondition.clone(util));
-            } else if (subCondition.getSingularity().equals("single")) {
-                m_conditions.add(subCondition.clone(util));
-            }
-        }
-    }
-
-    public subCondition clone(Utilites util){
-        return new multiple(this, util);
-    }
-
-    public String getSingularity(){
-        return "multiple";
-    }
-
-    public List<subCondition> getConditions(){
-        return m_conditions;
-    }
-
-    public logicalOp getLogical(){
-        return m_logical;
-    }
-
     @Override
     public boolean getBoolValue(Entity entity, int currTick)throws InvalidValue{
         if(m_logical == logicalOp.AND){

@@ -2,7 +2,6 @@ package Engine.world.rule.action;
 
 import DTO.DTOActionData;
 import Engine.InvalidValue;
-import Engine.utilites.Utilites;
 import Engine.world.entity.Entity;
 import Engine.world.entity.property.PropertyInterface;
 
@@ -24,8 +23,4 @@ public interface ActionInterface {
     public String getSecondaryName();
     public single getCondition();
     public DTOActionData makeActionDto();
-
-    public action clone(Utilites util, String ruleName);
-    public String getType();
-    public String getEntity();
 }

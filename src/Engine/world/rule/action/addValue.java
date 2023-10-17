@@ -1,6 +1,7 @@
 package Engine.world.rule.action;
 
 import DTO.DTOActionData;
+import DTO.DTORuleData;
 import Engine.utilites.Utilites;
 import Engine.world.entity.Entity;
 import Engine.generated.PRDAction;
@@ -46,43 +47,6 @@ public class addValue extends action implements Serializable {  //increase or de
         //getActionName() = action.getType();
         m_util = util;
         cheackUserInput();
-    }
-
-    public addValue(addValue action, Utilites util, String ruleName) throws InvalidValue {
-        super(action, util, ruleName);
-        m_by = new expressionWithFunc(util);
-        try {
-            m_by.convertValueInString(action.getBy());
-        }
-        catch (InvalidValue e){
-            throw new InvalidValue(e.getMessage() + ". In action " + action.getType());
-        }
-        m_entityName = action.getEntity();
-        m_propertyName = action.getProperty();
-        sign = action.getType().equals("increase") ? 1 : -1;
-        //getActionName() = action.getType();
-        m_util = util;
-        cheackUserInput();
-    }
-    @Override
-    public action clone(Utilites util, String ruleName){
-        return new addValue(this, util, ruleName);
-    }
-
-    public String getBy(){
-        return m_by.getValue().toString();
-    }
-
-    public String getType(){
-        return sign == 1 ? "increase" : "decrease";
-    }
-
-    public String getEntity(){
-        return m_entityName;
-    }
-
-    public String getProperty(){
-        return m_propertyName;
     }
 
     private void cheackUserInput() throws InvalidValue{
@@ -150,13 +114,13 @@ public class addValue extends action implements Serializable {  //increase or de
 
     private void checkEntityAndPropertyExist(){
         if(!m_util.isEntityDifenichanExists(m_entityName)){
-            throw new OBJECT_NOT_EXIST("In action " + getActionName() + " the entity " + m_entityName + " does not exist.");
+            throw new OBJECT_NOT_EXIST("In action " + getActionName() + " the entity " + m_entity + " does not exist.");
         }
         if(getCountForSecondaryEntities() != 0 && !m_util.isEntityDifenichanExists(getSecondaryName())){
             throw new OBJECT_NOT_EXIST("In action " + getActionName() + " the entity " + getSecondaryName() + " does not exist.");
         }
         if(!m_util.getEntityDifenichan(m_entityName).getPropertys().containsKey(m_propertyName)){
-            throw new OBJECT_NOT_EXIST("In action " + getActionName() + " the property " + m_entityName + " of entity " + m_entity +" does not exist.");
+            throw new OBJECT_NOT_EXIST("In action " + getActionName() + " the property " + m_propertyName + " of entity " + m_entity +" does not exist.");
         }
     }
 

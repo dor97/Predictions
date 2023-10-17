@@ -4,6 +4,7 @@ import DTO.DTOActionData;
 import Engine.utilites.Utilites;
 import Engine.world.entity.Entity;
 import Engine.generated.PRDAction;
+import Engine.world.expression.expression;
 import Engine.world.expression.expressionType;
 import Engine.world.expression.expressionWithFunc;
 import Engine.InvalidValue;
@@ -34,37 +35,6 @@ public class set extends action implements Serializable {
         }
         m_util = util;
         cheackUserInput();
-    }
-
-    public set(set action, Utilites util, String ruleName) throws InvalidValue{
-        super(action, util, ruleName);
-        m_value = new expressionWithFunc(util);
-        m_entityName = action.getEntity();
-        m_propertyName = action.getProperty();
-        //actionName = action.getType();
-        try {
-            m_value.convertValueInString(action.getValue());
-        }catch (InvalidValue e){
-            throw new InvalidValue(e.getMessage() + ". In action " + getActionName());
-        }
-        m_util = util;
-        cheackUserInput();
-    }
-
-    public set clone(Utilites util, String ruleName){
-        return new set(this, util, ruleName);
-    }
-
-    public String getValue(){
-        return m_value.getValue().toString();
-    }
-    @Override
-    public String getEntity(){
-        return m_entityName;
-    }
-
-    public String getProperty(){
-        return m_propertyName;
     }
 
     private void cheackUserInput() throws InvalidValue {
